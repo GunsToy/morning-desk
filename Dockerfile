@@ -2,20 +2,19 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-COPY package.json package-lock.json* ./
-RUN npm install --omit=dev && npm cache clean --force
+# Install production dependencies only
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev && npm cache clean --force
 
+# App source
 COPY server.mjs ./
 COPY public ./public
 COPY config.example.json ./config.example.json
 COPY docker-entrypoint.sh ./docker-entrypoint.sh
+RUN chmod +x /app/docker-entrypoint.sh
 
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001 && \
-    chmod +x /app/docker-entrypoint.sh && \
-    chown -R nodejs:nodejs /app
-
-USER nodejs
+# Run as root so the mounted config.json stays writable.
+# (Homelab dashboard; the volume is typically owned by root on the host.)
 
 ENV NODE_ENV=production \
     PORT=4123 \
