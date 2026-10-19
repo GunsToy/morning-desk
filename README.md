@@ -22,11 +22,16 @@ Dashboard: `http://<host>:4123`
 Run on the Proxmox host as root. It takes the next free CTID, downloads the Debian 12 template if needed, installs Docker and Morning Desk, and copies the Proxmox root password into the container.
 
 ```bash
-curl -fsSL -o install-proxmox.sh https://raw.githubusercontent.com/GunsToy/morning-desk/main/install-proxmox.sh
-bash install-proxmox.sh
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/GunsToy/morning-desk/main/install-proxmox.sh)"
 ```
 
 When asked for an IP, enter a static address with a prefix (`192.168.0.50/24`) or leave it blank for DHCP.
+
+The repo is private, so this curl only works if the repository is public or you pass a token:
+
+```bash
+bash -c "$(curl -fsSL -H 'Authorization: Bearer YOUR_TOKEN' https://raw.githubusercontent.com/GunsToy/morning-desk/main/install-proxmox.sh)"
+```
 
 ## Install inside an existing container
 
