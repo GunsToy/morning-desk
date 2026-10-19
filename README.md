@@ -27,12 +27,6 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/GunsToy/morning-desk/mai
 
 When asked for an IP, enter a static address with a prefix (`192.168.0.50/24`) or leave it blank for DHCP.
 
-The repo is private, so this curl only works if the repository is public or you pass a token:
-
-```bash
-bash -c "$(curl -fsSL -H 'Authorization: Bearer YOUR_TOKEN' https://raw.githubusercontent.com/GunsToy/morning-desk/main/install-proxmox.sh)"
-```
-
 ## Install inside an existing container
 
 ```bash
