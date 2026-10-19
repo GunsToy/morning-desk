@@ -25,8 +25,9 @@ MEMORY="${MEMORY:-512}"
 CORES="${CORES:-1}"
 DISK_GB="${DISK_GB:-8}"
 BRIDGE="${BRIDGE:-vmbr0}"
-TEMPLATE_STORAGE="${TEMPLATE_STORAGE:-local}"
-ROOTFS_STORAGE="${ROOTFS_STORAGE:-local-lvm}"
+# Set TEMPLATE_STORAGE / ROOTFS_STORAGE to skip the prompts
+TEMPLATE_STORAGE="${TEMPLATE_STORAGE:-}"
+ROOTFS_STORAGE="${ROOTFS_STORAGE:-}"
 REPO="${REPO:-https://github.com/GunsToy/morning-desk.git}"
 TEMPLATE_NAME="debian-12-standard_12.7-1_amd64.tar.zst"
 
@@ -42,6 +43,46 @@ next_ctid() {
     id=$((id + 1))
   done
   echo "$id"
+}
+
+list_storages() {
+  local content="$1"
+  # pvesm status -content <type> prints storage rows (skip header)
+  pvesm status -content "$content" 2>/dev/null | awk 'NR>1 {print $1}'
+}
+
+select_storage() {
+  local content="$1"
+  local prompt="$2"
+  local current="$3"
+  if [ -n "$current" ]; then
+    echo "$current"
+    return
+  fi
+  local -a stores=()
+  while IFS= read -r line; do
+    [ -n "$line" ] && stores+=("$line")
+  done < <(list_storages "$content")
+  if [ "${#stores[@]}" -eq 0 ]; then
+    echo "No storage with content type '$content' found." >&2
+    exit 1
+  fi
+  echo >&2
+  echo "$prompt" >&2
+  local i=1
+  for s in "${stores[@]}"; do
+    printf '  %d) %s\n' "$i" "$s" >&2
+    i=$((i + 1))
+  done
+  local choice
+  while true; do
+    read -r -p "Choice [1-${#stores[@]}]: " choice
+    if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le "${#stores[@]}" ]; then
+      echo "${stores[$((choice - 1))]}"
+      return
+    fi
+    echo "Invalid choice." >&2
+  done
 }
 
 ensure_template() {
@@ -141,6 +182,10 @@ copy_root_password() {
 
 CTID="$(next_ctid)"
 log "Next CTID: $CTID"
+TEMPLATE_STORAGE="$(select_storage vztmpl \"Template storage (where CT templates are stored):\" \"$TEMPLATE_STORAGE\")"
+ROOTFS_STORAGE="$(select_storage rootdir \"Root disk storage (where the container disk will live):\" \"$ROOTFS_STORAGE\")"
+log "Template storage: $TEMPLATE_STORAGE"
+log "Rootfs storage:   $ROOTFS_STORAGE"
 prompt_ip
 
 if pct status "$CTID" >/dev/null 2>&1; then
@@ -206,7 +251,7 @@ pct exec "$CTID" -- bash -lc "
   ./install-update-timer.sh
 "
 
-IP_SHOW="$(pct exec "$CTID" -- hostname -I 2>/dev/null | awk '{print $1}')"
+IP_SHOW="$(pct exec \"$CTID\" -- hostname -I 2>/dev/null | awk '{print $1}')"
 echo
 log "Morning Desk container $CTID is up"
 echo "  Hostname: $HOSTNAME"
