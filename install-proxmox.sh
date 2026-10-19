@@ -47,24 +47,26 @@ next_ctid() {
 ensure_template() {
   local dir="/var/lib/vz/template/cache"
   mkdir -p "$dir"
-  if [ -f "$dir/$TEMPLATE_NAME" ]; then
-    echo "$dir/$TEMPLATE_NAME"
-    return
+  local name="$TEMPLATE_NAME"
+  if [ ! -f "$dir/$name" ]; then
+    log "Downloading Debian 12 template"
+    pveam update >/dev/null 2>&1 || true
+    if pveam available --section system 2>/dev/null | grep -q 'debian-12-standard'; then
+      local avail
+      avail="$(pveam available --section system | awk '/debian-12-standard/ {print $2; exit}')"
+      pveam download "$TEMPLATE_STORAGE" "$avail"
+      name="$(basename "$avail")"
+    else
+      echo "Debian 12 template not in $dir."
+      echo "Download one with:"
+      echo "  pveam update && pveam available | grep debian-12"
+      echo "  pveam download local debian-12-standard_12.7-1_amd64.tar.zst"
+      exit 1
+    fi
   fi
-  log "Downloading Debian 12 template"
-  pveam update >/dev/null 2>&1 || true
-  if pveam available --section system 2>/dev/null | grep -q 'debian-12-standard'; then
-    local avail
-    avail="$(pveam available --section system | awk '/debian-12-standard/ {print $2; exit}')"
-    pveam download "$TEMPLATE_STORAGE" "$avail"
-    echo "$dir/$(basename "$avail")"
-    return
-  fi
-  echo "Debian 12 template not in $dir."
-  echo "Download one with:"
-  echo "  pveam update && pveam available | grep debian-12"
-  echo "  pveam download local debian-12-standard_12.7-1_amd64.tar.zst"
-  exit 1
+  # Proxmox wants storage:vztmpl/filename. Absolute paths are rejected
+  # (ostemplate max 255 chars) and are not the correct form.
+  echo "${TEMPLATE_STORAGE}:vztmpl/${name}"
 }
 
 prompt_ip() {
@@ -99,11 +101,12 @@ prompt_ip() {
 copy_root_password() {
   local ctid="$1"
   local hash
-  hash="$(awk -F: '$1=="root" {print $2}' /etc/shadow)"
+  hash="$(awk -F: '$1==\"root\" {print $2}' /etc/shadow)"
   if [ -z "$hash" ] || [ "$hash" = "*" ] || [ "$hash" = "!" ]; then
     echo "Could not read the Proxmox root password hash from /etc/shadow."
     exit 1
   fi
+  # Hash contains $, so send it as a file rather than a shell argument.
   local tmp
   tmp="$(mktemp)"
   printf '%s' "$hash" > "$tmp"
@@ -138,6 +141,7 @@ pct create "$CTID" "$TEMPLATE" \
 
 log "Starting container"
 pct start "$CTID"
+# Wait until the guest answers.
 for _ in $(seq 1 30); do
   if pct exec "$CTID" -- true >/dev/null 2>&1; then
     break
