@@ -2,17 +2,14 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Install production dependencies only
-COPY package.json package-lock.json ./
-RUN npm ci --omit=dev && npm cache clean --force
+COPY package.json package-lock.json* ./
+RUN npm install --omit=dev && npm cache clean --force
 
-# App source
 COPY server.mjs ./
 COPY public ./public
 COPY config.example.json ./config.example.json
 COPY docker-entrypoint.sh ./docker-entrypoint.sh
 
-# Non-root user
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001 && \
     chmod +x /app/docker-entrypoint.sh && \
