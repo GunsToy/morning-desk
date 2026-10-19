@@ -109,27 +109,8 @@
           </div>
         </div>
       </article>
-      <div class="col-stack col-right">
-      <article class="panel cnn-panel">
-        <div class="panel-heading">
-          <div>
-            <p class="eyebrow section-label">WORLD NEWS</p>
-            <h2 class="section-title">CNN</h2>
-          </div>
-          <a href="https://www.cnn.com" target="_blank" rel="noreferrer" class="source-link">OPEN ↗</a>
-        </div>
-        <div class="news-list" id="cnn-list"><p class="loading">Loading latest stories…</p></div>
-      </article>
-      <article class="panel news-panel">
-        <div class="panel-heading">
-          <div>
-            <p class="eyebrow section-label">SOUTH AFRICA</p>
-            <h2 class="section-title">Daily Maverick</h2>
-          </div>
-          <a href="https://www.dailymaverick.co.za" target="_blank" rel="noreferrer" class="source-link">OPEN ↗</a>
-        </div>
-        <div class="news-list" id="news-list"><p class="loading">Loading latest stories…</p></div>
-      </article>
+      <div class="col-stack col-right" id="news-stack">
+        <article class="panel"><p class="loading">Loading news…</p></article>
       </div>
     </section>
   </main>
@@ -143,33 +124,26 @@
       <p class="settings-status" id="settings-status">Growatt: checking…</p>
       <fieldset class="settings-section">
         <legend>Growatt</legend>
-        <label>OpenAPI address
-          <input name="growattServer" type="url" value="https://openapi.growatt.com/v1" required>
-        </label>
-        <label>API token
-          <input name="growattApiToken" type="password" placeholder="Paste your OpenAPI token" autocomplete="off">
-        </label>
+        <label>OpenAPI address<input name="growattServer" type="url" value="https://openapi.growatt.com/v1" required></label>
+        <label>API token<input name="growattApiToken" type="password" placeholder="Paste your OpenAPI token" autocomplete="off"></label>
       </fieldset>
       <fieldset class="settings-section">
         <legend>Location</legend>
-        <label>Name
-          <input name="locationName" required placeholder="Erasmuskloof">
-        </label>
+        <label>Name<input name="locationName" required placeholder="Erasmuskloof"></label>
         <div class="coordinate-row">
-          <label>Latitude
-            <input name="latitude" type="number" step="any" required>
-          </label>
-          <label>Longitude
-            <input name="longitude" type="number" step="any" required>
-          </label>
+          <label>Latitude<input name="latitude" type="number" step="any" required></label>
+          <label>Longitude<input name="longitude" type="number" step="any" required></label>
         </div>
-        <label>Timezone
-          <input name="timezone" value="Africa/Johannesburg" required>
-        </label>
+        <label>Timezone<input name="timezone" value="Africa/Johannesburg" required></label>
+      </fieldset>
+      <fieldset class="settings-section">
+        <legend>News channels</legend>
+        <p class="dialog-intro">Tick the public RSS feeds to show. Panels appear in this order.</p>
+        <div id="news-picker" class="news-picker"></div>
       </fieldset>
       <div class="dialog-actions">
-        <button type="button" value="cancel" class="secondary" id="settings-cancel">Cancel</button>
-        <button type="submit" id="save-settings" value="default">Save settings</button>
+        <button type="button" class="secondary" id="settings-cancel">Cancel</button>
+        <button type="submit" id="save-settings">Save settings</button>
       </div>
     </form>
   </dialog>
