@@ -186,6 +186,15 @@
 .settings-section legend { padding: 0 6px; font-family: 'DM Mono', monospace; font-size: .68rem; letter-spacing: .12em; color: var(--lime); }
 .settings-status { margin: 0 0 4px; font-family: 'DM Mono', monospace; font-size: .72rem; color: var(--coral); }
 .settings-status.ok { color: #a5e2ad; }
+dialog {
+  background: #111925;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 0;
+  max-width: 500px;
+  width: calc(100% - 36px);
+}
 dialog::backdrop { background:rgba(0,0,0,.68);backdrop-filter:blur(3px); }dialog form { padding:27px; } .dialog-heading button { font-size:1.5rem;color:var(--muted);background:transparent;border:0;cursor:pointer; }.dialog-intro { color:var(--muted);font-size:.8rem;line-height:1.5;margin:17px 0; }.dialog-intro code { color:var(--cyan); }label { display:grid;gap:7px;font-size:.76rem;margin:12px 0;color:#c3cbd7;} input { color:var(--ink);background:#0a1018;border:1px solid var(--line);border-radius:7px;padding:10px;font:inherit; }.coordinate-row { display:grid;grid-template-columns:1fr 1fr;gap:13px;}.dialog-actions { margin-top:22px;gap:10px;justify-content:flex-end; }.dialog-actions button { padding:10px 14px;border:0;border-radius:7px;background:var(--lime);font-weight:800;cursor:pointer; }.dialog-actions .secondary {background:#263141;color:var(--ink);}
 
 html { -webkit-text-size-adjust: 100%; }
