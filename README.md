@@ -21,27 +21,22 @@ Docker (or Docker Engine + Compose plugin) must be installed in the container.
 
 ## Install
 
+This starts the dashboard and installs the daily auto-update (checks GitHub at 04:15, pulls and rebuilds only when `main` changed, leaves `config.json` alone).
+
 ```bash
 git clone https://github.com/GunsToy/morning-desk.git
 cd morning-desk
 cp config.example.json config.json
 nano config.json
-docker compose up -d --build
+chmod +x install.sh update.sh install-update-timer.sh
+./install.sh
 ```
 
-## Auto-update
+`install.sh` runs `docker compose up -d --build` and then `install-update-timer.sh`.
 
-`update.sh` checks GitHub and, only if `main` has new commits, pulls and rebuilds the container. `config.json` is left alone.
-
-Run once by hand:
+Check the timer later:
 
 ```bash
-./update.sh
-```
-
-Install a daily check at 04:15 (as root, from the clone):
-
-```bash
-chmod +x update.sh install-update-timer.sh
-./install-update-timer.sh
+systemctl status morning-desk-update.timer
+journalctl -u morning-desk-update.service
 ```
