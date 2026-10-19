@@ -171,9 +171,8 @@ $('#settings-button').addEventListener('click', () => {
 });
 $('#settings-close').addEventListener('click', () => dialog.close());
 $('#settings-cancel').addEventListener('click', () => dialog.close());
-$('#settings-form').addEventListener('submit', async event => {
-  event.preventDefault();
-  const form = event.currentTarget;
+async function saveSettings() {
+  const form = $('#settings-form');
   const status = $('#settings-status');
   const payload = {
     location: {
@@ -188,6 +187,8 @@ $('#settings-form').addEventListener('submit', async event => {
     },
     news: selectedNews()
   };
+  status.textContent = 'Saving…';
+  status.classList.remove('ok');
   try {
     const res = await fetch('/api/config', {
       method: 'PUT',
@@ -196,8 +197,7 @@ $('#settings-form').addEventListener('submit', async event => {
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      status.textContent = err.error || 'Save failed';
-      status.classList.remove('ok');
+      status.textContent = err.error || `Save failed (${res.status})`;
       return;
     }
     status.textContent = 'Saved';
@@ -206,8 +206,15 @@ $('#settings-form').addEventListener('submit', async event => {
     await loadAll({ includeSky: false });
   } catch (error) {
     status.textContent = 'Save failed: ' + error.message;
-    status.classList.remove('ok');
   }
+}
+$('#settings-form').addEventListener('submit', event => {
+  event.preventDefault();
+  saveSettings();
+});
+$('#save-settings').addEventListener('click', event => {
+  event.preventDefault();
+  saveSettings();
 });
 document.querySelectorAll('[data-refresh]').forEach(button => button.addEventListener('click', () => button.dataset.refresh === 'weather' ? loadWeather() : loadSolar()));
 updateClock();
