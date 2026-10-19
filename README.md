@@ -4,11 +4,11 @@ Local dashboard: Growatt solar, weather, Sky News live, Daily Maverick and CNN.
 
 ## Docker (Proxmox LXC or any host)
 
-```bash
+git clone https://github.com/GunsToy/morning-desk.git
+cd morning-desk
 cp config.example.json config.json
-# edit config.json and paste your Growatt OpenAPI token
+nano config.json
 docker compose up -d --build
-```
 
 Dashboard: `http://<host>:4123`
 
