@@ -12,16 +12,23 @@ Dashboard: `http://<host>:4123`
 |----------|---------|
 | CPU | 1 vCPU |
 | RAM | 512 MB |
-| Disk | 2 GB |
-| OS | Debian 12 or Ubuntu 24.04 |
+| Disk | 8 GB |
+| OS | Debian 12 |
 | Features | Nesting enabled (required for Docker in an LXC) |
 | Ports | 4123/tcp |
 
-Docker (or Docker Engine + Compose plugin) must be installed in the container.
+## Install on Proxmox (creates the container)
 
-## Install
+Run on the Proxmox host as root. It takes the next free CTID, downloads the Debian 12 template if needed, installs Docker and Morning Desk, and copies the Proxmox root password into the container.
 
-Starts the dashboard and installs the daily auto-update (checks GitHub at 04:15, pulls and rebuilds only when `main` changed, leaves `config.json` alone).
+```bash
+curl -fsSL -o install-proxmox.sh https://raw.githubusercontent.com/GunsToy/morning-desk/main/install-proxmox.sh
+bash install-proxmox.sh
+```
+
+When asked for an IP, enter a static address with a prefix (`192.168.0.50/24`) or leave it blank for DHCP.
+
+## Install inside an existing container
 
 ```bash
 git clone https://github.com/GunsToy/morning-desk.git
