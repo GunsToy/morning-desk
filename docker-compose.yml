@@ -1,0 +1,21 @@
+services:
+  morning-desk:
+    build: .
+    image: morning-desk:latest
+    container_name: morning-desk
+    restart: unless-stopped
+    ports:
+      - "4123:4123"
+    environment:
+      - NODE_ENV=production
+      - PORT=4123
+      - HOST=0.0.0.0
+    volumes:
+      # Persist config (Growatt token + location). Create the file first if it does not exist.
+      - ./config.json:/app/config.json
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4123/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
