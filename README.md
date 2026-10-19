@@ -28,3 +28,20 @@ cp config.example.json config.json
 nano config.json
 docker compose up -d --build
 ```
+
+## Auto-update
+
+`update.sh` checks GitHub and, only if `main` has new commits, pulls and rebuilds the container. `config.json` is left alone.
+
+Run once by hand:
+
+```bash
+./update.sh
+```
+
+Install a daily check at 04:15 (as root, from the clone):
+
+```bash
+chmod +x update.sh install-update-timer.sh
+./install-update-timer.sh
+```
