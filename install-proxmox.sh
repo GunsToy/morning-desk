@@ -47,26 +47,50 @@ next_ctid() {
 ensure_template() {
   local dir="/var/lib/vz/template/cache"
   mkdir -p "$dir"
-  local name="$TEMPLATE_NAME"
-  if [ ! -f "$dir/$name" ]; then
+
+  # Prefer a known short name if it already exists.
+  local name=""
+  if [ -f "$dir/$TEMPLATE_NAME" ]; then
+    name="$TEMPLATE_NAME"
+  else
+    # Pick the newest debian-12-standard already on disk.
+    local found
+    found="$(ls -1t "$dir"/debian-12-standard_*.tar.zst 2>/dev/null | head -1 || true)"
+    if [ -n "$found" ]; then
+      name="$(basename "$found")"
+    fi
+  fi
+
+  if [ -z "$name" ]; then
     log "Downloading Debian 12 template"
     pveam update >/dev/null 2>&1 || true
-    if pveam available --section system 2>/dev/null | grep -q 'debian-12-standard'; then
-      local avail
-      avail="$(pveam available --section system | awk '/debian-12-standard/ {print $2; exit}')"
-      pveam download "$TEMPLATE_STORAGE" "$avail"
-      name="$(basename "$avail")"
-    else
-      echo "Debian 12 template not in $dir."
+    local avail
+    # pveam available prints: section  filename
+    avail="$(pveam available --section system 2>/dev/null | awk '/debian-12-standard/ {print $2; exit}')"
+    if [ -z "$avail" ]; then
+      echo "No debian-12-standard template available."
       echo "Download one with:"
-      echo "  pveam update && pveam available | grep debian-12"
+      echo "  pveam update && pveam available --section system | grep debian-12"
       echo "  pveam download local debian-12-standard_12.7-1_amd64.tar.zst"
       exit 1
     fi
+    # Strip any path prefix; we only want the filename.
+    name="$(basename "$avail")"
+    pveam download "$TEMPLATE_STORAGE" "$name"
   fi
-  # Proxmox wants storage:vztmpl/filename. Absolute paths are rejected
-  # (ostemplate max 255 chars) and are not the correct form.
-  echo "${TEMPLATE_STORAGE}:vztmpl/${name}"
+
+  # Final form Proxmox expects. Must stay well under 255 characters.
+  local ref="${TEMPLATE_STORAGE}:vztmpl/${name}"
+  if [ "${#ref}" -gt 200 ]; then
+    echo "Template reference is too long (${#ref} chars): $ref"
+    echo "This would be rejected by pct (max 255)."
+    exit 1
+  fi
+  if [ ! -f "$dir/$name" ]; then
+    echo "Template file missing after download: $dir/$name"
+    exit 1
+  fi
+  echo "$ref"
 }
 
 prompt_ip() {
@@ -112,7 +136,7 @@ copy_root_password() {
   printf '%s' "$hash" > "$tmp"
   pct push "$ctid" "$tmp" /tmp/root.hash
   rm -f "$tmp"
-  pct exec "$ctid" -- bash -c 'usermod -p "$(cat /tmp/root.hash)" root && rm -f /tmp/root.hash'
+  pct exec "$ctid" -- bash -c 'usermod -p \"$(cat /tmp/root.hash)\" root && rm -f /tmp/root.hash'
 }
 
 CTID="$(next_ctid)"
@@ -125,7 +149,11 @@ if pct status "$CTID" >/dev/null 2>&1; then
 fi
 
 TEMPLATE="$(ensure_template)"
-log "Using template $TEMPLATE"
+log "Using template $TEMPLATE (${#TEMPLATE} chars)"
+if [ "${#TEMPLATE}" -gt 200 ]; then
+  echo "Refusing to call pct: ostemplate string is too long."
+  exit 1
+fi
 
 log "Creating container $CTID ($HOSTNAME)"
 pct create "$CTID" "$TEMPLATE" \
