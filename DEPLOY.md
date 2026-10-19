@@ -1,25 +1,18 @@
 # Morning Desk — Proxmox container deploy
 
-Clean package for Docker on an LXC (or VM).
-
 ## On the container
 
 ```bash
-cd /root
-tar -xzf morning-desk.tar.gz
+git clone https://github.com/GunsToy/morning-desk.git
 cd morning-desk
 cp config.example.json config.json
-nano config.json          # paste Growatt API token
-docker compose up -d --build
+nano config.json
+chmod +x install.sh update.sh install-update-timer.sh
+./install.sh
 ```
+
+`install.sh` starts the dashboard and installs the daily auto-update.
 
 Dashboard: http://<container-ip>:4123
-
-## Update later
-
-```bash
-cd /root/morning-desk
-docker compose up -d --build
-```
 
 config.json is mounted from the host path, so rebuilds keep your token.
