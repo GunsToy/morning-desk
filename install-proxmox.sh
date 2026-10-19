@@ -1,0 +1,187 @@
+#!/bin/bash
+# Morning Desk — create a Proxmox LXC and install it.
+# Run on the Proxmox host as root:
+#   bash install-proxmox.sh
+#
+# - next free CTID
+# - static IP, or blank for DHCP
+# - container root password copied from the Proxmox host root hash
+# - Docker + Morning Desk + daily auto-update
+
+set -euo pipefail
+
+if [ "$(id -u)" -ne 0 ]; then
+  echo "Run as root on the Proxmox host."
+  exit 1
+fi
+
+if ! command -v pct >/dev/null 2>&1; then
+  echo "pct not found. This script must run on a Proxmox host."
+  exit 1
+fi
+
+HOSTNAME="${HOSTNAME_CT:-morningdesk}"
+MEMORY="${MEMORY:-512}"
+CORES="${CORES:-1}"
+DISK_GB="${DISK_GB:-8}"
+BRIDGE="${BRIDGE:-vmbr0}"
+TEMPLATE_STORAGE="${TEMPLATE_STORAGE:-local}"
+ROOTFS_STORAGE="${ROOTFS_STORAGE:-local-lvm}"
+REPO="${REPO:-https://github.com/GunsToy/morning-desk.git}"
+TEMPLATE_NAME="debian-12-standard_12.7-1_amd64.tar.zst"
+
+log() { printf '\033[1;36m==>\033[0m %s\n' "$*"; }
+
+next_ctid() {
+  if command -v pvesh >/dev/null 2>&1; then
+    pvesh get /cluster/nextid
+    return
+  fi
+  local id=100
+  while pct status "$id" >/dev/null 2>&1; do
+    id=$((id + 1))
+  done
+  echo "$id"
+}
+
+ensure_template() {
+  local dir="/var/lib/vz/template/cache"
+  mkdir -p "$dir"
+  if [ -f "$dir/$TEMPLATE_NAME" ]; then
+    echo "$dir/$TEMPLATE_NAME"
+    return
+  fi
+  log "Downloading Debian 12 template"
+  pveam update >/dev/null 2>&1 || true
+  if pveam available --section system 2>/dev/null | grep -q 'debian-12-standard'; then
+    local avail
+    avail="$(pveam available --section system | awk '/debian-12-standard/ {print $2; exit}')"
+    pveam download "$TEMPLATE_STORAGE" "$avail"
+    echo "$dir/$(basename "$avail")"
+    return
+  fi
+  echo "Debian 12 template not in $dir."
+  echo "Download one with:"
+  echo "  pveam update && pveam available | grep debian-12"
+  echo "  pveam download local debian-12-standard_12.7-1_amd64.tar.zst"
+  exit 1
+}
+
+prompt_ip() {
+  echo
+  echo "Network on $BRIDGE"
+  echo "Enter a static IP with prefix (example: 192.168.0.50/24)"
+  echo "Leave blank for DHCP."
+  read -r -p "IP: " IP_INPUT
+  IP_INPUT="${IP_INPUT// /}"
+  if [ -z "$IP_INPUT" ]; then
+    NET="name=eth0,bridge=${BRIDGE},ip=dhcp"
+    echo "Using DHCP."
+  else
+    case "$IP_INPUT" in
+      */*) ;;
+      *)
+        echo "Add a prefix, for example ${IP_INPUT}/24"
+        exit 1
+        ;;
+    esac
+    read -r -p "Gateway (example: 192.168.0.1): " GW
+    GW="${GW// /}"
+    if [ -z "$GW" ]; then
+      echo "Gateway is required for a static IP."
+      exit 1
+    fi
+    NET="name=eth0,bridge=${BRIDGE},ip=${IP_INPUT},gw=${GW}"
+    echo "Using static ${IP_INPUT} via ${GW}."
+  fi
+}
+
+copy_root_password() {
+  local ctid="$1"
+  local hash
+  hash="$(awk -F: '$1=="root" {print $2}' /etc/shadow)"
+  if [ -z "$hash" ] || [ "$hash" = "*" ] || [ "$hash" = "!" ]; then
+    echo "Could not read the Proxmox root password hash from /etc/shadow."
+    exit 1
+  fi
+  local tmp
+  tmp="$(mktemp)"
+  printf '%s' "$hash" > "$tmp"
+  pct push "$ctid" "$tmp" /tmp/root.hash
+  rm -f "$tmp"
+  pct exec "$ctid" -- bash -c 'usermod -p "$(cat /tmp/root.hash)" root && rm -f /tmp/root.hash'
+}
+
+CTID="$(next_ctid)"
+log "Next CTID: $CTID"
+prompt_ip
+
+if pct status "$CTID" >/dev/null 2>&1; then
+  echo "CTID $CTID already exists."
+  exit 1
+fi
+
+TEMPLATE="$(ensure_template)"
+log "Using template $TEMPLATE"
+
+log "Creating container $CTID ($HOSTNAME)"
+pct create "$CTID" "$TEMPLATE" \
+  --hostname "$HOSTNAME" \
+  --memory "$MEMORY" \
+  --cores "$CORES" \
+  --rootfs "${ROOTFS_STORAGE}:${DISK_GB}" \
+  --net0 "$NET" \
+  --features nesting=1,keyctl=1 \
+  --unprivileged 1 \
+  --onboot 1 \
+  --start 0
+
+log "Starting container"
+pct start "$CTID"
+for _ in $(seq 1 30); do
+  if pct exec "$CTID" -- true >/dev/null 2>&1; then
+    break
+  fi
+  sleep 2
+done
+
+log "Copying Proxmox root password into the container"
+copy_root_password "$CTID"
+
+log "Installing dependencies inside the container"
+pct exec "$CTID" -- bash -lc '
+  set -euo pipefail
+  export DEBIAN_FRONTEND=noninteractive
+  apt-get update
+  apt-get install -y ca-certificates curl git
+  curl -fsSL https://get.docker.com | sh
+  systemctl enable --now docker || service docker start
+'
+
+log "Cloning Morning Desk and installing"
+pct exec "$CTID" -- bash -lc "
+  set -euo pipefail
+  cd /root
+  if [ ! -d morning-desk/.git ]; then
+    git clone ${REPO} morning-desk
+  fi
+  cd morning-desk
+  if [ ! -f config.json ]; then
+    cp config.example.json config.json
+  fi
+  chmod +x install.sh update.sh install-update-timer.sh
+  docker compose up -d --build
+  ./install-update-timer.sh
+"
+
+IP_SHOW="$(pct exec "$CTID" -- hostname -I 2>/dev/null | awk '{print $1}')"
+echo
+log "Morning Desk container $CTID is up"
+echo "  Hostname: $HOSTNAME"
+echo "  IP:       ${IP_SHOW:-see pct exec $CTID -- hostname -I}"
+echo "  Dashboard: http://${IP_SHOW:-<container-ip>}:4123"
+echo "  Root password: same as Proxmox root"
+echo "  Edit the Growatt token:"
+echo "    pct enter $CTID"
+echo "    nano /root/morning-desk/config.json"
+echo "    cd /root/morning-desk && docker compose up -d --build"
