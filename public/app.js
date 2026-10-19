@@ -46,26 +46,32 @@ async function loadNewsPanels() {
     return `<article class="panel news-panel" data-feed="${id}">
       <div class="panel-heading">
         <div><p class="eyebrow section-label">${feed.region || 'NEWS'}</p><h2 class="section-title">${feed.name}</h2></div>
-        <a href="${feed.site}" target="_blank" rel="noreferrer" class="source-link">OPEN ↗</a>
+        <div class="heading-actions">
+          <button class="refresh" data-refresh="news" data-feed="${id}" aria-label="Refresh ${feed.name}">↻</button>
+          <a href="${feed.site}" target="_blank" rel="noreferrer" class="source-link">OPEN ↗</a>
+        </div>
       </div>
       <div class="news-list" id="news-${id}"><p class="loading">Loading…</p></div>
     </article>`;
   }).join('') || '<article class="panel"><p class="loading">No news channels selected. Open Settings to add some.</p></article>';
 
-  await Promise.all(chosen.map(async id => {
-    const box = $(`#news-${id}`);
-    if (!box) return;
-    try {
-      const res = await fetch(`/api/news?id=${encodeURIComponent(id)}`);
-      const data = await res.json();
-      if (!res.ok) throw Error(data.error);
-      box.innerHTML = data.items.map((item, index) =>
-        `<a class="news-item" href="${item.link}" target="_blank" rel="noreferrer"><span class="news-index">0${index + 1}</span><span>${item.title}</span></a>`
-      ).join('') || '<p class="loading">No stories right now.</p>';
-    } catch {
-      box.innerHTML = '<p class="loading">Could not load this feed.</p>';
-    }
-  }));
+  await Promise.all(chosen.map(id => loadOneNews(id)));
+}
+
+async function loadOneNews(id) {
+  const box = $(`#news-${id}`);
+  if (!box) return;
+  box.innerHTML = '<p class="loading">Loading…</p>';
+  try {
+    const res = await fetch(`/api/news?id=${encodeURIComponent(id)}`);
+    const data = await res.json();
+    if (!res.ok) throw Error(data.error);
+    box.innerHTML = data.items.map((item, index) =>
+      `<a class="news-item" href="${item.link}" target="_blank" rel="noreferrer"><span class="news-index">0${index + 1}</span><span>${item.title}</span></a>`
+    ).join('') || '<p class="loading">No stories right now.</p>';
+  } catch {
+    box.innerHTML = '<p class="loading">Could not load this feed.</p>';
+  }
 }
 async function loadSky() { try { const res = await fetch('/api/sky'); const data = await res.json(); if (!res.ok) throw Error(data.error); $('#sky-video').innerHTML = `<iframe title="Sky News live stream" src="https://www.youtube.com/embed/${data.videoId}?rel=0&autoplay=0&mute=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`; } catch (error) { $('#sky-video').innerHTML = `<div class="stream-message"><strong>Sky News is not live right now.</strong><a href="https://www.youtube.com/@SkyNews/streams" target="_blank" rel="noreferrer">Open Sky News on YouTube ↗</a></div>`; } }
 const flowBadge = (el, watts, active) => {
@@ -216,7 +222,14 @@ $('#save-settings').addEventListener('click', event => {
   event.preventDefault();
   saveSettings();
 });
-document.querySelectorAll('[data-refresh]').forEach(button => button.addEventListener('click', () => button.dataset.refresh === 'weather' ? loadWeather() : loadSolar()));
+document.addEventListener('click', event => {
+  const button = event.target.closest('[data-refresh]');
+  if (!button) return;
+  const kind = button.dataset.refresh;
+  if (kind === 'weather') loadWeather();
+  else if (kind === 'solar') loadSolar();
+  else if (kind === 'news' && button.dataset.feed) loadOneNews(button.dataset.feed);
+});
 updateClock();
 // Sky News only on first load so the live embed is not torn down every 15 minutes
 loadFeeds().then(() => loadAll({ includeSky: true }));
