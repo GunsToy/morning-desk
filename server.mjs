@@ -256,6 +256,8 @@ const NEWS_FEEDS = [
   { id: 'theverge', name: 'The Verge', region: 'Tech', url: 'https://www.theverge.com/rss/index.xml', site: 'https://www.theverge.com' },
   { id: 'wired', name: 'Wired', region: 'Tech', url: 'https://www.wired.com/feed/rss', site: 'https://www.wired.com' },
   { id: 'arstechnica', name: 'Ars Technica', region: 'Tech', url: 'https://feeds.arstechnica.com/arstechnica/index', site: 'https://arstechnica.com' },
+  { id: 'techpowerup', name: 'TechPowerUp', region: 'Tech', url: 'https://www.techpowerup.com/rss/news', site: 'https://www.techpowerup.com' },
+  { id: 'pcgamer', name: 'PC Gamer', region: 'Tech', url: 'https://www.pcgamer.com/rss/', site: 'https://www.pcgamer.com' },
   { id: 'hackernews', name: 'Hacker News', region: 'Tech', url: 'https://news.ycombinator.com/rss', site: 'https://news.ycombinator.com' }
 ];
 const DEFAULT_NEWS = ['daily-maverick', 'bbc'];
