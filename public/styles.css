@@ -182,6 +182,42 @@
 .cnn-panel .panel-heading,.news-panel .panel-heading{align-items:flex-start}
 * { box-sizing:border-box; } body { margin:0; min-height:100vh; color:var(--ink); background:radial-gradient(circle at 83% 10%,#172e3c 0,transparent 24rem),radial-gradient(circle at 8% 100%,#17241c 0,transparent 30rem),var(--page); font-family:Manrope,sans-serif; }.stream-fallback { display:inline-block; margin-top:11px; color:var(--muted); font-size:.73rem; text-decoration:none; }.stream-fallback:hover { color:var(--cyan); }.text-button { color:var(--cyan); background:transparent; border:0; padding:0; font:inherit; cursor:pointer; }.stream-message { height:100%; display:grid; place-content:center; gap:10px; text-align:center; color:var(--muted); font-size:.85rem; }.stream-message strong { color:var(--ink); }.stream-message a { color:var(--cyan); }
 .dashboard { max-width:1420px; margin:auto; padding:42px clamp(20px,4vw,64px) 64px; } header,.panel-heading,.dialog-heading,.header-actions,.weather-now,.energy-grid,.dialog-actions { display:flex; align-items:center; justify-content:space-between; } header { margin-bottom:28px; } h1,h2,p { margin:0; } h1 { font-size:clamp(2rem,4vw,3.3rem); letter-spacing:-.07em; font-weight:800; } h1 span { color:var(--lime); } h2 { font-size:1rem; letter-spacing:-.03em; } .eyebrow,.panel small,.updated,.source-link,.channel-badge,.live-dot { font-family:'DM Mono',monospace; font-size:.68rem; letter-spacing:.13em; } .eyebrow { color:var(--muted); margin-bottom:7px; } .subtitle { color:var(--muted); margin-top:8px; }.header-actions { gap:18px; }.live-dot { color:var(--coral); }.live-dot:before { content:''; display:inline-block; width:7px;height:7px;background:var(--coral);border-radius:50%;margin-right:7px;box-shadow:0 0 12px var(--coral); }.icon-button,.refresh { border:1px solid var(--line); color:var(--ink); background:#131a25; cursor:pointer; }.icon-button { border-radius:50%;width:38px;height:38px;font-size:1.1rem; }.grid { display:grid; grid-template-columns:1fr 1.25fr; }.panel { background:linear-gradient(135deg,rgba(29,39,53,.94),rgba(16,22,32,.94)); border:1px solid var(--line); padding:25px; border-radius:18px; box-shadow:0 20px 60px rgba(0,0,0,.18); overflow:hidden; }.panel-heading { margin-bottom:23px; }.refresh { border-radius:50%;height:29px;width:29px;font-size:1rem; }.solar-panel { min-height:281px; }.solar-state { color:#a5e2ad;font-size:.76rem; }.status-dot { display:inline-block;background:#65d87b;width:7px;height:7px;border-radius:50%;box-shadow:0 0 9px #65d87b;margin-right:7px; }.power-line { border-bottom:1px solid var(--line); margin:25px 0 18px; padding-bottom:18px; }.power-line span { font-size:clamp(2.7rem,5vw,4.5rem); font-weight:800; letter-spacing:-.08em; color:var(--lime); display:block; }.power-line small,.energy-grid small { color:var(--muted); display:block;margin-top:6px; }.energy-grid { justify-content:start;gap:56px; }.energy-grid strong { font-size:1.05rem;display:block;margin-top:6px; }.updated { color:var(--muted); margin-top:24px; letter-spacing:0; }.channel-badge { color:#141a22;background:var(--coral);padding:5px 7px;font-weight:600;border-radius:4px; }.video-wrap { aspect-ratio:16/9; background:#090c10; border-radius:11px; overflow:hidden; }.video-wrap iframe { border:0; width:100%; height:100%; }.weather-now { justify-content:flex-start;gap:16px;border-bottom:1px solid var(--line);padding-bottom:18px; }.weather-icon { font-size:2.35rem;}.weather-now strong { font-size:2.5rem;letter-spacing:-.08em; }.weather-now div { display:grid;gap:3px; }.weather-now small { color:var(--muted); }.forecast { display:grid;grid-template-columns:repeat(5,1fr);gap:7px;padding-top:18px; }.forecast-day { display:grid;gap:6px;font-size:.76rem;color:var(--muted);}.forecast-day span { font-size:1.2rem; }.forecast-day strong { color:var(--ink);font-size:.8rem; }.news-list { display:grid;gap:0; }.news-item { border-top:1px solid var(--line);padding:13px 0; display:flex;gap:12px; text-decoration:none;color:var(--ink);font-size:.86rem;font-weight:600;line-height:1.35; }.news-item:first-child { border-top:0;padding-top:0; }.news-item:hover { color:var(--cyan);}.news-index { color:var(--lime);font-family:'DM Mono',monospace;font-size:.7rem;padding-top:3px; }.source-link { color:var(--cyan);text-decoration:none; }.loading { color:var(--muted);font-size:.85rem; }.settings-open { width: auto; border-radius: 999px; padding: 0 14px; font-size: .78rem; font-weight: 700; letter-spacing: .04em; }
+
+/* News channel picker: checkbox column aligned to a fixed grid */
+.news-picker {
+  display: grid;
+  gap: 2px;
+  margin: 8px 0 4px;
+}
+.picker-region {
+  margin: 14px 0 4px;
+  font-family: 'DM Mono', monospace;
+  font-size: .62rem;
+  letter-spacing: .12em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.picker-region:first-child { margin-top: 4px; }
+.check-row {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 6px 2px;
+  font-size: .84rem;
+  color: var(--ink);
+  cursor: pointer;
+  border-radius: 6px;
+}
+.check-row:hover { background: rgba(255,255,255,.04); }
+.check-row input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  justify-self: start;
+  accent-color: var(--lime);
+}
 .settings-section { border: 1px solid var(--line); border-radius: 12px; margin: 14px 0; padding: 4px 14px 10px; }
 .settings-section legend { padding: 0 6px; font-family: 'DM Mono', monospace; font-size: .68rem; letter-spacing: .12em; color: var(--lime); }
 .settings-status { margin: 0 0 4px; font-family: 'DM Mono', monospace; font-size: .72rem; color: var(--coral); }
