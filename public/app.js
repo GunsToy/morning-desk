@@ -40,7 +40,7 @@ async function loadSolar() {
   if (!data.configured) {
     $('#solar-source').textContent = 'Connect Growatt';
     $('#solar-flow-summary').textContent = '';
-    $('#solar-updated').textContent = 'Use the gear icon to add your Growatt API token.';
+    $('#solar-updated').textContent = 'Use Settings to add your Growatt API token.';
     return;
   }
   if (!res.ok || data.error) {
@@ -48,16 +48,13 @@ async function loadSolar() {
     $('#solar-flow-summary').textContent = '';
     return;
   }
-
   const charging = data.flowBatteryIn || (Number(data.batteryCharge) >= 20 && !(Number(data.battery) >= 20));
   const discharging = data.flowBatteryOut || (Number(data.battery) >= 20);
-
   const feeds = [];
   if (data.flowPv) feeds.push('PV');
   if (data.flowGrid) feeds.push('GRID');
   if (discharging) feeds.push('BATTERY');
   const primaryInput = data.status || (feeds.length ? feeds.join(' + ') : null) || data.activeSource || 'STANDBY';
-
   $('#solar-name').textContent = data.plant;
   $('#solar-pv').textContent = unit(data.pv);
   $('#solar-grid').textContent = unit(data.grid);
@@ -65,24 +62,18 @@ async function loadSolar() {
   $('#solar-source').textContent = primaryInput;
   $('#solar-flow-summary').textContent = data.flowSummary || '';
   $('#solar-mode').textContent = feeds.length ? feeds.join(' + ') : (data.activeSource || 'STANDBY');
-
   const v = data.batteryVoltage;
-  $('#solar-battery-voltage').textContent =
-    v === null || v === undefined || Number.isNaN(Number(v)) ? '—' : `${Number(v).toFixed(1)} V`;
-
+  $('#solar-battery-voltage').textContent = v === null || v === undefined || Number.isNaN(Number(v)) ? '—' : `${Number(v).toFixed(1)} V`;
   const batLabel = charging ? 'Charging Power' : discharging ? 'Discharge Power' : 'Battery Power';
   const batWatts = charging ? data.batteryCharge : discharging ? data.battery : 0;
   $('#solar-battery-power-label').innerHTML = `${batLabel}: <strong id="solar-battery-power">${unit(batWatts)}</strong>`;
-
   flowBadge($('#flow-pv-badge'), data.pv, data.flowPv);
   flowBadge($('#flow-grid-badge'), data.grid, data.flowGrid);
   flowBadge($('#flow-load-badge'), data.consumption, data.flowLoad);
   flowBadge($('#flow-battery-badge'), charging ? data.batteryCharge : data.battery, charging || discharging);
-
   $('#solar-today').textContent = energy(data.today);
   $('#solar-total').textContent = energy(data.total);
   $('#solar-updated').textContent = data.updatedAt ? `UPDATED ${data.updatedAt}` : 'UPDATED JUST NOW';
-
   diagram.dataset.source = (data.activeSource || 'standby').toLowerCase();
   diagram.classList.toggle('flow-pv-on', Boolean(data.flowPv));
   diagram.classList.toggle('flow-grid-on', Boolean(data.flowGrid));
@@ -100,8 +91,45 @@ async function loadAll({ includeSky = false } = {}) {
     console.error(error);
   }
 }
-$('#settings-button').addEventListener('click', () => { const form = $('#settings-form'); form.locationName.value = config.location.name; form.latitude.value = config.location.latitude; form.longitude.value = config.location.longitude; form.growattServer.value = config.growattServer || form.growattServer.value; form.growattApiToken.value = ''; dialog.showModal(); });
-$('#settings-form').addEventListener('submit', async event => { if (event.submitter?.value === 'cancel') return; event.preventDefault(); const form = event.currentTarget; const payload = { location:{ name:form.locationName.value, latitude:Number(form.latitude.value), longitude:Number(form.longitude.value) }, growatt:{ server:form.growattServer.value, apiToken:form.growattApiToken.value } }; await fetch('/api/config',{ method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload) }); dialog.close(); await loadAll({ includeSky: false }); });
+$('#settings-button').addEventListener('click', () => {
+  const form = $('#settings-form');
+  form.locationName.value = config.location.name || '';
+  form.latitude.value = config.location.latitude;
+  form.longitude.value = config.location.longitude;
+  form.timezone.value = config.location.timezone || 'Africa/Johannesburg';
+  form.growattServer.value = config.growattServer || form.growattServer.value;
+  form.growattApiToken.value = '';
+  const status = $('#settings-status');
+  status.textContent = config.growattConfigured ? 'Growatt: token saved' : 'Growatt: no token yet';
+  status.classList.toggle('ok', Boolean(config.growattConfigured));
+  dialog.showModal();
+});
+$('#settings-close').addEventListener('click', () => dialog.close());
+$('#settings-cancel').addEventListener('click', () => dialog.close());
+$('#settings-form').addEventListener('submit', async event => {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const payload = {
+    location: {
+      name: form.locationName.value,
+      latitude: Number(form.latitude.value),
+      longitude: Number(form.longitude.value),
+      timezone: form.timezone.value
+    },
+    growatt: {
+      server: form.growattServer.value,
+      apiToken: form.growattApiToken.value
+    }
+  };
+  const res = await fetch('/api/config', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) return;
+  dialog.close();
+  await loadAll({ includeSky: false });
+});
 document.querySelectorAll('[data-refresh]').forEach(button => button.addEventListener('click', () => button.dataset.refresh === 'weather' ? loadWeather() : loadSolar()));
 updateClock();
 loadAll({ includeSky: true });
