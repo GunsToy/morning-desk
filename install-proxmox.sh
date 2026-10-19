@@ -200,6 +200,14 @@ if [ "${#TEMPLATE}" -gt 200 ]; then
   exit 1
 fi
 
+# Refuse a storage that is not actually present
+if ! pvesm status -storage "$ROOTFS_STORAGE" >/dev/null 2>&1; then
+  echo "Storage '$ROOTFS_STORAGE' does not exist on this node."
+  echo "Available rootdir storages:"
+  pvesm status -content rootdir 2>/dev/null | awk 'NR>1 {print "  " $1}' || true
+  exit 1
+fi
+
 log "Creating container $CTID ($HOSTNAME)"
 pct create "$CTID" "$TEMPLATE" \
   --hostname "$HOSTNAME" \
