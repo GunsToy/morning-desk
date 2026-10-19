@@ -45,6 +45,7 @@ next_ctid() {
   echo "$id"
 }
 
+
 list_storages() {
   local content="$1"
   # pvesm status -content <type> prints storage rows (skip header)
@@ -133,7 +134,6 @@ ensure_template() {
   fi
   echo "$ref"
 }
-
 prompt_ip() {
   echo
   echo "Network on $BRIDGE"
@@ -166,7 +166,7 @@ prompt_ip() {
 copy_root_password() {
   local ctid="$1"
   local hash
-  hash="$(awk -F: '$1==\"root\" {print $2}' /etc/shadow)"
+  hash="$(awk -F: '$1=="root" {print $2}' /etc/shadow)"
   if [ -z "$hash" ] || [ "$hash" = "*" ] || [ "$hash" = "!" ]; then
     echo "Could not read the Proxmox root password hash from /etc/shadow."
     exit 1
@@ -177,13 +177,13 @@ copy_root_password() {
   printf '%s' "$hash" > "$tmp"
   pct push "$ctid" "$tmp" /tmp/root.hash
   rm -f "$tmp"
-  pct exec "$ctid" -- bash -c 'usermod -p \"$(cat /tmp/root.hash)\" root && rm -f /tmp/root.hash'
+  pct exec "$ctid" -- bash -c 'usermod -p "$(cat /tmp/root.hash)" root && rm -f /tmp/root.hash'
 }
 
 CTID="$(next_ctid)"
 log "Next CTID: $CTID"
-TEMPLATE_STORAGE="$(select_storage vztmpl \"Template storage (where CT templates are stored):\" \"$TEMPLATE_STORAGE\")"
-ROOTFS_STORAGE="$(select_storage rootdir \"Root disk storage (where the container disk will live):\" \"$ROOTFS_STORAGE\")"
+TEMPLATE_STORAGE="$(select_storage vztmpl "Template storage (where CT templates are stored):" "$TEMPLATE_STORAGE")"
+ROOTFS_STORAGE="$(select_storage rootdir "Root disk storage (where the container disk will live):" "$ROOTFS_STORAGE")"
 log "Template storage: $TEMPLATE_STORAGE"
 log "Rootfs storage:   $ROOTFS_STORAGE"
 prompt_ip
@@ -251,7 +251,7 @@ pct exec "$CTID" -- bash -lc "
   ./install-update-timer.sh
 "
 
-IP_SHOW="$(pct exec \"$CTID\" -- hostname -I 2>/dev/null | awk '{print $1}')"
+IP_SHOW="$(pct exec "$CTID" -- hostname -I 2>/dev/null | awk '{print $1}')"
 echo
 log "Morning Desk container $CTID is up"
 echo "  Hostname: $HOSTNAME"
