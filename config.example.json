@@ -1,12 +1,20 @@
 {
-  "location": {
-    "name": "Erasmuskloof",
-    "latitude": -25.81566858703483,
-    "longitude": 28.269596944734296,
-    "timezone": "Africa/Johannesburg"
-  },
-  "growatt": {
-    "server": "https://openapi.growatt.com/v1",
-    "apiToken": ""
-  }
+  "defaultProfile": "home",
+  "profiles": [
+    {
+      "id": "home",
+      "name": "Home",
+      "location": {
+        "name": "Erasmuskloof",
+        "latitude": -25.81566858703483,
+        "longitude": 28.269596944734296,
+        "timezone": "Africa/Johannesburg"
+      },
+      "growatt": {
+        "server": "https://openapi.growatt.com/v1",
+        "apiToken": ""
+      },
+      "news": ["daily-maverick", "bbc"]
+    }
+  ]
 }

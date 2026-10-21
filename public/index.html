@@ -12,7 +12,7 @@
   <main class="dashboard">
     <header>
       <div><p class="eyebrow">HOME DESK</p></div>
-      <div class="header-actions"><span class="live-dot">LIVE</span><button class="icon-button settings-open" id="settings-button" aria-label="Open settings">⚙ Settings</button></div>
+      <div class="header-actions"><select id="profile-select" aria-label="Switch profile" hidden></select><span class="live-dot">LIVE</span><button class="icon-button settings-open" id="settings-button" aria-label="Open settings">⚙ Settings</button></div>
     </header>
     <section class="grid">
       <div class="col-stack col-left">
@@ -131,14 +131,50 @@
       </div>
     </section>
   </main>
+  <dialog id="auth-dialog">
+    <form id="auth-form">
+      <div class="dialog-heading">
+        <div><p class="eyebrow">ADMIN</p><h2 id="auth-title">Unlock settings</h2></div>
+        <button type="button" id="auth-close" aria-label="Close">×</button>
+      </div>
+      <p class="dialog-intro" id="auth-intro">Enter the admin password to change profiles and settings.</p>
+      <label>Password
+        <input name="password" type="password" autocomplete="current-password" required>
+      </label>
+      <label id="auth-confirm-row" hidden>Confirm password
+        <input name="confirm" type="password" autocomplete="new-password">
+      </label>
+      <p class="settings-status" id="auth-status"></p>
+      <div class="dialog-actions">
+        <button type="button" class="secondary" id="auth-cancel">Cancel</button>
+        <button type="submit" id="auth-submit">Unlock</button>
+      </div>
+    </form>
+  </dialog>
+
   <dialog id="settings-dialog">
     <form id="settings-form">
       <div class="dialog-heading">
-        <div><p class="eyebrow">SETTINGS</p><h2>Connect your desk</h2></div>
+        <div><p class="eyebrow">SETTINGS</p><h2>Profiles</h2></div>
         <button type="button" id="settings-close" aria-label="Close">×</button>
       </div>
-      <p class="dialog-intro">Saved only in the local <code>config.json</code>. A blank token keeps the one already stored.</p>
+      <p class="dialog-intro">Each profile has its own location, Growatt account and news channels. Saved only in the local <code>config.json</code>. A blank token keeps the one already stored.</p>
       <p class="settings-status" id="settings-status">Growatt: checking…</p>
+
+      <fieldset class="settings-section">
+        <legend>Profile</legend>
+        <label>Editing
+          <select id="edit-profile"></select>
+        </label>
+        <div class="inline-actions">
+          <button type="button" id="profile-new">New profile</button>
+          <button type="button" class="danger" id="profile-delete">Delete profile</button>
+        </div>
+        <label>Profile name
+          <input name="profileName" required maxlength="40" placeholder="Home">
+        </label>
+        <label class="check-row"><input type="checkbox" name="makeDefault"> Default profile (shown first on new devices)</label>
+      </fieldset>
 
       <fieldset class="settings-section">
         <legend>Growatt</legend>
@@ -176,8 +212,24 @@
 
       <div class="dialog-actions">
         <button type="button" class="secondary" id="settings-cancel">Cancel</button>
-        <button type="button" id="save-settings">Save settings</button>
+        <button type="button" id="save-settings">Save profile</button>
       </div>
+
+      <fieldset class="settings-section">
+        <legend>Admin password</legend>
+        <p class="dialog-intro" id="password-note">Use at least 8 characters. Changing it signs out every other browser.</p>
+        <label>Current password
+          <input name="currentPassword" type="password" autocomplete="current-password">
+        </label>
+        <label>New password
+          <input name="newPassword" type="password" autocomplete="new-password">
+        </label>
+        <div class="inline-actions">
+          <button type="button" id="password-change">Change password</button>
+          <button type="button" id="logout">Log out</button>
+        </div>
+        <p class="settings-status" id="password-status"></p>
+      </fieldset>
     </form>
   </dialog>
   <script src="app.js"></script>

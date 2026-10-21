@@ -10,6 +10,8 @@ services:
       - NODE_ENV=production
       - PORT=4123
       - HOST=0.0.0.0
+      # Optional: fix the admin password here instead of choosing it on first visit.
+      # - ADMIN_PASSWORD=change-me-please
     volumes:
       # Persist config (Growatt token + location). Create the file first if it does not exist.
       - ./config.json:/app/config.json

@@ -1,6 +1,42 @@
 const $ = selector => document.querySelector(selector);
 const dialog = $('#settings-dialog');
+const authDialog = $('#auth-dialog');
 let config;
+
+// Anything that came from a feed or the server goes through esc() / safeUrl() before it reaches innerHTML.
+const esc = value => String(value ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+const safeUrl = value => {
+  try {
+    const url = new URL(value, location.href);
+    return /^https?:$/.test(url.protocol) ? url.href : '#';
+  } catch { return '#'; }
+};
+
+const storage = {
+  get: key => { try { return localStorage.getItem(key); } catch { return null; } },
+  set: (key, value) => { try { localStorage.setItem(key, value); } catch { /* storage can be blocked */ } }
+};
+
+// Profile shown on this device. ?profile=<id> in the address wins, so a wall display can be bookmarked per profile.
+let currentProfile = new URLSearchParams(location.search).get('profile') || storage.get('md.profile') || '';
+let profileList = [];
+let editingId = '';
+let session = { authenticated: false, setupRequired: false, passwordManagedByEnv: false };
+const profileUrl = path => `${path}${path.includes('?') ? '&' : '?'}profile=${encodeURIComponent(currentProfile)}`;
+
+async function api(path, { method = 'GET', body } = {}) {
+  const res = await fetch(path, {
+    method,
+    headers: body ? { 'Content-Type': 'application/json' } : undefined,
+    body: body ? JSON.stringify(body) : undefined
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    if (res.status === 401 && path !== '/api/auth/login') session.authenticated = false;
+    throw Object.assign(new Error(data.error || `Request failed (${res.status})`), { status: res.status });
+  }
+  return data;
+}
 
 const codeMap = { 0:['☀','Clear sky'], 1:['🌤','Mainly clear'], 2:['⛅','Partly cloudy'], 3:['☁','Overcast'], 45:['🌫','Foggy'], 48:['🌫','Foggy'], 51:['🌦','Light drizzle'], 53:['🌦','Drizzle'], 55:['🌧','Heavy drizzle'], 61:['🌦','Light rain'], 63:['🌧','Rain'], 65:['🌧','Heavy rain'], 71:['🌨','Snow'], 80:['🌦','Showers'], 81:['🌧','Showers'], 82:['⛈','Heavy showers'], 95:['⛈','Thunderstorms'] };
 const weatherState = code => codeMap[code] || ['☁','Cloudy'];
@@ -14,7 +50,7 @@ function updateClock() {
   });
 }
 async function loadWeather() {
-  const res = await fetch('/api/weather'); const data = await res.json(); if (!res.ok) throw Error(data.error);
+  const res = await fetch(profileUrl('/api/weather')); const data = await res.json(); if (!res.ok) throw Error(data.error);
   $('#weather-place').textContent = data.location; const [icon, condition] = weatherState(data.current.weather_code);
   $('#weather-icon').textContent = icon; $('#weather-temp').textContent = `${Math.round(data.current.temperature_2m)}°`; $('#weather-condition').textContent = condition; $('#weather-feels').textContent = `Feels like ${Math.round(data.current.apparent_temperature)}° · ${Math.round(data.current.wind_speed_10m)} km/h`;
   $('#forecast').innerHTML = data.daily.time.map((day, index) => { const [dailyIcon] = weatherState(data.daily.weather_code[index]); return `<div class="forecast-day"><span>${index === 0 ? 'TODAY' : new Date(`${day}T12:00`).toLocaleDateString('en-ZA',{weekday:'short'}).toUpperCase()}</span><b>${dailyIcon}</b><strong>${Math.round(data.daily.temperature_2m_max[index])}° / ${Math.round(data.daily.temperature_2m_min[index])}°</strong></div>`; }).join('');
@@ -27,15 +63,11 @@ async function loadFeeds() {
   const picker = $('#news-picker');
   const regions = [...new Set(feeds.map(feed => feed.region))];
   picker.innerHTML = regions.map(region => `
-    <p class="picker-region">${region}</p>
+    <p class="picker-region">${esc(region)}</p>
     ${feeds.filter(feed => feed.region === region).map(feed => `
-      <label class="check-row"><input type="checkbox" name="news" value="${feed.id}"> ${feed.name}</label>
+      <label class="check-row"><input type="checkbox" name="news" value="${esc(feed.id)}"> ${esc(feed.name)}</label>
     `).join('')}
   `).join('');
-}
-
-function selectedNews() {
-  return [...document.querySelectorAll('#news-picker input:checked')].map(input => input.value);
 }
 
 async function loadNewsPanels() {
@@ -43,15 +75,15 @@ async function loadNewsPanels() {
   const chosen = (config.news && config.news.length) ? config.news : ['daily-maverick', 'bbc'];
   stack.innerHTML = chosen.map(id => {
     const feed = feeds.find(item => item.id === id) || { id, name: id, site: '#' };
-    return `<article class="panel news-panel" data-feed="${id}">
+    return `<article class="panel news-panel" data-feed="${esc(id)}">
       <div class="panel-heading">
-        <div><p class="eyebrow section-label">${feed.region || 'NEWS'}</p><h2 class="section-title">${feed.name}</h2></div>
+        <div><p class="eyebrow section-label">${esc(feed.region || 'NEWS')}</p><h2 class="section-title">${esc(feed.name)}</h2></div>
         <div class="heading-actions">
-          <button class="refresh" data-refresh="news" data-feed="${id}" aria-label="Refresh ${feed.name}">↻</button>
-          <a href="${feed.site}" target="_blank" rel="noreferrer" class="source-link">OPEN ↗</a>
+          <button class="refresh" data-refresh="news" data-feed="${esc(id)}" aria-label="Refresh ${esc(feed.name)}">↻</button>
+          <a href="${esc(safeUrl(feed.site))}" target="_blank" rel="noreferrer" class="source-link">OPEN ↗</a>
         </div>
       </div>
-      <div class="news-list" id="news-${id}"><p class="loading">Loading…</p></div>
+      <div class="news-list" id="news-${esc(id)}"><p class="loading">Loading…</p></div>
     </article>`;
   }).join('') || '<article class="panel"><p class="loading">No news channels selected. Open Settings to add some.</p></article>';
 
@@ -67,7 +99,7 @@ async function loadOneNews(id) {
     const data = await res.json();
     if (!res.ok) throw Error(data.error);
     box.innerHTML = data.items.map((item, index) =>
-      `<a class="news-item" href="${item.link}" target="_blank" rel="noreferrer"><span class="news-index">0${index + 1}</span><span>${item.title}</span></a>`
+      `<a class="news-item" href="${esc(safeUrl(item.link))}" target="_blank" rel="noreferrer"><span class="news-index">0${index + 1}</span><span>${esc(item.title)}</span></a>`
     ).join('') || '<p class="loading">No stories right now.</p>';
   } catch {
     box.innerHTML = '<p class="loading">Could not load this feed.</p>';
@@ -86,7 +118,7 @@ const flowBadge = (el, watts, active) => {
 };
 
 async function loadSolar() {
-  const res = await fetch('/api/solar');
+  const res = await fetch(profileUrl('/api/solar'));
   const data = await res.json();
   const diagram = $('#solar-diagram');
   if (!data.configured) {
@@ -146,9 +178,41 @@ async function loadSolar() {
   diagram.classList.toggle('flow-bat-out', Boolean(discharging));
   diagram.classList.toggle('flow-bat-in', Boolean(charging) && !discharging);
 }
+// ---- Profiles ----------------------------------------------------------------------------
+function renderProfileSelect() {
+  const select = $('#profile-select');
+  select.innerHTML = profileList.map(profile => `<option value="${esc(profile.id)}">${esc(profile.name)}</option>`).join('');
+  select.value = currentProfile;
+  select.hidden = profileList.length < 2;
+}
+
+async function loadProfiles() {
+  const data = await api('/api/profiles');
+  profileList = data.profiles;
+  if (!profileList.some(profile => profile.id === currentProfile)) currentProfile = data.defaultProfile;
+  renderProfileSelect();
+}
+
+function resetSolar() {
+  const diagram = $('#solar-diagram');
+  diagram.className = 'solar-diagram';
+  diagram.dataset.source = 'standby';
+  ['solar-pv', 'solar-grid', 'solar-consumption', 'solar-battery-voltage', 'solar-today', 'solar-total', 'solar-source', 'solar-flow-summary', 'solar-mode']
+    .forEach(id => { $(`#${id}`).textContent = '—'; });
+  $('#solar-name').textContent = 'Solar overview';
+  $('#solar-updated').textContent = '';
+  $('#solar-battery-power-label').innerHTML = '— <strong id="solar-battery-power">—</strong>';
+  document.querySelectorAll('.flow-badge').forEach(badge => { badge.textContent = ''; badge.hidden = true; });
+}
+
 async function loadAll({ includeSky = false } = {}) {
   try {
-    config = await fetch('/api/config').then(r => r.json());
+    config = await api(profileUrl('/api/config'));
+    if (config.id !== currentProfile) { // the saved profile was deleted: the server sent the default instead
+      currentProfile = config.id;
+      renderProfileSelect();
+    }
+    storage.set('md.profile', currentProfile);
     const tasks = [loadWeather(), loadNewsPanels(), loadSolar()];
     if (includeSky) tasks.push(loadSky());
     await Promise.all(tasks);
@@ -156,62 +220,179 @@ async function loadAll({ includeSky = false } = {}) {
     console.error(error);
   }
 }
-$('#settings-button').addEventListener('click', () => {
+
+$('#profile-select').addEventListener('change', event => {
+  currentProfile = event.target.value;
+  storage.set('md.profile', currentProfile);
+  resetSolar();
+  loadAll({ includeSky: false });
+});
+
+// ---- Admin login -------------------------------------------------------------------------
+function openAuth() {
+  const form = $('#auth-form');
+  const setup = session.setupRequired;
+  $('#auth-title').textContent = setup ? 'Choose an admin password' : 'Unlock settings';
+  $('#auth-intro').textContent = setup
+    ? 'No admin password is set yet. Pick one (at least 8 characters). You will need it to change profiles and settings.'
+    : 'Enter the admin password to change profiles and settings.';
+  $('#auth-submit').textContent = setup ? 'Set password' : 'Unlock';
+  $('#auth-confirm-row').hidden = !setup;
+  form.elements.password.autocomplete = setup ? 'new-password' : 'current-password';
+  form.elements.confirm.required = setup;
+  $('#auth-status').textContent = '';
+  form.reset();
+  authDialog.showModal();
+  form.elements.password.focus();
+}
+
+$('#auth-form').addEventListener('submit', async event => {
+  event.preventDefault();
+  const form = event.target;
+  const status = $('#auth-status');
+  const setup = session.setupRequired;
+  const password = form.elements.password.value;
+  if (setup && password.length < 8) { status.textContent = 'Use at least 8 characters.'; return; }
+  if (setup && password !== form.elements.confirm.value) { status.textContent = 'The two passwords do not match.'; return; }
+  status.textContent = setup ? 'Setting password…' : 'Checking…';
+  try {
+    await api(setup ? '/api/auth/setup' : '/api/auth/login', { method: 'POST', body: { password } });
+    session = { ...session, authenticated: true, setupRequired: false };
+    form.reset();
+    authDialog.close();
+    await openSettings(currentProfile);
+  } catch (error) {
+    status.textContent = error.message;
+  }
+});
+$('#auth-close').addEventListener('click', () => authDialog.close());
+$('#auth-cancel').addEventListener('click', () => authDialog.close());
+
+// ---- Settings ----------------------------------------------------------------------------
+const BLANK_PROFILE = {
+  id: '', name: '', isDefault: false, growattConfigured: false,
+  growattServer: 'https://openapi.growatt.com/v1',
+  location: { name: '', latitude: '', longitude: '', timezone: 'Africa/Johannesburg' },
+  news: ['daily-maverick', 'bbc']
+};
+
+function selectedNews() {
+  return [...document.querySelectorAll('#news-picker input:checked')].map(input => input.value);
+}
+
+async function populateSettings(id) {
   const form = $('#settings-form');
-  form.locationName.value = config.location.name || '';
-  form.latitude.value = config.location.latitude;
-  form.longitude.value = config.location.longitude;
-  form.timezone.value = config.location.timezone || 'Africa/Johannesburg';
-  form.growattServer.value = config.growattServer || form.growattServer.value;
-  form.growattApiToken.value = '';
   const status = $('#settings-status');
-  status.textContent = config.growattConfigured
-    ? 'Growatt: token saved'
-    : 'Growatt: no token yet';
-  status.classList.toggle('ok', Boolean(config.growattConfigured));
-  const chosen = new Set(config.news || []);
-  document.querySelectorAll('#news-picker input[name="news"]').forEach(input => {
-    input.checked = chosen.has(input.value);
-  });
-  dialog.showModal();
+  editingId = id;
+  const select = $('#edit-profile');
+  select.innerHTML = profileList.map(profile => `<option value="${esc(profile.id)}">${esc(profile.name)}</option>`).join('')
+    + (id ? '' : '<option value="">New profile…</option>');
+  select.value = id;
+
+  const data = id ? await api(`/api/config?profile=${encodeURIComponent(id)}`) : BLANK_PROFILE;
+  form.elements.profileName.value = data.name;
+  form.elements.makeDefault.checked = data.isDefault;
+  form.elements.makeDefault.disabled = data.isDefault; // pick another profile as default to move it
+  form.elements.locationName.value = data.location.name || '';
+  form.elements.latitude.value = data.location.latitude;
+  form.elements.longitude.value = data.location.longitude;
+  form.elements.timezone.value = data.location.timezone || 'Africa/Johannesburg';
+  form.elements.growattServer.value = data.growattServer;
+  form.elements.growattApiToken.value = '';
+  status.textContent = data.growattConfigured ? 'Growatt: token saved' : 'Growatt: no token yet';
+  status.classList.toggle('ok', Boolean(data.growattConfigured));
+  const chosen = new Set(data.news);
+  document.querySelectorAll('#news-picker input[name="news"]').forEach(input => { input.checked = chosen.has(input.value); });
+  $('#profile-delete').disabled = !id || profileList.length < 2;
+
+  const managed = session.passwordManagedByEnv;
+  $('#password-note').textContent = managed
+    ? 'The password is set by the ADMIN_PASSWORD environment variable and cannot be changed here.'
+    : 'Use at least 8 characters. Changing it signs out every other browser.';
+  form.elements.currentPassword.disabled = managed;
+  form.elements.newPassword.disabled = managed;
+  $('#password-change').disabled = managed;
+  $('#password-status').textContent = '';
+  form.elements.currentPassword.value = '';
+  form.elements.newPassword.value = '';
+}
+
+async function openSettings(id) {
+  await loadProfiles();
+  await populateSettings(profileList.some(profile => profile.id === id) ? id : currentProfile);
+  if (!dialog.open) dialog.showModal();
+}
+
+$('#settings-button').addEventListener('click', async () => {
+  try {
+    session = await api('/api/session');
+    if (session.authenticated) await openSettings(currentProfile);
+    else openAuth();
+  } catch (error) {
+    console.error(error);
+  }
 });
 $('#settings-close').addEventListener('click', () => dialog.close());
 $('#settings-cancel').addEventListener('click', () => dialog.close());
+
+$('#edit-profile').addEventListener('change', event => populateSettings(event.target.value));
+$('#profile-new').addEventListener('click', async () => {
+  await populateSettings('');
+  $('#settings-form').elements.profileName.focus();
+});
+
+$('#profile-delete').addEventListener('click', async () => {
+  const status = $('#settings-status');
+  const profile = profileList.find(item => item.id === editingId);
+  if (!profile || !confirm(`Delete the profile "${profile.name}"? Its saved Growatt token is deleted too.`)) return;
+  try {
+    await api(`/api/profiles/${encodeURIComponent(editingId)}`, { method: 'DELETE' });
+    await loadProfiles(); // falls back to the default profile if this device was showing the deleted one
+    await populateSettings(currentProfile);
+    loadAll({ includeSky: false });
+  } catch (error) {
+    status.textContent = error.message;
+    status.classList.remove('ok');
+  }
+});
+
 async function saveSettings() {
   const form = $('#settings-form');
   const status = $('#settings-status');
-  const payload = {
+  if (!form.reportValidity()) return;
+  const body = {
+    name: form.elements.profileName.value,
     location: {
-      name: form.locationName.value,
-      latitude: Number(form.latitude.value),
-      longitude: Number(form.longitude.value),
-      timezone: form.timezone.value
+      name: form.elements.locationName.value,
+      latitude: form.elements.latitude.value,
+      longitude: form.elements.longitude.value,
+      timezone: form.elements.timezone.value
     },
     growatt: {
-      server: form.growattServer.value,
-      apiToken: form.growattApiToken.value
+      server: form.elements.growattServer.value,
+      apiToken: form.elements.growattApiToken.value
     },
-    news: selectedNews()
+    news: selectedNews(),
+    makeDefault: form.elements.makeDefault.checked
   };
   status.textContent = 'Saving…';
   status.classList.remove('ok');
   try {
-    const res = await fetch('/api/config', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      status.textContent = err.error || `Save failed (${res.status})`;
-      return;
-    }
-    status.textContent = 'Saved';
-    status.classList.add('ok');
+    const data = editingId
+      ? await api(`/api/profiles/${encodeURIComponent(editingId)}`, { method: 'PUT', body })
+      : await api('/api/profiles', { method: 'POST', body });
+    currentProfile = data.profile.id;
     dialog.close();
+    await loadProfiles();
     await loadAll({ includeSky: false });
   } catch (error) {
-    status.textContent = 'Save failed: ' + error.message;
+    if (error.status === 401) { // the session expired while the dialog was open
+      dialog.close();
+      session.setupRequired = false;
+      openAuth();
+      return;
+    }
+    status.textContent = error.message;
   }
 }
 $('#settings-form').addEventListener('submit', event => {
@@ -222,6 +403,30 @@ $('#save-settings').addEventListener('click', event => {
   event.preventDefault();
   saveSettings();
 });
+
+$('#password-change').addEventListener('click', async () => {
+  const form = $('#settings-form');
+  const status = $('#password-status');
+  const next = form.elements.newPassword.value;
+  if (next.length < 8) { status.classList.remove('ok'); status.textContent = 'The new password must be at least 8 characters.'; return; }
+  try {
+    await api('/api/auth/password', { method: 'POST', body: { current: form.elements.currentPassword.value, next } });
+    form.elements.currentPassword.value = '';
+    form.elements.newPassword.value = '';
+    status.classList.add('ok');
+    status.textContent = 'Password changed. Other browsers were signed out.';
+  } catch (error) {
+    status.classList.remove('ok');
+    status.textContent = error.message;
+  }
+});
+
+$('#logout').addEventListener('click', async () => {
+  await api('/api/auth/logout', { method: 'POST' }).catch(() => {});
+  session.authenticated = false;
+  dialog.close();
+});
+
 document.addEventListener('click', event => {
   const button = event.target.closest('[data-refresh]');
   if (!button) return;
@@ -232,5 +437,5 @@ document.addEventListener('click', event => {
 });
 updateClock();
 // Sky News only on first load so the live embed is not torn down every 15 minutes
-loadFeeds().then(() => loadAll({ includeSky: true }));
+Promise.all([loadFeeds(), loadProfiles()]).then(() => loadAll({ includeSky: true }));
 setInterval(() => loadAll({ includeSky: false }), 15 * 60 * 1000);
