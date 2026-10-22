@@ -158,8 +158,8 @@
         <div><p class="eyebrow">SETTINGS</p><h2>Profiles</h2></div>
         <button type="button" id="settings-close" aria-label="Close">×</button>
       </div>
-      <p class="dialog-intro">Each profile has its own location, Growatt account and news channels. Saved only in the local <code>config.json</code>. A blank token keeps the one already stored.</p>
-      <p class="settings-status" id="settings-status">Growatt: checking…</p>
+      <p class="dialog-intro">Each profile has its own location, solar system and news channels. Saved only in the local <code>config.json</code>. Leave a saved token or password blank to keep it.</p>
+      <p class="settings-status" id="settings-status">Solar: checking…</p>
 
       <fieldset class="settings-section">
         <legend>Profile</legend>
@@ -177,13 +177,11 @@
       </fieldset>
 
       <fieldset class="settings-section">
-        <legend>Growatt</legend>
-        <label>OpenAPI address
-          <input name="growattServer" type="url" value="https://openapi.growatt.com/v1" required>
+        <legend>Solar</legend>
+        <label id="solar-provider-row">Provider
+          <select name="solarProvider" id="solar-provider"></select>
         </label>
-        <label>API token
-          <input name="growattApiToken" type="password" placeholder="Paste your OpenAPI token" autocomplete="off">
-        </label>
+        <div id="solar-fields"></div>
       </fieldset>
 
       <fieldset class="settings-section">

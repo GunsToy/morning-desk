@@ -9,6 +9,7 @@ RUN npm install --omit=dev && npm cache clean --force
 
 # App source
 COPY server.mjs store.mjs auth.mjs ./
+COPY providers ./providers
 COPY public ./public
 COPY config.example.json ./config.example.json
 COPY docker-entrypoint.sh ./docker-entrypoint.sh

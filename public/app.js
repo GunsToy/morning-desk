@@ -21,6 +21,8 @@ const storage = {
 let currentProfile = new URLSearchParams(location.search).get('profile') || storage.get('md.profile') || '';
 let profileList = [];
 let editingId = '';
+let solarProviders = [];
+let editingProfile = null; // what the open settings form was filled from
 let session = { authenticated: false, setupRequired: false, passwordManagedByEnv: false };
 const profileUrl = path => `${path}${path.includes('?') ? '&' : '?'}profile=${encodeURIComponent(currentProfile)}`;
 
@@ -122,9 +124,9 @@ async function loadSolar() {
   const data = await res.json();
   const diagram = $('#solar-diagram');
   if (!data.configured) {
-    $('#solar-source').textContent = 'Connect Growatt';
+    $('#solar-source').textContent = 'Connect your solar system';
     $('#solar-flow-summary').textContent = '';
-    $('#solar-updated').textContent = 'Use the gear icon to add your Growatt API token.';
+    $('#solar-updated').textContent = 'Open Settings, choose your solar provider and add its details.';
     return;
   }
   if (!res.ok || data.error) {
@@ -269,12 +271,45 @@ $('#auth-close').addEventListener('click', () => authDialog.close());
 $('#auth-cancel').addEventListener('click', () => authDialog.close());
 
 // ---- Settings ----------------------------------------------------------------------------
-const BLANK_PROFILE = {
-  id: '', name: '', isDefault: false, growattConfigured: false,
-  growattServer: 'https://openapi.growatt.com/v1',
-  location: { name: '', latitude: '', longitude: '', timezone: 'Africa/Johannesburg' },
-  news: ['daily-maverick', 'bbc']
-};
+const providerById = id => solarProviders.find(provider => provider.id === id);
+
+// A profile with nothing saved yet, shaped like what /api/config returns.
+function blankProfile() {
+  return {
+    id: '', name: '', isDefault: false,
+    location: { name: '', latitude: '', longitude: '', timezone: 'Africa/Johannesburg' },
+    solar: {
+      provider: solarProviders[0]?.id ?? '',
+      byProvider: Object.fromEntries(solarProviders.map(provider => [provider.id, { configured: false, values: provider.defaults, secretsSet: [] }]))
+    },
+    news: ['daily-maverick', 'bbc']
+  };
+}
+
+async function loadSolarProviders() {
+  const data = await api('/api/solar-providers');
+  solarProviders = data.providers;
+}
+
+// Draws the form for one provider. `saved` is what the server told us about this provider for this profile.
+function renderSolarFields(providerId) {
+  const provider = providerById(providerId);
+  const saved = editingProfile?.solar.byProvider[providerId] ?? { configured: false, values: provider?.defaults ?? {}, secretsSet: [] };
+  const box = $('#solar-fields');
+  box.innerHTML = (provider?.fields ?? []).map(field => {
+    const has = saved.secretsSet.includes(field.name);
+    const placeholder = field.secret ? (has ? 'Saved. Leave blank to keep it' : field.placeholder) : field.placeholder;
+    const value = field.secret ? '' : saved.values[field.name] ?? '';
+    return `<label>${esc(field.label)}
+      <input name="solar_${esc(field.name)}" type="${field.type === 'password' ? 'password' : field.type === 'url' ? 'url' : 'text'}"
+        value="${esc(value)}" placeholder="${esc(placeholder)}" autocomplete="off"${field.required ? ' required' : ''}>
+    </label>`;
+  }).join('');
+  const status = $('#settings-status');
+  const label = provider?.label ?? 'Solar';
+  status.textContent = saved.configured ? `${label}: credentials saved` : `${label}: not connected yet`;
+  status.classList.toggle('ok', Boolean(saved.configured));
+}
 
 function selectedNews() {
   return [...document.querySelectorAll('#news-picker input:checked')].map(input => input.value);
@@ -289,7 +324,8 @@ async function populateSettings(id) {
     + (id ? '' : '<option value="">New profile…</option>');
   select.value = id;
 
-  const data = id ? await api(`/api/config?profile=${encodeURIComponent(id)}`) : BLANK_PROFILE;
+  const data = id ? await api(`/api/config?profile=${encodeURIComponent(id)}`) : blankProfile();
+  editingProfile = data;
   form.elements.profileName.value = data.name;
   form.elements.makeDefault.checked = data.isDefault;
   form.elements.makeDefault.disabled = data.isDefault; // pick another profile as default to move it
@@ -297,10 +333,11 @@ async function populateSettings(id) {
   form.elements.latitude.value = data.location.latitude;
   form.elements.longitude.value = data.location.longitude;
   form.elements.timezone.value = data.location.timezone || 'Africa/Johannesburg';
-  form.elements.growattServer.value = data.growattServer;
-  form.elements.growattApiToken.value = '';
-  status.textContent = data.growattConfigured ? 'Growatt: token saved' : 'Growatt: no token yet';
-  status.classList.toggle('ok', Boolean(data.growattConfigured));
+  const providerSelect = $('#solar-provider');
+  providerSelect.innerHTML = solarProviders.map(provider => `<option value="${esc(provider.id)}">${esc(provider.label)}</option>`).join('');
+  providerSelect.value = data.solar.provider;
+  $('#solar-provider-row').hidden = solarProviders.length < 2; // nothing to choose between yet
+  renderSolarFields(data.solar.provider);
   const chosen = new Set(data.news);
   document.querySelectorAll('#news-picker input[name="news"]').forEach(input => { input.checked = chosen.has(input.value); });
   $('#profile-delete').disabled = !id || profileList.length < 2;
@@ -335,6 +372,7 @@ $('#settings-button').addEventListener('click', async () => {
 $('#settings-close').addEventListener('click', () => dialog.close());
 $('#settings-cancel').addEventListener('click', () => dialog.close());
 
+$('#solar-provider').addEventListener('change', event => renderSolarFields(event.target.value));
 $('#edit-profile').addEventListener('change', event => populateSettings(event.target.value));
 $('#profile-new').addEventListener('click', async () => {
   await populateSettings('');
@@ -344,7 +382,7 @@ $('#profile-new').addEventListener('click', async () => {
 $('#profile-delete').addEventListener('click', async () => {
   const status = $('#settings-status');
   const profile = profileList.find(item => item.id === editingId);
-  if (!profile || !confirm(`Delete the profile "${profile.name}"? Its saved Growatt token is deleted too.`)) return;
+  if (!profile || !confirm(`Delete the profile "${profile.name}"? Its saved solar credentials are deleted too.`)) return;
   try {
     await api(`/api/profiles/${encodeURIComponent(editingId)}`, { method: 'DELETE' });
     await loadProfiles(); // falls back to the default profile if this device was showing the deleted one
@@ -368,9 +406,10 @@ async function saveSettings() {
       longitude: form.elements.longitude.value,
       timezone: form.elements.timezone.value
     },
-    growatt: {
-      server: form.elements.growattServer.value,
-      apiToken: form.elements.growattApiToken.value
+    solar: {
+      provider: form.elements.solarProvider.value,
+      values: Object.fromEntries((providerById(form.elements.solarProvider.value)?.fields ?? [])
+        .map(field => [field.name, form.elements[`solar_${field.name}`]?.value ?? '']))
     },
     news: selectedNews(),
     makeDefault: form.elements.makeDefault.checked
@@ -437,5 +476,5 @@ document.addEventListener('click', event => {
 });
 updateClock();
 // Sky News only on first load so the live embed is not torn down every 15 minutes
-Promise.all([loadFeeds(), loadProfiles()]).then(() => loadAll({ includeSky: true }));
+Promise.all([loadFeeds(), loadProfiles(), loadSolarProviders()]).then(() => loadAll({ includeSky: true }));
 setInterval(() => loadAll({ includeSky: false }), 15 * 60 * 1000);

@@ -10,9 +10,14 @@
         "longitude": 28.269596944734296,
         "timezone": "Africa/Johannesburg"
       },
-      "growatt": {
-        "server": "https://openapi.growatt.com/v1",
-        "apiToken": ""
+      "solar": {
+        "provider": "growatt",
+        "settings": {
+          "growatt": {
+            "server": "https://openapi.growatt.com/v1",
+            "apiToken": ""
+          }
+        }
       },
       "news": ["daily-maverick", "bbc"]
     }

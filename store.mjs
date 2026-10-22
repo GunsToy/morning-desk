@@ -1,11 +1,12 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import * as providers from './providers/index.mjs';
+import { applyFields } from './providers/common.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const configPath = process.env.CONFIG_PATH || path.join(__dirname, 'config.json');
 
-export const DEFAULT_SERVER = 'https://openapi.growatt.com/v1';
 export const DEFAULT_NEWS = ['daily-maverick', 'bbc'];
 export const DEFAULT_LOCATION = { name: 'Cape Town', latitude: -33.9249, longitude: 18.4241, timezone: 'Africa/Johannesburg' };
 
@@ -16,7 +17,7 @@ export function blankProfile() {
     id: '',
     name: '',
     location: { ...DEFAULT_LOCATION },
-    growatt: { server: DEFAULT_SERVER, apiToken: '' },
+    solar: { provider: providers.DEFAULT_PROVIDER, settings: { [providers.DEFAULT_PROVIDER]: providers.get(providers.DEFAULT_PROVIDER).defaults() } },
     news: [...DEFAULT_NEWS]
   };
 }
@@ -29,18 +30,27 @@ export function uniqueId(taken, name) {
   return id;
 }
 
+// Solar settings are kept per provider, so switching provider in Settings does not lose the other one's credentials.
+function cleanSolar(raw) {
+  const incoming = raw.solar && typeof raw.solar === 'object' ? raw.solar : {};
+  const settings = {};
+  for (const [id, value] of Object.entries(incoming.settings ?? {})) {
+    // A provider this version does not know about is kept untouched rather than dropped.
+    settings[id] = providers.has(id) ? providers.get(id).clean(value) : value;
+  }
+  // Profiles saved before solar providers existed kept the Growatt details in a top-level "growatt" block.
+  if (raw.growatt && !settings.growatt) settings.growatt = providers.get('growatt').clean(raw.growatt);
+  const provider = providers.has(incoming.provider) ? incoming.provider : providers.DEFAULT_PROVIDER;
+  return { provider, settings };
+}
+
 function cleanProfile(raw = {}) {
   const base = blankProfile();
-  const growatt = raw.growatt ?? {};
   return {
     id: String(raw.id || ''),
     name: String(raw.name || 'Home'),
     location: { ...base.location, ...raw.location },
-    growatt: {
-      // Older versions stored the same values under different names; keep reading them.
-      server: growatt.server ?? growatt.apiBase ?? base.growatt.server,
-      apiToken: growatt.apiToken ?? growatt.token ?? growatt.thirdPartyKey ?? ''
-    },
+    solar: cleanSolar(raw),
     news: Array.isArray(raw.news) ? raw.news.map(String) : [...base.news]
   };
 }
@@ -48,7 +58,7 @@ function cleanProfile(raw = {}) {
 // Turns whatever is on disk into the current shape:
 // { version, admin: {salt, hash} | null, defaultProfile, profiles: [...] }
 function upgrade(saved) {
-  const config = { version: 2, admin: null, defaultProfile: '', profiles: [] };
+  const config = { version: 3, admin: null, defaultProfile: '', profiles: [] };
   if (saved && typeof saved === 'object') {
     if (saved.admin?.salt && saved.admin?.hash) config.admin = { salt: String(saved.admin.salt), hash: String(saved.admin.hash) };
     if (Array.isArray(saved.profiles) && saved.profiles.length) {
@@ -117,10 +127,33 @@ export function update(mutator) {
   return run;
 }
 
+function legacyGrowatt(growatt) {
+  if (growatt === undefined) return undefined;
+  if (growatt === null || typeof growatt !== 'object') return null;
+  const values = {};
+  if (typeof growatt.server === 'string' && growatt.server.trim()) values.server = growatt.server;
+  if (growatt.apiToken !== undefined) values.apiToken = growatt.apiToken;
+  return { provider: 'growatt', values, clearSecrets: growatt.clearToken === true ? ['apiToken'] : [] };
+}
+
+// input: { provider?, values?: { field: value }, clearSecrets?: [field] }. Returns an error message, or null.
+function applySolarInput(profile, input) {
+  if (input === null || typeof input !== 'object') return 'Solar settings are invalid.';
+  const id = input.provider ?? profile.solar.provider;
+  const provider = providers.get(id);
+  if (!provider) return 'Unknown solar provider.';
+  const current = profile.solar.settings[id] ?? provider.defaults();
+  const result = applyFields(provider, current, input.values ?? {}, input.clearSecrets ?? []);
+  if (result.error) return result.error;
+  profile.solar = { provider: id, settings: { ...profile.solar.settings, [id]: result.settings } };
+  return null;
+}
+
 const toNumber = value => typeof value === 'number' ? value : (typeof value === 'string' && value.trim() !== '' ? Number(value) : NaN);
 
 // Applies the fields present in `input` to `profile`. Returns an error message, or null when it is fine.
-// A blank Growatt token keeps the stored one; send growatt.clearToken = true to remove it.
+// Solar settings go through the chosen provider's field list: a blank secret keeps the stored one,
+// and clearSecrets removes one.
 export function applyProfileInput(profile, input = {}, validNews = new Set()) {
   if (input === null || typeof input !== 'object') return 'Invalid request body.';
 
@@ -157,22 +190,11 @@ export function applyProfileInput(profile, input = {}, validNews = new Set()) {
     profile.location = next;
   }
 
-  if (input.growatt !== undefined) {
-    const growatt = input.growatt ?? {};
-    const next = { ...profile.growatt };
-    if (growatt.server !== undefined && String(growatt.server).trim() !== '') {
-      let url;
-      try { url = new URL(String(growatt.server).trim()); }
-      catch { return 'The Growatt address must be a valid URL.'; }
-      if (!/^https?:$/.test(url.protocol)) return 'The Growatt address must start with http:// or https://.';
-      next.server = url.toString().replace(/\/+$/, '');
-    }
-    if (growatt.clearToken === true) next.apiToken = '';
-    else if (typeof growatt.apiToken === 'string' && growatt.apiToken.trim()) {
-      if (growatt.apiToken.trim().length > 500) return 'The API token is too long.';
-      next.apiToken = growatt.apiToken.trim();
-    }
-    profile.growatt = next;
+  // The older request shape { growatt: { server, apiToken, clearToken } } is still accepted.
+  const solarInput = input.solar !== undefined ? input.solar : legacyGrowatt(input.growatt);
+  if (solarInput !== undefined) {
+    const problem = applySolarInput(profile, solarInput);
+    if (problem) return problem;
   }
 
   if (input.news !== undefined) {

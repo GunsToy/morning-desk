@@ -1,6 +1,6 @@
 # Morning Desk
 
-Local dashboard: Growatt solar, weather, Sky News live, Daily Maverick and CNN.
+Local dashboard: solar (Growatt), weather, Sky News live and news feeds.
 
 Dashboard: `http://<host>:4123`
 
@@ -20,6 +20,14 @@ Anyone on the network can view the dashboard, but changing settings needs the ad
 - Forgot the password? Delete the `"admin"` block from `config.json` and restart; the next visit lets you choose a new one.
 
 An older single-profile `config.json` is upgraded automatically on first save: its location and token become a profile called after the location.
+
+## Solar providers
+
+Each profile picks one solar provider and keeps its own credentials for it. Right now that is **Growatt**. The Settings screen draws the form from the provider's field list, saved tokens and passwords are never sent back to the browser, and switching provider keeps the other one's saved details.
+
+A provider is one file in `providers/` that fetches readings from a vendor's cloud and returns them in a common shape. `providers/common.mjs` documents the shape and the field list, and `providers/index.mjs` is where a new provider is registered. A provider with a strict API quota can set `minIntervalMs` so it is polled less often than the dashboard's 15 minutes.
+
+`config.json` is now version 3: each profile has a `solar` block (`provider` plus `settings` per provider) in place of the old `growatt` block. Older files are upgraded the next time settings are saved, and your Growatt token is carried over. To roll back to an older release after that, copy the token into the old `growatt` block by hand.
 
 ## Minimum container requirements
 
