@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import * as store from './store.mjs';
 import * as auth from './auth.mjs';
 import * as providers from './providers/index.mjs';
-import { describeSettings, keepPreviousFlow, publicSchema, USER_AGENT } from './providers/common.mjs';
+import { describeSettings, keepPreviousFlow, publicSchema, USER_AGENT, FETCH_TIMEOUT_MS } from './providers/common.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // One solar cache per profile, so profiles on different solar accounts never share readings.
@@ -13,7 +13,7 @@ const solarCaches = new Map();
 const SOLAR_TTL = 15 * 60 * 1000;
 
 async function getText(url) {
-  const response = await fetch(url, { headers: { 'User-Agent': USER_AGENT } });
+  const response = await fetch(url, { headers: { 'User-Agent': USER_AGENT }, signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
   if (!response.ok) throw new Error(`Source returned ${response.status}`);
   return response.text();
 }
@@ -328,7 +328,9 @@ app.get('/api/weather', async (req, res) => {
       current: 'temperature_2m,apparent_temperature,weather_code,wind_speed_10m',
       daily: 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunrise,sunset', forecast_days: '5'
     });
-    const data = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`).then(r => r.json());
+    const response = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`, { headers: { 'User-Agent': USER_AGENT }, signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
+    if (!response.ok) throw new Error(`Open-Meteo returned ${response.status}`);
+    const data = await response.json();
     res.json({ location: location.name, ...data });
   } catch (error) { res.status(502).json({ error: error.message }); }
 });

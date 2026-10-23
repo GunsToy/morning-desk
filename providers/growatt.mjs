@@ -1,5 +1,5 @@
 // Growatt OpenAPI adapter. The functions below are the original Growatt code, moved here unchanged.
-import { USER_AGENT } from './common.mjs';
+import { USER_AGENT, FETCH_TIMEOUT_MS } from './common.mjs';
 
 const DEFAULT_SERVER = 'https://openapi.growatt.com/v1';
 
@@ -114,7 +114,8 @@ async function growattOpenApiRequest(baseUrl, endpoint, token, params = {}) {
   const url = new URL(`${baseUrl}/${endpoint.replace(/^\/+/, '')}`);
   for (const [name, value] of Object.entries(params)) if (value !== undefined && value !== null) url.searchParams.set(name, String(value));
   const response = await fetch(url, {
-    headers: { token, Accept: 'application/json', 'User-Agent': USER_AGENT }
+    headers: { token, Accept: 'application/json', 'User-Agent': USER_AGENT },
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS)
   });
   const text = await response.text();
   if (!response.ok) throw new Error(`Growatt OpenAPI returned ${response.status}. Check the selected regional OpenAPI address.`);
@@ -140,7 +141,8 @@ async function growattLatestDeviceData(baseUrl, token, device) {
       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
       'User-Agent': USER_AGENT
     },
-    body: new URLSearchParams({ deviceType, deviceSn }).toString()
+    body: new URLSearchParams({ deviceType, deviceSn }).toString(),
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS)
   });
   if (!response.ok) return {};
   const body = await response.json().catch(() => null);
@@ -202,9 +204,11 @@ export default {
     return normaliseSolar({ ...plant, ...(plantData ?? {}), liveDevices: liveDeviceData, ...(liveDeviceData[0] ?? {}) });
   },
 
-  explainError: error => /frequently_access/i.test(error.message)
-    ? 'Growatt has temporarily rate-limited this API token. The widget will wait 15 minutes before trying again.'
-    : /permission_denied/i.test(error.message)
-      ? 'Growatt accepted the token but has not authorized it for this plant. Create a new OpenAPI token for the account that owns the plant, or ask the installer to authorize OpenAPI access.'
-      : error.message
+  explainError: error => error.name === 'TimeoutError'
+    ? 'Growatt did not answer within 15 seconds. The widget will try again in 15 minutes.'
+    : /frequently_access/i.test(error.message)
+      ? 'Growatt has temporarily rate-limited this API token. The widget will wait 15 minutes before trying again.'
+      : /permission_denied/i.test(error.message)
+        ? 'Growatt accepted the token but has not authorized it for this plant. Create a new OpenAPI token for the account that owns the plant, or ask the installer to authorize OpenAPI access.'
+        : error.message
 };

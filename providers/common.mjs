@@ -20,6 +20,8 @@
 //   activeSource, flowSummary, flowPv, flowGrid, flowBatteryOut, flowBatteryIn, flowLoad, hasFlowData
 
 export const USER_AGENT = 'MorningDesk/1.0 (personal dashboard)';
+// Every outside request gives up after this, so a stalled source cannot leave its panel on "Loading…".
+export const FETCH_TIMEOUT_MS = 15_000;
 
 const FLOW_KEYS = [
   'pv', 'grid', 'battery', 'batteryCharge', 'batteryPercent', 'batteryVoltage', 'consumption',

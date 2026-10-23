@@ -52,7 +52,9 @@ function updateClock() {
   });
 }
 async function loadWeather() {
+  const requested = currentProfile;
   const res = await fetch(profileUrl('/api/weather')); const data = await res.json(); if (!res.ok) throw Error(data.error);
+  if (requested !== currentProfile) return; // the profile was switched while this was loading
   $('#weather-place').textContent = data.location; const [icon, condition] = weatherState(data.current.weather_code);
   $('#weather-icon').textContent = icon; $('#weather-temp').textContent = `${Math.round(data.current.temperature_2m)}°`; $('#weather-condition').textContent = condition; $('#weather-feels').textContent = `Feels like ${Math.round(data.current.apparent_temperature)}° · ${Math.round(data.current.wind_speed_10m)} km/h`;
   $('#forecast').innerHTML = data.daily.time.map((day, index) => { const [dailyIcon] = weatherState(data.daily.weather_code[index]); return `<div class="forecast-day"><span>${index === 0 ? 'TODAY' : new Date(`${day}T12:00`).toLocaleDateString('en-ZA',{weekday:'short'}).toUpperCase()}</span><b>${dailyIcon}</b><strong>${Math.round(data.daily.temperature_2m_max[index])}° / ${Math.round(data.daily.temperature_2m_min[index])}°</strong></div>`; }).join('');
@@ -120,8 +122,10 @@ const flowBadge = (el, watts, active) => {
 };
 
 async function loadSolar() {
+  const requested = currentProfile;
   const res = await fetch(profileUrl('/api/solar'));
   const data = await res.json();
+  if (requested !== currentProfile) return; // the profile was switched while this was loading
   const diagram = $('#solar-diagram');
   if (!data.configured) {
     $('#solar-source').textContent = 'Connect your solar system';
@@ -210,7 +214,12 @@ function resetSolar() {
 async function loadAll({ includeSky = false } = {}) {
   updateClock(); // wall displays run for days: the date must follow the 15-minute refresh
   try {
-    config = await api(profileUrl('/api/config'));
+    const requested = currentProfile;
+    const data = await api(profileUrl('/api/config'));
+    // A newer load for another profile owns the screen now. Without this, a slow answer for the old
+    // profile would also take the deleted-profile branch below and switch the screen back to it.
+    if (requested !== currentProfile) return;
+    config = data;
     if (config.id !== currentProfile) { // the saved profile was deleted: the server sent the default instead
       currentProfile = config.id;
       renderProfileSelect();
