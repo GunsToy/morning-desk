@@ -68,3 +68,5 @@ Check the update timer:
 systemctl status morning-desk-update.timer
 journalctl -u morning-desk-update.service
 ```
+
+The daily update only installs a commit whose tests passed on GitHub (the **Test** workflow). If they failed, are still running, or GitHub cannot be reached, it keeps the current version and tries again the next day; the journal says which. To update anyway: `SKIP_TEST_CHECK=1 ./update.sh`.
