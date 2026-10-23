@@ -31,7 +31,8 @@ ROOTFS_STORAGE="${ROOTFS_STORAGE:-}"
 REPO="${REPO:-https://github.com/GunsToy/morning-desk.git}"
 TEMPLATE_NAME="debian-12-standard_12.7-1_amd64.tar.zst"
 
-log() { printf '\033[1;36m==>\033[0m %s\n' "$*"; }
+# Messages go to stderr so functions called as "$(...)" return only their value.
+log() { printf '\033[1;36m==>\033[0m %s\n' "$*" >&2; }
 
 next_ctid() {
   if command -v pvesh >/dev/null 2>&1; then
@@ -110,29 +111,24 @@ ensure_template() {
     # pveam available prints: section  filename
     avail="$(pveam available --section system 2>/dev/null | awk '/debian-12-standard/ {print $2; exit}')"
     if [ -z "$avail" ]; then
-      echo "No debian-12-standard template available."
-      echo "Download one with:"
-      echo "  pveam update && pveam available --section system | grep debian-12"
-      echo "  pveam download local debian-12-standard_12.7-1_amd64.tar.zst"
+      {
+        echo "No debian-12-standard template available."
+        echo "Download one with:"
+        echo "  pveam update && pveam available --section system | grep debian-12"
+        echo "  pveam download local debian-12-standard_12.7-1_amd64.tar.zst"
+      } >&2
       exit 1
     fi
     # Strip any path prefix; we only want the filename.
     name="$(basename "$avail")"
-    pveam download "$TEMPLATE_STORAGE" "$name"
+    pveam download "$TEMPLATE_STORAGE" "$name" >&2
   fi
 
-  # Final form Proxmox expects. Must stay well under 255 characters.
-  local ref="${TEMPLATE_STORAGE}:vztmpl/${name}"
-  if [ "${#ref}" -gt 200 ]; then
-    echo "Template reference is too long (${#ref} chars): $ref"
-    echo "This would be rejected by pct (max 255)."
-    exit 1
-  fi
   if [ ! -f "$dir/$name" ]; then
-    echo "Template file missing after download: $dir/$name"
+    echo "Template file missing after download: $dir/$name" >&2
     exit 1
   fi
-  echo "$ref"
+  echo "${TEMPLATE_STORAGE}:vztmpl/${name}"
 }
 prompt_ip() {
   echo
@@ -194,11 +190,7 @@ if pct status "$CTID" >/dev/null 2>&1; then
 fi
 
 TEMPLATE="$(ensure_template)"
-log "Using template $TEMPLATE (${#TEMPLATE} chars)"
-if [ "${#TEMPLATE}" -gt 200 ]; then
-  echo "Refusing to call pct: ostemplate string is too long."
-  exit 1
-fi
+log "Using template $TEMPLATE"
 
 # Refuse a storage that is not actually present
 if ! pvesm status -storage "$ROOTFS_STORAGE" >/dev/null 2>&1; then

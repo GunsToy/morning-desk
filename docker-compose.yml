@@ -12,6 +12,8 @@ services:
       - HOST=0.0.0.0
       # Optional: fix the admin password here instead of choosing it on first visit.
       # - ADMIN_PASSWORD=change-me-please
+      # Optional: address of an nginx in front of the app (see README, "Profiles and the admin password").
+      # - TRUST_PROXY=172.18.0.1
     volumes:
       # Persist config (Growatt token + location). Create the file first if it does not exist.
       - ./config.json:/app/config.json

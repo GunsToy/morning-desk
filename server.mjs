@@ -43,8 +43,10 @@ function tag(block, name) {
 
 const app = express();
 app.disable('x-powered-by');
-// Trust the reverse proxy (nginx) when it has a private address, so req.secure and req.ip are correct.
-app.set('trust proxy', 'loopback, linklocal, uniquelocal');
+// Trust X-Forwarded-* only from a proxy on this machine, so req.secure and req.ip are correct behind nginx.
+// Trusting every private address would let any device on the LAN fake its address and dodge the login lockout.
+// nginx on another host: set TRUST_PROXY to its address.
+app.set('trust proxy', process.env.TRUST_PROXY || 'loopback');
 
 app.use((_req, res, next) => {
   res.set({
@@ -335,10 +337,11 @@ app.get('/api/news', async (req, res) => {
     const feed = NEWS_FEEDS.find(item => item.id === req.query.id);
     if (!feed) return res.status(404).json({ error: 'Unknown news channel' });
     const xml = await getText(feed.url);
-    const items = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/gi)].slice(0, 7).map(match => ({
-      title: tag(match[1], 'title'),
-      link: tag(match[1], 'link') || tag(match[1], 'guid'),
-      published: tag(match[1], 'pubDate')
+    // RSS 2.0 <item>, RSS 1.0 <item rdf:about="…"> and Atom <entry> (whose link is <link href="…"/>).
+    const items = [...xml.matchAll(/<(item|entry)(?:\s[^>]*)?>([\s\S]*?)<\/\1>/gi)].slice(0, 7).map(([, , block]) => ({
+      title: tag(block, 'title'),
+      link: tag(block, 'link') || decode(block.match(/<link\b[^>]*\bhref="([^"]*)"/i)?.[1] ?? '') || tag(block, 'guid'),
+      published: tag(block, 'pubDate')
     })).filter(item => item.title);
     res.json({ id: feed.id, name: feed.name, site: feed.site, items });
   } catch (error) { res.status(502).json({ error: error.message }); }

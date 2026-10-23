@@ -74,7 +74,7 @@ async function loadFeeds() {
 
 async function loadNewsPanels() {
   const stack = $('#news-stack');
-  const chosen = (config.news && config.news.length) ? config.news : ['daily-maverick', 'bbc'];
+  const chosen = config.news ?? [];
   stack.innerHTML = chosen.map(id => {
     const feed = feeds.find(item => item.id === id) || { id, name: id, site: '#' };
     return `<article class="panel news-panel" data-feed="${esc(id)}">
@@ -208,6 +208,7 @@ function resetSolar() {
 }
 
 async function loadAll({ includeSky = false } = {}) {
+  updateClock(); // wall displays run for days: the date must follow the 15-minute refresh
   try {
     config = await api(profileUrl('/api/config'));
     if (config.id !== currentProfile) { // the saved profile was deleted: the server sent the default instead
