@@ -18,6 +18,7 @@ export function blankProfile() {
     name: '',
     location: { ...DEFAULT_LOCATION },
     solar: { provider: providers.DEFAULT_PROVIDER, settings: { [providers.DEFAULT_PROVIDER]: providers.get(providers.DEFAULT_PROVIDER).defaults() } },
+    batteryKwh: null, // usable battery capacity; null hides the runtime estimate
     news: [...DEFAULT_NEWS]
   };
 }
@@ -51,6 +52,7 @@ function cleanProfile(raw = {}) {
     name: String(raw.name || 'Home'),
     location: { ...base.location, ...raw.location },
     solar: cleanSolar(raw),
+    batteryKwh: Number.isFinite(raw.batteryKwh) && raw.batteryKwh > 0 ? raw.batteryKwh : null,
     news: Array.isArray(raw.news) ? raw.news.map(String) : [...base.news]
   };
 }
@@ -195,6 +197,16 @@ export function applyProfileInput(profile, input = {}, validNews = new Set()) {
   if (solarInput !== undefined) {
     const problem = applySolarInput(profile, solarInput);
     if (problem) return problem;
+  }
+
+  if (input.batteryKwh !== undefined) {
+    if (input.batteryKwh === null || String(input.batteryKwh).trim() === '') {
+      profile.batteryKwh = null;
+    } else {
+      const value = toNumber(input.batteryKwh);
+      if (!Number.isFinite(value) || value <= 0 || value > 1000) return 'Battery capacity must be a number of kWh above 0 and up to 1000, or blank.';
+      profile.batteryKwh = value;
+    }
   }
 
   if (input.news !== undefined) {

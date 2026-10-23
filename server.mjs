@@ -260,6 +260,7 @@ const publicProfile = (profile, config) => ({
     provider: profile.solar.provider,
     byProvider: Object.fromEntries(providers.list().map(provider => [provider.id, describeSettings(provider, profile.solar.settings[provider.id] ?? provider.defaults())]))
   },
+  batteryKwh: profile.batteryKwh,
   news: profile.news,
   isDefault: profile.id === config.defaultProfile
 });

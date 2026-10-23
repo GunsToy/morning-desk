@@ -58,6 +58,12 @@ async function loadWeather() {
   $('#weather-place').textContent = data.location; const [icon, condition] = weatherState(data.current.weather_code);
   $('#weather-icon').textContent = icon; $('#weather-temp').textContent = `${Math.round(data.current.temperature_2m)}°`; $('#weather-condition').textContent = condition; $('#weather-feels').textContent = `Feels like ${Math.round(data.current.apparent_temperature)}° · ${Math.round(data.current.wind_speed_10m)} km/h`;
   $('#forecast').innerHTML = data.daily.time.map((day, index) => { const [dailyIcon] = weatherState(data.daily.weather_code[index]); return `<div class="forecast-day"><span>${index === 0 ? 'TODAY' : new Date(`${day}T12:00`).toLocaleDateString('en-ZA',{weekday:'short'}).toUpperCase()}</span><b>${dailyIcon}</b><strong>${Math.round(data.daily.temperature_2m_max[index])}° / ${Math.round(data.daily.temperature_2m_min[index])}°</strong></div>`; }).join('');
+
+  // Night mode: dim the screen between sunset and sunrise at the profile's location. Open-Meteo gives
+  // those times in the location's local time, so compare against "now" shifted by the same offset.
+  const here = new Date(Date.now() + (data.utc_offset_seconds ?? 0) * 1000).toISOString().slice(0, 16);
+  const [sunrise, sunset] = [data.daily.sunrise?.[0], data.daily.sunset?.[0]];
+  document.body.classList.toggle('night', Boolean(sunrise && sunset) && (here < sunrise || here >= sunset));
 }
 let feeds = [];
 
@@ -121,6 +127,19 @@ const flowBadge = (el, watts, active) => {
   el.textContent = unit(watts);
 };
 
+// Time until the battery is empty (discharging) or full (charging) at the current rate.
+// Empty when the capacity is not set, the inverter reports no state of charge, or the battery is idle.
+function batteryRuntime(capacityKwh, percent, charging, watts) {
+  const kwh = Number(capacityKwh), soc = Number(percent), w = Number(watts);
+  if (!(kwh > 0) || percent == null || !Number.isFinite(soc) || !(w >= 20)) return '';
+  const share = (charging ? 100 - soc : soc) / 100;
+  if (share <= 0) return '';
+  const minutes = Math.round(share * kwh * 1000 / w * 60);
+  if (minutes >= 48 * 60) return charging ? 'Full in over 2 days' : 'Over 2 days left';
+  const text = minutes >= 60 ? `${Math.floor(minutes / 60)} h ${minutes % 60} min` : `${minutes} min`;
+  return charging ? `Full in ≈ ${text}` : `≈ ${text} left`;
+}
+
 async function loadSolar() {
   const requested = currentProfile;
   const res = await fetch(profileUrl('/api/solar'));
@@ -165,6 +184,9 @@ async function loadSolar() {
   const batLabel = charging ? 'Charging Power' : discharging ? 'Discharge Power' : 'Battery Power';
   const batWatts = charging ? data.batteryCharge : discharging ? data.battery : 0;
   $('#solar-battery-power-label').innerHTML = `${batLabel}: <strong id="solar-battery-power">${unit(batWatts)}</strong>`;
+  const runtime = batteryRuntime(config?.batteryKwh, data.batteryPercent, charging, batWatts);
+  $('#solar-battery-runtime').textContent = runtime;
+  $('#solar-battery-runtime').hidden = !runtime;
 
   // Watt labels on each flow path
   flowBadge($('#flow-pv-badge'), data.pv, data.flowPv);
@@ -208,6 +230,7 @@ function resetSolar() {
   $('#solar-name').textContent = 'Solar overview';
   $('#solar-updated').textContent = '';
   $('#solar-battery-power-label').innerHTML = '— <strong id="solar-battery-power">—</strong>';
+  $('#solar-battery-runtime').hidden = true;
   document.querySelectorAll('.flow-badge').forEach(badge => { badge.textContent = ''; badge.hidden = true; });
 }
 
@@ -292,6 +315,7 @@ function blankProfile() {
       provider: solarProviders[0]?.id ?? '',
       byProvider: Object.fromEntries(solarProviders.map(provider => [provider.id, { configured: false, values: provider.defaults, secretsSet: [] }]))
     },
+    batteryKwh: null,
     news: ['daily-maverick', 'bbc']
   };
 }
@@ -343,6 +367,7 @@ async function populateSettings(id) {
   form.elements.latitude.value = data.location.latitude;
   form.elements.longitude.value = data.location.longitude;
   form.elements.timezone.value = data.location.timezone || 'Africa/Johannesburg';
+  form.elements.batteryKwh.value = data.batteryKwh ?? '';
   const providerSelect = $('#solar-provider');
   providerSelect.innerHTML = solarProviders.map(provider => `<option value="${esc(provider.id)}">${esc(provider.label)}</option>`).join('');
   providerSelect.value = data.solar.provider;
@@ -416,6 +441,7 @@ async function saveSettings() {
       longitude: form.elements.longitude.value,
       timezone: form.elements.timezone.value
     },
+    batteryKwh: form.elements.batteryKwh.value,
     solar: {
       provider: form.elements.solarProvider.value,
       values: Object.fromEntries((providerById(form.elements.solarProvider.value)?.fields ?? [])

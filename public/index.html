@@ -93,6 +93,7 @@
               </div>
               <p class="node-label">Battery: <strong id="solar-battery-voltage">—</strong></p>
               <p class="node-label node-battery-power" id="solar-battery-power-label">— <strong id="solar-battery-power">—</strong></p>
+              <p class="node-label node-battery-runtime" id="solar-battery-runtime" hidden></p>
             </div>
           </div>
 
@@ -182,6 +183,9 @@
           <select name="solarProvider" id="solar-provider"></select>
         </label>
         <div id="solar-fields"></div>
+        <label>Battery capacity (kWh)
+          <input name="batteryKwh" type="number" step="any" min="0" placeholder="Leave blank to hide the runtime estimate">
+        </label>
       </fieldset>
 
       <fieldset class="settings-section">

@@ -81,3 +81,22 @@ test('a damaged config.json is never overwritten by a save', async () => {
   await assert.rejects(store.update(config => { config.profiles[0].name = 'x'; }), /not valid JSON/);
   assert.equal(await fs.readFile(configPath, 'utf8'), damaged);
 });
+
+test('battery capacity: a number is kept, blank clears it, nonsense is rejected', () => {
+  const profile = store.blankProfile();
+  assert.equal(profile.batteryKwh, null);
+  assert.equal(store.applyProfileInput(profile, { batteryKwh: '10.24' }), null);
+  assert.equal(profile.batteryKwh, 10.24);
+  assert.match(store.applyProfileInput(profile, { batteryKwh: '-5' }), /Battery capacity/);
+  assert.match(store.applyProfileInput(profile, { batteryKwh: 'lots' }), /Battery capacity/);
+  assert.equal(profile.batteryKwh, 10.24, 'a rejected value leaves the saved one alone');
+  assert.equal(store.applyProfileInput(profile, { batteryKwh: '' }), null);
+  assert.equal(profile.batteryKwh, null);
+});
+
+test('battery capacity survives a save, and configs without it still load', async () => {
+  await writeConfig({ profiles: [{ id: 'home', name: 'Home' }] });
+  assert.equal((await store.read()).profiles[0].batteryKwh, null);
+  await store.update(config => { config.profiles[0].batteryKwh = 15; });
+  assert.equal((await store.read()).profiles[0].batteryKwh, 15);
+});
