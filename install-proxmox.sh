@@ -5,8 +5,8 @@
 #
 # - next free CTID
 # - static IP, or blank for DHCP
-# - container root password copied from the Proxmox host root hash
 # - Docker + Morning Desk + daily auto-update
+# - container root has no password; open a shell from the host with: pct enter <ctid>
 
 set -euo pipefail
 
@@ -159,23 +159,6 @@ prompt_ip() {
   fi
 }
 
-copy_root_password() {
-  local ctid="$1"
-  local hash
-  hash="$(awk -F: '$1=="root" {print $2}' /etc/shadow)"
-  if [ -z "$hash" ] || [ "$hash" = "*" ] || [ "$hash" = "!" ]; then
-    echo "Could not read the Proxmox root password hash from /etc/shadow."
-    exit 1
-  fi
-  # Hash contains $, so send it as a file rather than a shell argument.
-  local tmp
-  tmp="$(mktemp)"
-  printf '%s' "$hash" > "$tmp"
-  pct push "$ctid" "$tmp" /tmp/root.hash
-  rm -f "$tmp"
-  pct exec "$ctid" -- bash -c 'usermod -p "$(cat /tmp/root.hash)" root && rm -f /tmp/root.hash'
-}
-
 CTID="$(next_ctid)"
 log "Next CTID: $CTID"
 TEMPLATE_STORAGE="$(select_storage vztmpl "Template storage (where CT templates are stored):" "$TEMPLATE_STORAGE")"
@@ -222,9 +205,6 @@ for _ in $(seq 1 30); do
   sleep 2
 done
 
-log "Copying Proxmox root password into the container"
-copy_root_password "$CTID"
-
 log "Installing dependencies inside the container"
 pct exec "$CTID" -- bash -lc '
   set -euo pipefail
@@ -257,7 +237,7 @@ log "Morning Desk container $CTID is up"
 echo "  Hostname: $HOSTNAME"
 echo "  IP:       ${IP_SHOW:-see pct exec $CTID -- hostname -I}"
 echo "  Dashboard: http://${IP_SHOW:-<container-ip>}:4123"
-echo "  Root password: same as Proxmox root"
+echo "  Shell:    pct enter $CTID   (root has no password; set one with: pct exec $CTID -- passwd)"
 echo "  Edit the Growatt token:"
 echo "    pct enter $CTID"
 echo "    nano /root/morning-desk/config.json"

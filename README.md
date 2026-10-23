@@ -43,7 +43,7 @@ A provider is one file in `providers/` that fetches readings from a vendor's clo
 
 ## Install on Proxmox (creates the container)
 
-Run on the Proxmox host as root. It takes the next free CTID, downloads the Debian 12 template if needed, installs Docker and Morning Desk, and copies the Proxmox root password into the container.
+Run on the Proxmox host as root. It takes the next free CTID, downloads the Debian 12 template if needed, and installs Docker and Morning Desk. The container's root account has no password: open a shell from the Proxmox host with `pct enter <ctid>`, or set one with `pct exec <ctid> -- passwd` if you want to log in from the Proxmox console.
 
 ```bash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/GunsToy/morning-desk/main/install-proxmox.sh)"

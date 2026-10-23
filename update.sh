@@ -8,7 +8,6 @@ set -eu
 APP_DIR="${APP_DIR:-$(cd "$(dirname "$0")" && pwd)}"
 cd "$APP_DIR"
 
-REPO="${REPO:-https://github.com/GunsToy/morning-desk.git}"
 BRANCH="${BRANCH:-main}"
 
 log() { printf '%s %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*"; }
@@ -16,11 +15,6 @@ log() { printf '%s %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*"; }
 if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   log "Not a git checkout: $APP_DIR"
   exit 1
-fi
-
-# Do not clobber a local config.json
-if [ -f config.json ]; then
-  git update-index --assume-unchanged config.json 2>/dev/null || true
 fi
 
 log "Fetching $BRANCH from origin"

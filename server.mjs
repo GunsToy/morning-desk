@@ -100,14 +100,15 @@ const NEWS_FEEDS = [
   // South Africa
   { id: 'daily-maverick', name: 'Daily Maverick', region: 'South Africa', url: 'https://www.dailymaverick.co.za/dmrss/', site: 'https://www.dailymaverick.co.za' },
   { id: 'mail-guardian', name: 'Mail & Guardian', region: 'South Africa', url: 'https://mg.co.za/rss', site: 'https://mg.co.za' },
-  { id: 'news24', name: 'News24', region: 'South Africa', url: 'https://feeds.capi24.com/v1/Search/articles/news24/TopStories/rss', site: 'https://www.news24.com' },
-  { id: 'iol', name: 'IOL', region: 'South Africa', url: 'https://rss.iol.io/iol/news', site: 'https://www.iol.co.za' },
-  { id: 'timeslive', name: 'TimesLIVE', region: 'South Africa', url: 'https://www.timeslive.co.za/rss/', site: 'https://www.timeslive.co.za' },
+  { id: 'news24', name: 'News24', region: 'South Africa', url: 'https://news.google.com/rss/search?q=when:24h+site:news24.com&hl=en-ZA&gl=ZA&ceid=ZA:en', site: 'https://www.news24.com' },
+  { id: 'iol', name: 'IOL', region: 'South Africa', url: 'https://iol.co.za/rss/', site: 'https://iol.co.za' },
+  { id: 'timeslive', name: 'TimesLIVE', region: 'South Africa', url: 'https://www.timeslive.co.za/arc/outboundfeeds/rss/', site: 'https://www.timeslive.co.za' },
   { id: 'moneyweb', name: 'Moneyweb', region: 'South Africa', url: 'https://www.moneyweb.co.za/feed/', site: 'https://www.moneyweb.co.za' },
   { id: 'techcentral', name: 'TechCentral', region: 'South Africa', url: 'https://techcentral.co.za/feed/', site: 'https://techcentral.co.za' },
   { id: 'citizen', name: 'The Citizen', region: 'South Africa', url: 'https://www.citizen.co.za/feed/', site: 'https://www.citizen.co.za' },
-  { id: 'ewn', name: 'Eyewitness News', region: 'South Africa', url: 'https://ewn.co.za/RSS%20Feeds/Latest%20News', site: 'https://ewn.co.za' },
-  { id: 'businesslive', name: 'BusinessLIVE', region: 'South Africa', url: 'https://www.businesslive.co.za/bd/rss/', site: 'https://www.businesslive.co.za' },
+  { id: 'ewn', name: 'Eyewitness News', region: 'South Africa', url: 'https://news.google.com/rss/search?q=when:24h+site:ewn.co.za&hl=en-ZA&gl=ZA&ceid=ZA:en', site: 'https://ewn.co.za' },
+  // Id kept from when the site was BusinessLIVE, so saved profiles keep their choice.
+  { id: 'businesslive', name: 'Business Day', region: 'South Africa', url: 'https://www.businessday.co.za/arc/outboundfeeds/rss/', site: 'https://www.businessday.co.za' },
 
   // World
   { id: 'bbc', name: 'BBC News', region: 'World', url: 'https://feeds.bbci.co.uk/news/rss.xml', site: 'https://www.bbc.com/news' },
@@ -121,7 +122,7 @@ const NEWS_FEEDS = [
   { id: 'sky', name: 'Sky News', region: 'World', url: 'https://feeds.skynews.com/feeds/rss/home.xml', site: 'https://news.sky.com' },
   { id: 'nbc', name: 'NBC News', region: 'World', url: 'https://feeds.nbcnews.com/feeds/topstories', site: 'https://www.nbcnews.com' },
   { id: 'pbs', name: 'PBS NewsHour', region: 'World', url: 'https://www.pbs.org/newshour/feeds/rss/headlines', site: 'https://www.pbs.org/newshour' },
-  { id: 'washingtonpost', name: 'Washington Post World', region: 'World', url: 'https://feeds.washingtonpost.com/rss/world', site: 'https://www.washingtonpost.com' },
+  { id: 'washingtonpost', name: 'Washington Post', region: 'World', url: 'https://news.google.com/rss/search?q=when:24h+site:washingtonpost.com&hl=en-ZA&gl=ZA&ceid=ZA:en', site: 'https://www.washingtonpost.com' },
   { id: 'dw', name: 'Deutsche Welle', region: 'World', url: 'https://rss.dw.com/rdf/rss-en-all', site: 'https://www.dw.com' },
   { id: 'france24', name: 'France 24', region: 'World', url: 'https://www.france24.com/en/rss', site: 'https://www.france24.com' },
   { id: 'economist', name: 'The Economist', region: 'World', url: 'https://www.economist.com/the-world-this-week/rss.xml', site: 'https://www.economist.com' },
