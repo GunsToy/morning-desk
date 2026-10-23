@@ -57,7 +57,7 @@ async function loadWeather() {
   if (requested !== currentProfile) return; // the profile was switched while this was loading
   $('#weather-place').textContent = data.location; const [icon, condition] = weatherState(data.current.weather_code);
   $('#weather-icon').textContent = icon; $('#weather-temp').textContent = `${Math.round(data.current.temperature_2m)}°`; $('#weather-condition').textContent = condition; $('#weather-feels').textContent = `Feels like ${Math.round(data.current.apparent_temperature)}° · ${Math.round(data.current.wind_speed_10m)} km/h`;
-  $('#forecast').innerHTML = data.daily.time.map((day, index) => { const [dailyIcon] = weatherState(data.daily.weather_code[index]); return `<div class="forecast-day"><span>${index === 0 ? 'TODAY' : new Date(`${day}T12:00`).toLocaleDateString('en-ZA',{weekday:'short'}).toUpperCase()}</span><b>${dailyIcon}</b><strong>${Math.round(data.daily.temperature_2m_max[index])}° / ${Math.round(data.daily.temperature_2m_min[index])}°</strong></div>`; }).join('');
+  $('#forecast').innerHTML = data.daily.time.map((day, index) => { const [dailyIcon] = weatherState(data.daily.weather_code[index]); return `<div class="forecast-day"><span>${index === 0 ? 'TODAY' : new Date(`${day}T12:00`).toLocaleDateString('en-ZA',{weekday:'short'}).toUpperCase()}</span><b>${dailyIcon}</b><strong><span class="t-max">${Math.round(data.daily.temperature_2m_max[index])}°</span><span class="t-sep"> / </span><span class="t-min">${Math.round(data.daily.temperature_2m_min[index])}°</span></strong></div>`; }).join('');
 
   // Night mode: dim the screen between sunset and sunrise at the profile's location. Open-Meteo gives
   // those times in the location's local time, so compare against "now" shifted by the same offset.
