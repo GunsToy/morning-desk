@@ -341,7 +341,7 @@ body { overflow-x: hidden; }
 
 /* —— Profiles and admin login —— */
 [hidden] { display: none !important; }
-#profile-select, #edit-profile {
+#profile-select, #edit-profile, #solar-provider {
   color: var(--ink);
   background: #131a25;
   border: 1px solid var(--line);
@@ -352,7 +352,7 @@ body { overflow-x: hidden; }
   font-weight: 700;
   cursor: pointer;
 }
-#edit-profile { border-radius: 7px; background: #0a1018; padding: 10px; font-weight: 500; font-size: inherit; }
+#edit-profile, #solar-provider { border-radius: 7px; background: #0a1018; padding: 10px; font-weight: 500; font-size: inherit; }
 .inline-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 4px 0 10px; }
 .inline-actions button {
   padding: 8px 12px;
@@ -374,3 +374,12 @@ body { overflow-x: hidden; }
   .header-actions { gap: 10px; }
   #profile-select { max-width: 40vw; padding: 8px 10px; }
 }
+
+/* —— Solar provider help and connection check —— */
+.field-help { color: var(--muted); font-size: .7rem; line-height: 1.45; font-weight: 400; }
+.check-result { margin: 4px 0 8px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: .76rem; line-height: 1.5; color: var(--muted); }
+.check-result p { margin: 0 0 4px; color: var(--ink); overflow-wrap: anywhere; }
+.check-result.ok { border-color: rgba(165, 226, 173, .35); }
+.check-result.bad { border-color: rgba(255, 132, 108, .45); color: var(--coral); }
+.check-result summary { cursor: pointer; color: var(--cyan); margin-top: 6px; }
+.check-result pre { max-height: 220px; overflow: auto; margin: 8px 0 0; padding: 8px; background: #0a1018; border-radius: 6px; font-size: .66rem; white-space: pre-wrap; overflow-wrap: anywhere; }

@@ -1,6 +1,6 @@
 # Morning Desk
 
-Local dashboard: solar (Growatt), weather, Sky News live and news feeds.
+Local dashboard: solar (Growatt or Victron), weather, Sky News live and news feeds.
 
 Dashboard: `http://<host>:4123`
 
@@ -23,9 +23,22 @@ An older single-profile `config.json` is upgraded automatically on first save: i
 
 ## Solar providers
 
-Each profile picks one solar provider and keeps its own credentials for it. Right now that is **Growatt**. The Settings screen draws the form from the provider's field list, saved tokens and passwords are never sent back to the browser, and switching provider keeps the other one's saved details.
+Each profile picks one solar provider and keeps its own credentials for it. Right now that is **Growatt** or **Victron VRM**. The Settings screen draws the form from the provider's field list, saved tokens and passwords are never sent back to the browser, and switching provider keeps the other one's saved details.
 
 A provider is one file in `providers/` that fetches readings from a vendor's cloud and returns them in a common shape. `providers/common.mjs` documents the shape and the field list, and `providers/index.mjs` is where a new provider is registered. A provider with a strict API quota can set `minIntervalMs` so it is polled less often than the dashboard's 15 minutes.
+
+### Victron VRM
+
+Reads a Victron system (Cerbo GX / Venus OS, MultiPlus / Quattro, SmartSolar, Smart/BMV shunt) through the VRM portal's API.
+
+1. In VRM go to **Preferences → Integrations → Access tokens → Add**, name it "Morning Desk" and copy the token (it is shown once). A token gives read access to every installation on your account.
+2. In Settings choose **Victron VRM** as the provider and paste the token.
+3. **Installation ID** can stay blank if your account has a single installation. Otherwise use the number in the VRM address, `vrm.victronenergy.com/installation/<id>/dashboard`.
+4. Press **Check connection**. It tries the details you typed without saving them, shows what Morning Desk recognised (battery %, solar, grid, load) and lists every data point VRM returned.
+
+What it reads: battery charge, voltage and current (power = V × A, positive current is charging), solar from your solar chargers plus any AC-coupled PV inverters, grid import from a grid meter, the load from the inverter/charger's AC output, and today's yield. VRM only receives new data every minute or so, so the dashboard shows what VRM last heard, and says so if that is more than 30 minutes old.
+
+**Not yet confirmed against a live installation.** The matching of VRM's data points to dashboard fields is built from Victron's documentation and client libraries and tested against recorded-style responses, but not against real hardware. Different setups (no grid meter, DC-coupled only, several inverters, Fronius or other PV inverters) report slightly differently. If a figure is missing or looks wrong, press **Check connection**, open "All data points" and compare. The matching table sits at the top of `providers/victron.mjs` and is easy to adjust.
 
 `config.json` is now version 3: each profile has a `solar` block (`provider` plus `settings` per provider) in place of the old `growatt` block. Older files are upgraded the next time settings are saved, and your Growatt token is carried over. To roll back to an older release after that, copy the token into the old `growatt` block by hand.
 

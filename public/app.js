@@ -303,8 +303,10 @@ function renderSolarFields(providerId) {
     return `<label>${esc(field.label)}
       <input name="solar_${esc(field.name)}" type="${field.type === 'password' ? 'password' : field.type === 'url' ? 'url' : 'text'}"
         value="${esc(value)}" placeholder="${esc(placeholder)}" autocomplete="off"${field.required ? ' required' : ''}>
+      ${field.help ? `<small class="field-help">${esc(field.help)}</small>` : ''}
     </label>`;
   }).join('');
+  $('#solar-check-result').hidden = true;
   const status = $('#settings-status');
   const label = provider?.label ?? 'Solar';
   status.textContent = saved.configured ? `${label}: credentials saved` : `${label}: not connected yet`;
@@ -372,6 +374,35 @@ $('#settings-button').addEventListener('click', async () => {
 $('#settings-close').addEventListener('click', () => dialog.close());
 $('#settings-cancel').addEventListener('click', () => dialog.close());
 
+// Tries the credentials currently typed into the form, without saving anything.
+$('#solar-check').addEventListener('click', async () => {
+  const form = $('#settings-form');
+  const button = $('#solar-check');
+  const box = $('#solar-check-result');
+  const providerId = form.elements.solarProvider.value;
+  const values = Object.fromEntries((providerById(providerId)?.fields ?? []).map(field => [field.name, form.elements[`solar_${field.name}`]?.value ?? '']));
+  button.disabled = true;
+  box.hidden = false;
+  box.className = 'check-result';
+  box.textContent = 'Checking…';
+  try {
+    const result = await api('/api/solar-inspect', { method: 'POST', body: { profile: editingId, provider: providerId, values } });
+    box.className = 'check-result ok';
+    box.replaceChildren(...result.lines.map(line => Object.assign(document.createElement('p'), { textContent: line })));
+    if (result.details.length) {
+      const details = document.createElement('details');
+      const summary = Object.assign(document.createElement('summary'), { textContent: `All ${result.details.length} data points` });
+      const pre = Object.assign(document.createElement('pre'), { textContent: result.details.join('\n') });
+      details.append(summary, pre);
+      box.append(details);
+    }
+  } catch (error) {
+    box.className = 'check-result bad';
+    box.textContent = error.status === 401 ? 'Your admin session has expired. Close Settings and unlock it again.' : error.message;
+  } finally {
+    button.disabled = false;
+  }
+});
 $('#solar-provider').addEventListener('change', event => renderSolarFields(event.target.value));
 $('#edit-profile').addEventListener('change', event => populateSettings(event.target.value));
 $('#profile-new').addEventListener('click', async () => {

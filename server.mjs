@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import * as store from './store.mjs';
 import * as auth from './auth.mjs';
 import * as providers from './providers/index.mjs';
-import { describeSettings, keepPreviousFlow, publicSchema } from './providers/common.mjs';
+import { applyFields, describeReadings, describeSettings, keepPreviousFlow, publicSchema } from './providers/common.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // One solar cache per profile, so profiles on different solar accounts never share readings.
@@ -362,6 +362,25 @@ app.get('/api/solar', async (req, res) => {
     res.status(502).json(value);
   }
 });
+
+// "Check connection": tries the credentials in the settings form (blank secrets fall back to the saved ones) and
+// reports what the provider found. Nothing is saved, and the dashboard's cached readings are left alone.
+app.post('/api/solar-inspect', requireAdmin, handle(async (req, res) => {
+  const provider = providers.get(req.body?.provider);
+  if (!provider) throw httpError(400, 'Unknown solar provider.');
+  const config = await store.read();
+  const saved = req.body?.profile ? config.profiles.find(item => item.id === req.body.profile) : null;
+  if (req.body?.profile && !saved) throw httpError(404, 'Profile not found.');
+  const applied = applyFields(provider, saved?.solar.settings[provider.id] ?? provider.defaults(), req.body?.values ?? {});
+  if (applied.error) throw httpError(400, applied.error);
+  if (!provider.isConfigured(applied.settings)) throw httpError(400, 'Enter the credentials first.');
+  try {
+    const result = provider.inspect ? await provider.inspect(applied.settings) : describeReadings(await provider.fetchReadings(applied.settings));
+    res.json({ ok: true, provider: provider.id, label: provider.label, lines: result.lines, details: result.details ?? [] });
+  } catch (error) {
+    res.status(502).json({ ok: false, error: provider.explainError ? provider.explainError(error) : error.message });
+  }
+}));
 
 app.get('/api/sky', async (_req, res) => {
   try {

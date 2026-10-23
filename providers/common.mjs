@@ -10,8 +10,11 @@
 //   fetchReadings(s)     - asks the provider's cloud for live data and returns a readings object (see below)
 //   explainError(e)      - OPTIONAL: turns an error from fetchReadings into a message for the dashboard
 //   minIntervalMs        - OPTIONAL: never poll more often than this (the dashboard polls every 15 minutes)
+//   inspect(s)           - OPTIONAL: backs the "Check connection" button. Returns { lines: [string], details?: [string] }.
+//                          Without it the button simply runs fetchReadings and summarises the result.
 //
-// Each field is { name, label, type: 'url' | 'text' | 'password', secret?, required?, placeholder?, maxLength? }.
+// Each field is { name, label, type: 'url' | 'text' | 'password', secret?, required?, placeholder?, help?, maxLength?,
+//                 pattern?: RegExp, patternMessage?: string }.
 // Secret fields are write-only: the browser is told whether one is stored, never what it is.
 //
 // fetchReadings returns the same shape for every provider (watts unless noted; null when unknown):
@@ -71,6 +74,7 @@ export function applyFields(provider, current, values = {}, clear = []) {
       if (!/^https?:$/.test(url.protocol)) return { error: `${field.label} must start with http:// or https://.` };
       next[field.name] = url.toString().replace(/\/+$/, '');
     } else {
+      if (field.pattern && !field.pattern.test(text)) return { error: field.patternMessage || `${field.label} is not valid.` };
       next[field.name] = text;
     }
   }
@@ -99,7 +103,79 @@ export const publicSchema = provider => {
   return {
     id: provider.id,
     label: provider.label,
-    fields: provider.fields.map(({ name, label, type, secret = false, required = false, placeholder = '' }) => ({ name, label, type, secret, required, placeholder })),
+    fields: provider.fields.map(({ name, label, type, secret = false, required = false, placeholder = '', help = '' }) => ({ name, label, type, secret, required, placeholder, help })),
     defaults: Object.fromEntries(provider.fields.filter(field => !field.secret).map(field => [field.name, defaults[field.name] ?? '']))
   };
 };
+
+// ---- Building readings ------------------------------------------------------------------
+
+const MIN_FLOW_W = 20; // below this a path is treated as idle, the same threshold the dashboard uses
+const num = value => (typeof value === 'number' && Number.isFinite(value) ? value : null);
+
+// Turns a provider's raw figures into the readings shape. Anything the provider could not supply stays null, and
+// hasFlowData is only true when at least one live power figure is known (so keepPreviousFlow can do its job).
+//   pv, grid (import), battery (discharging), batteryCharge (charging), consumption: watts
+export function buildReadings(input) {
+  const pv = num(input.pv);
+  const grid = num(input.grid);
+  const battery = num(input.battery);
+  const batteryCharge = num(input.batteryCharge);
+  const consumption = num(input.consumption);
+  const on = value => value !== null && value >= MIN_FLOW_W;
+  const flowPv = on(pv);
+  const flowGrid = on(grid);
+  const flowBatteryOut = on(battery);
+  const flowBatteryIn = on(batteryCharge);
+  const flowLoad = on(consumption);
+
+  const candidates = [['PV', pv], ['BATTERY', battery], ['GRID', grid]].filter(([, value]) => value !== null && Math.abs(value) >= MIN_FLOW_W);
+  const activeSource = candidates.sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))[0]?.[0] ?? 'STANDBY';
+
+  const feeding = [];
+  if (flowPv) feeding.push(`PV ${Math.round(pv)}W`);
+  if (flowGrid) feeding.push(`Grid ${Math.round(grid)}W`);
+  if (flowBatteryOut) feeding.push(`Battery ${Math.round(battery)}W`);
+  const sinking = [];
+  if (flowLoad) sinking.push(`Load ${Math.round(consumption)}W`);
+  if (flowBatteryIn) sinking.push(`Charge ${Math.round(batteryCharge)}W`);
+
+  return {
+    plant: input.plant ?? 'Solar system',
+    power: num(input.power),
+    today: num(input.today),
+    total: num(input.total),
+    status: input.status ?? 'Connected',
+    updatedAt: input.updatedAt ?? null,
+    pv,
+    grid,
+    battery,
+    batteryCharge,
+    batteryPercent: num(input.batteryPercent),
+    batteryVoltage: num(input.batteryVoltage),
+    consumption,
+    activeSource,
+    flowSummary: [feeding.length ? feeding.join(' + ') : 'No source', sinking.length ? sinking.join(' · ') : 'Idle'].join(' → '),
+    flowPv,
+    flowGrid,
+    flowBatteryOut,
+    flowBatteryIn,
+    flowLoad,
+    hasFlowData: [pv, consumption, battery, batteryCharge, grid].some(value => value !== null)
+  };
+}
+
+const watts = value => (value === null || value === undefined ? 'not available' : `${Math.round(value)} W`);
+
+// What "Check connection" shows for a provider that has no inspect() of its own.
+export function describeReadings(readings) {
+  return {
+    lines: [
+      `Connected to ${readings.plant}.`,
+      `Solar: ${watts(readings.pv)}`,
+      `Grid import: ${watts(readings.grid)}`,
+      `House load: ${watts(readings.consumption)}`,
+      `Battery: ${readings.batteryPercent === null ? 'not available' : `${readings.batteryPercent}%`}, charging ${watts(readings.batteryCharge)}, discharging ${watts(readings.battery)}`
+    ]
+  };
+}
