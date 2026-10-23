@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import * as store from './store.mjs';
 import * as auth from './auth.mjs';
 import * as providers from './providers/index.mjs';
-import { describeSettings, keepPreviousFlow, publicSchema } from './providers/common.mjs';
+import { describeSettings, keepPreviousFlow, publicSchema, USER_AGENT } from './providers/common.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // One solar cache per profile, so profiles on different solar accounts never share readings.
@@ -13,7 +13,7 @@ const solarCaches = new Map();
 const SOLAR_TTL = 15 * 60 * 1000;
 
 async function getText(url) {
-  const response = await fetch(url, { headers: { 'User-Agent': 'MorningDesk/1.0 (personal dashboard)' } });
+  const response = await fetch(url, { headers: { 'User-Agent': USER_AGENT } });
   if (!response.ok) throw new Error(`Source returned ${response.status}`);
   return response.text();
 }

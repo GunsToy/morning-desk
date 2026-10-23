@@ -1,4 +1,6 @@
 // Growatt OpenAPI adapter. The functions below are the original Growatt code, moved here unchanged.
+import { USER_AGENT } from './common.mjs';
+
 const DEFAULT_SERVER = 'https://openapi.growatt.com/v1';
 
 function normaliseSolar(payload) {
@@ -112,7 +114,7 @@ async function growattOpenApiRequest(baseUrl, endpoint, token, params = {}) {
   const url = new URL(`${baseUrl}/${endpoint.replace(/^\/+/, '')}`);
   for (const [name, value] of Object.entries(params)) if (value !== undefined && value !== null) url.searchParams.set(name, String(value));
   const response = await fetch(url, {
-    headers: { token, Accept: 'application/json', 'User-Agent': 'MorningDesk/1.0 (personal dashboard)' }
+    headers: { token, Accept: 'application/json', 'User-Agent': USER_AGENT }
   });
   const text = await response.text();
   if (!response.ok) throw new Error(`Growatt OpenAPI returned ${response.status}. Check the selected regional OpenAPI address.`);
@@ -136,7 +138,7 @@ async function growattLatestDeviceData(baseUrl, token, device) {
       token,
       Accept: 'application/json',
       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-      'User-Agent': 'MorningDesk/1.0 (personal dashboard)'
+      'User-Agent': USER_AGENT
     },
     body: new URLSearchParams({ deviceType, deviceSn }).toString()
   });
