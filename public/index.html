@@ -132,7 +132,7 @@
       </div>
     </section>
   </main>
-  <dialog id="auth-dialog">
+  <dialog id="auth-dialog" aria-labelledby="auth-title">
     <form id="auth-form">
       <div class="dialog-heading">
         <div><p class="eyebrow">ADMIN</p><h2 id="auth-title">Unlock settings</h2></div>
@@ -153,10 +153,10 @@
     </form>
   </dialog>
 
-  <dialog id="settings-dialog">
+  <dialog id="settings-dialog" aria-labelledby="settings-title">
     <form id="settings-form">
       <div class="dialog-heading">
-        <div><p class="eyebrow">SETTINGS</p><h2>Profiles</h2></div>
+        <div><p class="eyebrow">SETTINGS</p><h2 id="settings-title">Profiles</h2></div>
         <button type="button" id="settings-close" aria-label="Close">×</button>
       </div>
       <p class="dialog-intro">Each profile has its own location, solar system and news channels. Saved only in the local <code>config.json</code>. Leave a saved token or password blank to keep it.</p>

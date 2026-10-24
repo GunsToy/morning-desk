@@ -55,6 +55,7 @@ async function loadWeather() {
   const requested = currentProfile;
   const res = await fetch(profileUrl('/api/weather')); const data = await res.json(); if (!res.ok) throw Error(data.error);
   if (requested !== currentProfile) return; // the profile was switched while this was loading
+  weatherUpdated = new Date();
   $('#weather-place').textContent = data.location; const [icon, condition] = weatherState(data.current.weather_code);
   $('#weather-icon').textContent = icon; $('#weather-temp').textContent = `${Math.round(data.current.temperature_2m)}°`; $('#weather-condition').textContent = condition; $('#weather-feels').textContent = `Feels like ${Math.round(data.current.apparent_temperature)}° · ${Math.round(data.current.wind_speed_10m)} km/h`;
   $('#forecast').innerHTML = data.daily.time.map((day, index) => { const [dailyIcon] = weatherState(data.daily.weather_code[index]); return `<div class="forecast-day"><span>${index === 0 ? 'TODAY' : new Date(`${day}T12:00`).toLocaleDateString('en-ZA',{weekday:'short'}).toUpperCase()}</span><b>${dailyIcon}</b><strong><span class="t-max">${Math.round(data.daily.temperature_2m_max[index])}°</span><span class="t-sep"> / </span><span class="t-min">${Math.round(data.daily.temperature_2m_min[index])}°</span></strong></div>`; }).join('');
@@ -234,11 +235,38 @@ function resetSolar() {
   document.querySelectorAll('.flow-badge').forEach(badge => { badge.textContent = ''; badge.hidden = true; });
 }
 
+let lastRefresh = null; // when the dashboard last reached its server
+let weatherUpdated = null; // when the forecast on screen was fetched
+const clockTime = date => date.toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit' });
+
+// Header badge: LIVE while refreshes reach the server, OFFLINE with the last good time when they do not.
+function setConnection(ok) {
+  const dot = $('.live-dot');
+  if (ok) lastRefresh = new Date();
+  dot.classList.toggle('offline', !ok);
+  dot.textContent = ok ? 'LIVE' : lastRefresh ? `OFFLINE · ${clockTime(lastRefresh)}` : 'OFFLINE';
+}
+
+// Keep the last forecast on screen, but say it is old instead of passing it off as current.
+function markWeatherStale(error) {
+  console.error(error);
+  $('#weather-feels').textContent = weatherUpdated
+    ? `Weather unavailable · last update ${clockTime(weatherUpdated)}`
+    : 'Weather unavailable right now';
+}
+
 async function loadAll({ includeSky = false } = {}) {
   updateClock(); // wall displays run for days: the date must follow the 15-minute refresh
   try {
     const requested = currentProfile;
-    const data = await api(profileUrl('/api/config'));
+    let data;
+    try {
+      data = await api(profileUrl('/api/config'));
+    } catch (error) {
+      setConnection(false); // the dashboard's own server did not answer: say so instead of showing old data as live
+      throw error;
+    }
+    setConnection(true);
     // A newer load for another profile owns the screen now. Without this, a slow answer for the old
     // profile would also take the deleted-profile branch below and switch the screen back to it.
     if (requested !== currentProfile) return;
@@ -248,7 +276,7 @@ async function loadAll({ includeSky = false } = {}) {
       renderProfileSelect();
     }
     storage.set('md.profile', currentProfile);
-    const tasks = [loadWeather(), loadNewsPanels(), loadSolar()];
+    const tasks = [loadWeather().catch(markWeatherStale), loadNewsPanels(), loadSolar()];
     if (includeSky) tasks.push(loadSky());
     await Promise.all(tasks);
   } catch (error) {
@@ -429,7 +457,10 @@ $('#profile-delete').addEventListener('click', async () => {
   }
 });
 
+let saving = false;
+
 async function saveSettings() {
+  if (saving) return; // a second click while the first save is in flight would create a new profile twice
   const form = $('#settings-form');
   const status = $('#settings-status');
   if (!form.reportValidity()) return;
@@ -452,6 +483,8 @@ async function saveSettings() {
   };
   status.textContent = 'Saving…';
   status.classList.remove('ok');
+  saving = true;
+  $('#save-settings').disabled = true;
   try {
     const data = editingId
       ? await api(`/api/profiles/${encodeURIComponent(editingId)}`, { method: 'PUT', body })
@@ -468,6 +501,9 @@ async function saveSettings() {
       return;
     }
     status.textContent = error.message;
+  } finally {
+    saving = false;
+    $('#save-settings').disabled = false;
   }
 }
 $('#settings-form').addEventListener('submit', event => {
@@ -506,7 +542,7 @@ document.addEventListener('click', event => {
   const button = event.target.closest('[data-refresh]');
   if (!button) return;
   const kind = button.dataset.refresh;
-  if (kind === 'weather') loadWeather();
+  if (kind === 'weather') loadWeather().catch(markWeatherStale);
   else if (kind === 'solar') loadSolar();
   else if (kind === 'news' && button.dataset.feed) loadOneNews(button.dataset.feed);
 });
