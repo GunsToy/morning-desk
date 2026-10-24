@@ -15,6 +15,27 @@
       <div class="header-actions"><select id="profile-select" aria-label="Switch profile" hidden></select><span class="live-dot">LIVE</span><button class="icon-button settings-open" id="settings-button" aria-label="Open settings">⚙ Settings</button></div>
     </header>
     <section class="grid">
+      <article class="panel weather-panel">
+        <div class="weather-layout">
+          <div class="weather-date-block">
+            <p class="weather-date-label" id="weather-date">—</p>
+            <h2 class="weather-place" id="weather-place">—</h2>
+            <button class="refresh" data-refresh="weather" aria-label="Refresh weather">↻</button>
+          </div>
+          <div class="weather-body">
+            <div class="weather-now">
+              <span class="weather-icon" id="weather-icon">☀</span>
+              <strong id="weather-temp">—°</strong>
+              <div>
+                <span id="weather-condition">Loading forecast</span>
+                <small id="weather-feels"></small>
+              </div>
+            </div>
+            <div class="forecast" id="forecast"></div>
+          </div>
+        </div>
+      </article>
+
       <div class="col-stack col-left">
       <article class="panel sky-panel">
         <div class="sky-toolbar"><span class="channel-badge">LIVE</span></div>
@@ -105,27 +126,6 @@
         </div>
       </article>
       </div><!-- /.col-left -->
-
-      <article class="panel weather-panel">
-        <div class="weather-layout">
-          <div class="weather-date-block">
-            <p class="weather-date-label" id="weather-date">—</p>
-            <h2 class="weather-place" id="weather-place">—</h2>
-            <button class="refresh" data-refresh="weather" aria-label="Refresh weather">↻</button>
-          </div>
-          <div class="weather-body">
-            <div class="weather-now">
-              <span class="weather-icon" id="weather-icon">☀</span>
-              <strong id="weather-temp">—°</strong>
-              <div>
-                <span id="weather-condition">Loading forecast</span>
-                <small id="weather-feels"></small>
-              </div>
-            </div>
-            <div class="forecast" id="forecast"></div>
-          </div>
-        </div>
-      </article>
 
       <div class="col-stack col-right" id="news-stack">
         <article class="panel"><p class="loading">Loading news…</p></article>

@@ -237,7 +237,7 @@ dialog {
   max-width: 500px;
   width: calc(100% - 36px);
 }
-dialog::backdrop { background:rgba(0,0,0,.68);backdrop-filter:blur(3px); }dialog form { padding:27px; } .dialog-heading button { font-size:1.5rem;color:var(--muted);background:transparent;border:0;cursor:pointer; }.dialog-intro { color:var(--muted);font-size:var(--text-body-sm);line-height:1.5;margin:17px 0; }.dialog-intro code { color:var(--cyan); }label { display:grid;gap:7px;font-size:var(--text-control);margin:12px 0;color:#c3cbd7;} input { color:var(--ink);background:#0a1018;border:1px solid var(--line);border-radius:7px;padding:10px;font:inherit; }.coordinate-row { display:grid;grid-template-columns:1fr 1fr;gap:13px;}.dialog-actions { margin-top:22px;gap:10px;justify-content:flex-end; }.dialog-actions button { padding:10px 14px;border:0;border-radius:7px;background:var(--lime);font-weight:800;cursor:pointer; }.dialog-actions .secondary {background:#263141;color:var(--ink);}
+dialog::backdrop { background:rgba(0,0,0,.68);backdrop-filter:blur(3px); }dialog form { padding:27px; } .dialog-heading button { font-size:1.5rem;color:var(--muted);background:transparent;border:0;cursor:pointer; }.dialog-intro { color:var(--muted);font-size:var(--text-body-sm);line-height:1.5;margin:17px 0; }.dialog-intro code { color:var(--cyan); }label { display:grid;gap:7px;font-size:var(--text-control);margin:12px 0;color:#c3cbd7;} input { color:var(--ink);background:#0a1018;border:1px solid var(--line);border-radius:7px;padding:10px;font:inherit; }.coordinate-row { display:grid;grid-template-columns:1fr 1fr;gap:13px;}.dialog-actions { margin-top:22px;gap:10px;justify-content:flex-end; }.dialog-actions button { padding:10px 14px;border:0;border-radius:7px;background:var(--lime);color:var(--page);font-weight:800;cursor:pointer; }.dialog-actions .secondary {background:#263141;color:var(--ink);}
 
 html { -webkit-text-size-adjust: 100%; }
 body { overflow-x: hidden; }
@@ -433,3 +433,23 @@ header .eyebrow { white-space:nowrap; }
 /* OFFLINE badge: the dashboard could not reach its server, so the data on screen is from the time shown. */
 .live-dot.offline { color:var(--muted); }
 .live-dot.offline:before { background:var(--muted); box-shadow:none; }
+
+/* —— Polish: interaction states and the browser surfaces nobody draws —— */
+/* Dark native widgets: the profile/news dropdowns, scrollbars and form controls follow the page. */
+:root { color-scheme: dark; }
+::selection { background: rgba(199,255,71,.28); color: #fff; }
+input, textarea, select { caret-color: var(--lime); }
+html, dialog { scrollbar-color: rgba(236,242,255,.2) transparent; }
+
+/* Keyboard focus: one ring in the lime accent everywhere, offset so it also shows on lime buttons. */
+:focus-visible { outline: 2px solid var(--lime); outline-offset: 2px; }
+.news-item:focus-visible, .source-link:focus-visible, .stream-fallback:focus-visible { outline-offset: 3px; border-radius: 4px; }
+
+/* Round buttons: a hover cue on pointers that can hover, and a brief press on every input. */
+.icon-button, .refresh { transition: border-color .15s ease, color .15s ease, transform .1s ease; }
+@media (hover: hover) {
+  .icon-button:hover, .refresh:hover { border-color: rgba(236,242,255,.32); }
+  .dialog-actions button:hover:not(:disabled), .inline-actions button:hover:not(:disabled) { filter: brightness(1.12); }
+}
+.icon-button:active, .refresh:active { transform: scale(.94); }
+#weather-feels { text-wrap: balance; }
