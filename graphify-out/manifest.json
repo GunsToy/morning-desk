@@ -1,0 +1,134 @@
+{
+  "auth.mjs": {
+    "mtime": 1792792382.7874534,
+    "seen": 1792792579.5138495,
+    "ast_hash": "99f87dfa7817ce67c53ec25f4c5daadd",
+    "semantic_hash": "99f87dfa7817ce67c53ec25f4c5daadd"
+  },
+  "config.example.json": {
+    "mtime": 1792792382.7874534,
+    "seen": 1792792579.5138545,
+    "ast_hash": "57bc3d79df612784d5dd52611f2239d2",
+    "semantic_hash": "57bc3d79df612784d5dd52611f2239d2"
+  },
+  "docker-compose.yml": {
+    "mtime": 1792793143.1150455,
+    "seen": 1792795011.9346683,
+    "ast_hash": "7152e19e21a929c8afadee5760f4faa7",
+    "semantic_hash": "7152e19e21a929c8afadee5760f4faa7"
+  },
+  "docker-entrypoint.sh": {
+    "mtime": 1792792382.7874534,
+    "seen": 1792792579.5138583,
+    "ast_hash": "768609d022d44738cca0dcb3a2048d3a",
+    "semantic_hash": "768609d022d44738cca0dcb3a2048d3a"
+  },
+  "install-proxmox.sh": {
+    "mtime": 1792793418.0515492,
+    "seen": 1792795011.9346724,
+    "ast_hash": "9f4d51093de8e79abfbf4e5d8548e6ba",
+    "semantic_hash": "9f4d51093de8e79abfbf4e5d8548e6ba"
+  },
+  "install-update-timer.sh": {
+    "mtime": 1792792382.7874534,
+    "seen": 1792792579.5138605,
+    "ast_hash": "1610448d10a859cc501e25054913ca31",
+    "semantic_hash": "1610448d10a859cc501e25054913ca31"
+  },
+  "install.sh": {
+    "mtime": 1792792382.7878869,
+    "seen": 1792792579.5138617,
+    "ast_hash": "456a09136339719deebe7211554609ae",
+    "semantic_hash": "456a09136339719deebe7211554609ae"
+  },
+  "package.json": {
+    "mtime": 1792807229.2429092,
+    "seen": 1792851539.5248766,
+    "ast_hash": "df76c44101f08fc2d8224bf71f47eb2b",
+    "semantic_hash": "df76c44101f08fc2d8224bf71f47eb2b"
+  },
+  "providers/common.mjs": {
+    "mtime": 1792793852.0783017,
+    "seen": 1792795011.93468,
+    "ast_hash": "031348f1f012dd8d37f4e82fe77ff3c3",
+    "semantic_hash": "031348f1f012dd8d37f4e82fe77ff3c3"
+  },
+  "providers/growatt.mjs": {
+    "mtime": 1792793861.5209746,
+    "seen": 1792795011.9346814,
+    "ast_hash": "0d66c4e0f774b7818e7f5b69c06d822b",
+    "semantic_hash": "0d66c4e0f774b7818e7f5b69c06d822b"
+  },
+  "providers/index.mjs": {
+    "mtime": 1792792382.7887304,
+    "seen": 1792792579.5138657,
+    "ast_hash": "b95d297346b40b642e9e8af10a99da3c",
+    "semantic_hash": "b95d297346b40b642e9e8af10a99da3c"
+  },
+  "public/app.js": {
+    "mtime": 1792806660.8849945,
+    "seen": 1792851539.5248814,
+    "ast_hash": "5aed736748eff5ac728e64b836a37be3",
+    "semantic_hash": "5aed736748eff5ac728e64b836a37be3"
+  },
+  "server.mjs": {
+    "mtime": 1792795298.0185714,
+    "seen": 1792851539.5248828,
+    "ast_hash": "a22cc2f1eedf28c89ee2c7b13a589eb9",
+    "semantic_hash": "a22cc2f1eedf28c89ee2c7b13a589eb9"
+  },
+  "store.mjs": {
+    "mtime": 1792795297.909834,
+    "seen": 1792851539.5248837,
+    "ast_hash": "6ea7d522ba576a9e919ebc062190e551",
+    "semantic_hash": "6ea7d522ba576a9e919ebc062190e551"
+  },
+  "update.sh": {
+    "mtime": 1792794721.0176768,
+    "seen": 1792795011.9346917,
+    "ast_hash": "712f5710c0ae81153e6acf38046e54a8",
+    "semantic_hash": "712f5710c0ae81153e6acf38046e54a8"
+  },
+  "README.md": {
+    "mtime": 1792794758.898884,
+    "seen": 1792795011.934693,
+    "ast_hash": "0512faeaa06a30359434f7181374a9ac",
+    "semantic_hash": "0512faeaa06a30359434f7181374a9ac"
+  },
+  "public/index.html": {
+    "mtime": 1792806744.7842996,
+    "seen": 1792851539.5248897,
+    "ast_hash": "750030e66ae6de304143f13a686577fc",
+    "semantic_hash": "750030e66ae6de304143f13a686577fc"
+  },
+  ".github/workflows/test.yml": {
+    "mtime": 1792794297.56222,
+    "seen": 1792795011.9346535,
+    "ast_hash": "a5f6542e1fa81892d2a3629eb82cc642",
+    "semantic_hash": "a5f6542e1fa81892d2a3629eb82cc642"
+  },
+  "test/store.test.mjs": {
+    "mtime": 1792795338.2150545,
+    "seen": 1792851539.5248847,
+    "ast_hash": "474630015d516469704af179432fffa7",
+    "semantic_hash": "474630015d516469704af179432fffa7"
+  },
+  ".impeccable/design.json": {
+    "mtime": 1792806852.157962,
+    "seen": 1792851539.5248628,
+    "ast_hash": "d103d9ea8dc87c251c257857f76fc090",
+    "semantic_hash": "d103d9ea8dc87c251c257857f76fc090"
+  },
+  "DESIGN.md": {
+    "mtime": 1792806938.7521772,
+    "seen": 1792851539.524887,
+    "ast_hash": "c91d0168f265d462843cf42d46ddf4a4",
+    "semantic_hash": "c91d0168f265d462843cf42d46ddf4a4"
+  },
+  "PRODUCT.md": {
+    "mtime": 1792806297.1242023,
+    "seen": 1792851539.5248883,
+    "ast_hash": "8e7ab4ad4216158e7606fdec1db48c5b",
+    "semantic_hash": "8e7ab4ad4216158e7606fdec1db48c5b"
+  }
+}
