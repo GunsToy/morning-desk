@@ -6,13 +6,17 @@
   <meta name="theme-color" content="#090d13" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <title>Morning Desk</title>
+  <!-- Fonts: connect to Google Fonts early and fetch the font CSS alongside styles.css, not after it -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <main class="dashboard">
     <header>
       <div><p class="eyebrow">HOME DESK</p></div>
-      <div class="header-actions"><select id="profile-select" aria-label="Switch profile" hidden></select><span class="live-dot">LIVE</span><button class="icon-button settings-open" id="settings-button" aria-label="Open settings">⚙ Settings</button></div>
+      <div class="header-actions"><select id="profile-select" aria-label="Switch profile" hidden></select><span class="live-dot">LIVE</span><button class="icon-button settings-open" id="settings-button" aria-label="Open settings" data-icon="settings"> Settings</button></div>
     </header>
     <section class="grid">
       <article class="panel weather-panel">
@@ -20,11 +24,11 @@
           <div class="weather-date-block">
             <p class="weather-date-label" id="weather-date">—</p>
             <h2 class="weather-place" id="weather-place">—</h2>
-            <button class="refresh" data-refresh="weather" aria-label="Refresh weather">↻</button>
+            <button class="refresh" data-refresh="weather" aria-label="Refresh weather" data-icon="refresh"></button>
           </div>
           <div class="weather-body">
             <div class="weather-now">
-              <span class="weather-icon" id="weather-icon">☀</span>
+              <span class="weather-icon" id="weather-icon"></span>
               <strong id="weather-temp">—°</strong>
               <div>
                 <span id="weather-condition">Loading forecast</span>
@@ -40,7 +44,7 @@
       <article class="panel sky-panel">
         <div class="sky-toolbar"><span class="channel-badge">LIVE</span></div>
         <div class="video-wrap" id="sky-video"><p class="loading">Finding the current Sky News live stream…</p></div>
-        <a class="stream-fallback" href="https://www.youtube.com/@SkyNews/streams" target="_blank" rel="noreferrer">Video unavailable? Open the live stream ↗</a>
+        <a class="stream-fallback" href="https://www.youtube.com/@SkyNews/streams" target="_blank" rel="noreferrer">Video unavailable? Open the live stream <span data-icon="external" data-icon-at="end"></span></a>
       </article>
       <article class="panel solar-panel">
         <div class="solar-diagram" id="solar-diagram" data-source="standby">
@@ -49,7 +53,7 @@
               <p class="diagram-title" id="solar-source">—</p>
               <p class="diagram-flow-summary" id="solar-flow-summary">—</p>
             </div>
-            <button class="refresh" data-refresh="solar" aria-label="Refresh solar">↻</button>
+            <button class="refresh" data-refresh="solar" aria-label="Refresh solar" data-icon="refresh"></button>
           </div>
 
           <div class="diagram-stage">
@@ -136,7 +140,7 @@
     <form id="auth-form">
       <div class="dialog-heading">
         <div><p class="eyebrow">ADMIN</p><h2 id="auth-title">Unlock settings</h2></div>
-        <button type="button" id="auth-close" aria-label="Close">×</button>
+        <button type="button" id="auth-close" aria-label="Close" data-icon="close"></button>
       </div>
       <p class="dialog-intro" id="auth-intro">Enter the admin password to change profiles and settings.</p>
       <label>Password
@@ -157,7 +161,7 @@
     <form id="settings-form">
       <div class="dialog-heading">
         <div><p class="eyebrow">SETTINGS</p><h2 id="settings-title">Profiles</h2></div>
-        <button type="button" id="settings-close" aria-label="Close">×</button>
+        <button type="button" id="settings-close" aria-label="Close" data-icon="close"></button>
       </div>
       <p class="dialog-intro">Each profile has its own location, solar system and news channels. Saved only in the local <code>config.json</code>. Leave a saved token or password blank to keep it.</p>
       <p class="settings-status" id="settings-status">Solar: checking…</p>

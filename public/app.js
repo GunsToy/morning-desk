@@ -40,8 +40,28 @@ async function api(path, { method = 'GET', body } = {}) {
   return data;
 }
 
-const codeMap = { 0:['☀','Clear sky'], 1:['🌤','Mainly clear'], 2:['⛅','Partly cloudy'], 3:['☁','Overcast'], 45:['🌫','Foggy'], 48:['🌫','Foggy'], 51:['🌦','Light drizzle'], 53:['🌦','Drizzle'], 55:['🌧','Heavy drizzle'], 61:['🌦','Light rain'], 63:['🌧','Rain'], 65:['🌧','Heavy rain'], 71:['🌨','Snow'], 80:['🌦','Showers'], 81:['🌧','Showers'], 82:['⛈','Heavy showers'], 95:['⛈','Thunderstorms'] };
-const weatherState = code => codeMap[code] || ['☁','Cloudy'];
+// Icons are inline SVG line drawings, so every screen draws them the same (emoji depend on the device's font).
+// Shapes from Lucide (https://lucide.dev), ISC License, Copyright (c) Lucide Contributors.
+const ICONS = {
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2m-7.07-17.07 1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
+  'cloud-sun': '<path d="M12 2v2m-7.07.93 1.41 1.41M20 12h2m-2.93-7.07-1.41 1.41M15.95 12.65a4 4 0 0 0-5.93-4.13M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"/>',
+  cloud: '<path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>',
+  'cloud-fog': '<path d="M4 14.9A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.24M16 17H7m10 4H9"/>',
+  'cloud-drizzle': '<path d="M4 14.9A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.24M8 19v1m0-6v1m8 4v1m0-6v1m-4 6v1m0-6v1"/>',
+  'cloud-rain': '<path d="M4 14.9A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.24M16 14v6m-8-6v6m4-4v6"/>',
+  'cloud-snow': '<path d="M4 14.9A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.24M8 15h.01M8 19h.01M12 17h.01M12 21h.01M16 15h.01M16 19h.01"/>',
+  'cloud-lightning': '<path d="M6 16.33A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 .5 8.97M13 12l-3 5h4l-3 5"/>',
+  refresh: '<path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/>',
+  close: '<path d="M18 6 6 18M6 6l12 12"/>',
+  external: '<path d="M7 7h10v10M7 17 17 7"/>',
+  settings: '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>'
+};
+// label: an accessible name when the icon is the only thing saying what it means; otherwise hidden from screen readers.
+const icon = (name, label) => `<svg class="icon" viewBox="0 0 24 24" ${label ? `role="img" aria-label="${esc(label)}"` : 'aria-hidden="true"'}>${ICONS[name]}</svg>`;
+document.querySelectorAll('[data-icon]').forEach(el => { el.insertAdjacentHTML(el.dataset.iconAt === 'end' ? 'beforeend' : 'afterbegin', icon(el.dataset.icon)); });
+
+const codeMap = { 0:['sun','Clear sky'], 1:['cloud-sun','Mainly clear'], 2:['cloud-sun','Partly cloudy'], 3:['cloud','Overcast'], 45:['cloud-fog','Foggy'], 48:['cloud-fog','Foggy'], 51:['cloud-drizzle','Light drizzle'], 53:['cloud-drizzle','Drizzle'], 55:['cloud-rain','Heavy drizzle'], 61:['cloud-drizzle','Light rain'], 63:['cloud-rain','Rain'], 65:['cloud-rain','Heavy rain'], 71:['cloud-snow','Snow'], 80:['cloud-drizzle','Showers'], 81:['cloud-rain','Showers'], 82:['cloud-lightning','Heavy showers'], 95:['cloud-lightning','Thunderstorms'] };
+const weatherState = code => codeMap[code] || ['cloud','Cloudy'];
 const unit = value => value == null || Number.isNaN(value) ? '—' : `${value >= 1000 ? (value / 1000).toFixed(2) : Math.round(value)} ${value >= 1000 ? 'kW' : 'W'}`;
 const energy = value => value == null || Number.isNaN(value) ? '—' : `${Number(value).toFixed(1)} kWh`;
 
@@ -56,9 +76,9 @@ async function loadWeather() {
   const res = await fetch(profileUrl('/api/weather')); const data = await res.json(); if (!res.ok) throw Error(data.error);
   if (requested !== currentProfile) return; // the profile was switched while this was loading
   weatherUpdated = new Date();
-  $('#weather-place').textContent = data.location; const [icon, condition] = weatherState(data.current.weather_code);
-  $('#weather-icon').textContent = icon; $('#weather-temp').textContent = `${Math.round(data.current.temperature_2m)}°`; $('#weather-condition').textContent = condition; $('#weather-feels').textContent = `Feels like ${Math.round(data.current.apparent_temperature)}° · ${Math.round(data.current.wind_speed_10m)} km/h`;
-  $('#forecast').innerHTML = data.daily.time.map((day, index) => { const [dailyIcon] = weatherState(data.daily.weather_code[index]); return `<div class="forecast-day"><span>${index === 0 ? 'TODAY' : new Date(`${day}T12:00`).toLocaleDateString('en-ZA',{weekday:'short'}).toUpperCase()}</span><b>${dailyIcon}</b><strong><span class="t-max">${Math.round(data.daily.temperature_2m_max[index])}°</span><span class="t-sep"> / </span><span class="t-min">${Math.round(data.daily.temperature_2m_min[index])}°</span></strong></div>`; }).join('');
+  $('#weather-place').textContent = data.location; const [iconName, condition] = weatherState(data.current.weather_code);
+  $('#weather-icon').innerHTML = icon(iconName); $('#weather-temp').textContent = `${Math.round(data.current.temperature_2m)}°`; $('#weather-condition').textContent = condition; $('#weather-feels').textContent = `Feels like ${Math.round(data.current.apparent_temperature)}° · ${Math.round(data.current.wind_speed_10m)} km/h`;
+  $('#forecast').innerHTML = data.daily.time.map((day, index) => { const [dailyIcon, dailyCondition] = weatherState(data.daily.weather_code[index]); return `<div class="forecast-day"><span>${index === 0 ? 'TODAY' : new Date(`${day}T12:00`).toLocaleDateString('en-ZA',{weekday:'short'}).toUpperCase()}</span><b>${icon(dailyIcon, dailyCondition)}</b><strong><span class="t-max">${Math.round(data.daily.temperature_2m_max[index])}°</span><span class="t-sep"> / </span><span class="t-min">${Math.round(data.daily.temperature_2m_min[index])}°</span></strong></div>`; }).join('');
 
   // Night mode: dim the screen between sunset and sunrise at the profile's location. Open-Meteo gives
   // those times in the location's local time, so compare against "now" shifted by the same offset.
@@ -90,8 +110,8 @@ async function loadNewsPanels() {
       <div class="panel-heading">
         <div><p class="eyebrow section-label">${esc(feed.region || 'NEWS')}</p><h2 class="section-title">${esc(feed.name)}</h2></div>
         <div class="heading-actions">
-          <button class="refresh" data-refresh="news" data-feed="${esc(id)}" aria-label="Refresh ${esc(feed.name)}">↻</button>
-          <a href="${esc(safeUrl(feed.site))}" target="_blank" rel="noreferrer" class="source-link">OPEN ↗</a>
+          <button class="refresh" data-refresh="news" data-feed="${esc(id)}" aria-label="Refresh ${esc(feed.name)}">${icon('refresh')}</button>
+          <a href="${esc(safeUrl(feed.site))}" target="_blank" rel="noreferrer" class="source-link">OPEN ${icon('external')}</a>
         </div>
       </div>
       <div class="news-list" id="news-${esc(id)}"><p class="loading">Loading…</p></div>
@@ -116,7 +136,7 @@ async function loadOneNews(id) {
     box.innerHTML = '<p class="loading">Could not load this feed.</p>';
   }
 }
-async function loadSky() { try { const res = await fetch('/api/sky'); const data = await res.json(); if (!res.ok) throw Error(data.error); $('#sky-video').innerHTML = `<iframe title="Sky News live stream" src="https://www.youtube.com/embed/${data.videoId}?rel=0&autoplay=0&mute=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`; } catch (error) { $('#sky-video').innerHTML = `<div class="stream-message"><strong>Sky News is not live right now.</strong><a href="https://www.youtube.com/@SkyNews/streams" target="_blank" rel="noreferrer">Open Sky News on YouTube ↗</a></div>`; } }
+async function loadSky() { try { const res = await fetch('/api/sky'); const data = await res.json(); if (!res.ok) throw Error(data.error); $('#sky-video').innerHTML = `<iframe title="Sky News live stream" src="https://www.youtube.com/embed/${data.videoId}?rel=0&autoplay=0&mute=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`; } catch (error) { $('#sky-video').innerHTML = `<div class="stream-message"><strong>Sky News is not live right now.</strong><a href="https://www.youtube.com/@SkyNews/streams" target="_blank" rel="noreferrer">Open Sky News on YouTube ${icon('external')}</a></div>`; } }
 const flowBadge = (el, watts, active) => {
   if (!el) return;
   if (!active || watts == null || Number.isNaN(Number(watts)) || Math.abs(Number(watts)) < 20) {
