@@ -1,57 +1,196 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-24T03:30:00Z",
+  "generatedAt": "2026-10-25T05:50:55Z",
   "title": "Design System: Morning Desk",
   "extensions": {
     "colorMeta": {
-      "lime": { "role": "primary", "displayName": "Morning Lime" },
-      "coral": { "role": "secondary", "displayName": "Ember Coral" },
-      "cyan": { "role": "secondary", "displayName": "Signal Cyan" },
-      "ink": { "role": "neutral", "displayName": "Daybreak Ink" },
-      "muted": { "role": "neutral", "displayName": "Overcast Grey" },
-      "panel": { "role": "neutral", "displayName": "Slate Panel" },
-      "page": { "role": "neutral", "displayName": "Night Page" },
-      "flow-solar": { "role": "tertiary", "displayName": "Solar Flow" },
-      "flow-battery": { "role": "tertiary", "displayName": "Battery Flow" }
+      "lime": {
+        "role": "primary",
+        "displayName": "Morning Lime"
+      },
+      "coral": {
+        "role": "secondary",
+        "displayName": "Ember Coral"
+      },
+      "cyan": {
+        "role": "secondary",
+        "displayName": "Signal Cyan"
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Daybreak Ink"
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Overcast Grey"
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "Slate Panel"
+      },
+      "page": {
+        "role": "neutral",
+        "displayName": "Night Page"
+      },
+      "flow-solar": {
+        "role": "tertiary",
+        "displayName": "Solar Flow"
+      },
+      "flow-battery": {
+        "role": "tertiary",
+        "displayName": "Battery Flow"
+      }
     },
     "typographyMeta": {
-      "display": { "displayName": "Readout", "purpose": "Big power and temperature numbers; tabular figures." },
-      "label": { "displayName": "Mono Label", "purpose": "Uppercase section labels, badges, source links." },
-      "micro": { "displayName": "Diagram Micro", "purpose": "Solar diagram labels and flow badges only; the 11px floor." }
+      "display": {
+        "displayName": "Readout",
+        "purpose": "Big power and temperature numbers; tabular figures."
+      },
+      "label": {
+        "displayName": "Mono Label",
+        "purpose": "Uppercase section labels, badges, source links."
+      },
+      "micro": {
+        "displayName": "Diagram Micro",
+        "purpose": "Solar diagram labels and flow badges only; the 11px floor."
+      }
     },
     "shadows": [
-      { "name": "panel-ambient", "value": "0 20px 60px rgba(0,0,0,.18)", "purpose": "Soft lift of every panel off the page." }
+      {
+        "name": "panel-ambient",
+        "value": "0 20px 60px rgba(0,0,0,.18)",
+        "purpose": "Soft lift of every panel off the page."
+      }
     ],
     "motion": [
-      { "name": "flow-loop", "value": "1.1s linear infinite (transform)", "purpose": "Power travelling along an active solar path; stops under reduced motion." },
-      { "name": "state-fade", "value": "opacity .3s ease", "purpose": "Flow paths lighting up or going idle." },
-      { "name": "press", "value": "transform .1s ease, scale(.94)", "purpose": "Round button press feedback." }
+      {
+        "name": "flow-loop",
+        "value": "1.1s linear infinite (transform)",
+        "purpose": "Power travelling along an active solar path; stops under reduced motion."
+      },
+      {
+        "name": "state-fade",
+        "value": "opacity .3s ease",
+        "purpose": "Flow paths lighting up or going idle."
+      },
+      {
+        "name": "press",
+        "value": "transform .1s ease, scale(.94)",
+        "purpose": "Round button press feedback."
+      }
     ],
     "breakpoints": [
-      { "name": "phone", "value": "520px" },
-      { "name": "single-column", "value": "760px" },
-      { "name": "compact", "value": "980px" },
-      { "name": "forecast-stack (container)", "value": "660px" }
+      {
+        "name": "phone",
+        "value": "520px"
+      },
+      {
+        "name": "single-column",
+        "value": "760px"
+      },
+      {
+        "name": "compact",
+        "value": "980px"
+      },
+      {
+        "name": "forecast-stack (container)",
+        "value": "660px"
+      }
     ]
   },
   "components": [
-    { "name": "Primary Button", "kind": "button", "refersTo": "button-primary", "description": "Lime dialog action.", "html": "<button class=\"ds-btn-primary\">Save profile</button>", "css": ".ds-btn-primary{background:#c7ff47;color:#090d13;border:0;border-radius:7px;padding:10px 14px;font:800 .8125rem Manrope,sans-serif;cursor:pointer}.ds-btn-primary:hover{filter:brightness(1.12)}.ds-btn-primary:focus-visible{outline:2px solid #c7ff47;outline-offset:2px}" },
-    { "name": "Secondary Button", "kind": "button", "refersTo": "button-secondary", "description": "Cancel and secondary dialog actions.", "html": "<button class=\"ds-btn-secondary\">Cancel</button>", "css": ".ds-btn-secondary{background:#263141;color:#e9edf3;border:0;border-radius:7px;padding:10px 14px;font:800 .8125rem Manrope,sans-serif;cursor:pointer}.ds-btn-secondary:focus-visible{outline:2px solid #c7ff47;outline-offset:2px}" },
-    { "name": "Round Refresh Button", "kind": "button", "refersTo": "button-round", "description": "Circular icon button with a line icon.", "html": "<button class=\"ds-btn-round\" aria-label=\"Refresh\"><svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8\"/><path d=\"M21 3v5h-5\"/></svg></button>", "css": ".ds-btn-round{display:inline-grid;place-items:center;width:38px;height:38px;border-radius:50%;border:1px solid rgba(236,242,255,.11);background:#131a25;color:#e9edf3;cursor:pointer;transition:border-color .15s ease,transform .1s ease}.ds-btn-round:hover{border-color:rgba(236,242,255,.32)}.ds-btn-round:active{transform:scale(.94)}.ds-btn-round:focus-visible{outline:2px solid #c7ff47;outline-offset:2px}" },
-    { "name": "Text Field", "kind": "input", "refersTo": "input", "description": "Settings form field.", "html": "<input class=\"ds-input\" placeholder=\"Erasmuskloof\">", "css": ".ds-input{background:#0a1018;color:#e9edf3;border:1px solid rgba(236,242,255,.11);border-radius:7px;padding:10px;font:600 .875rem Manrope,sans-serif;caret-color:#c7ff47}.ds-input:focus-visible{outline:2px solid #c7ff47;outline-offset:2px}" },
-    { "name": "Panel", "kind": "card", "refersTo": "panel", "description": "Every dashboard section.", "html": "<article class=\"ds-panel\"><p class=\"ds-label\">WORLD</p><h2>BBC News</h2></article>", "css": ".ds-panel{background:linear-gradient(135deg,rgba(29,39,53,.94),rgba(16,22,32,.94));border:1px solid rgba(236,242,255,.11);border-radius:18px;padding:25px;box-shadow:0 20px 60px rgba(0,0,0,.18);color:#e9edf3;font-family:Manrope,sans-serif}.ds-label{font:.75rem 'DM Mono',monospace;letter-spacing:.13em;color:#c7ff47;margin:0 0 6px}" },
-    { "name": "Live Badge", "kind": "chip", "description": "Header connection state: LIVE (coral) or OFFLINE with the last good time (grey).", "html": "<span class=\"ds-live\">LIVE</span>", "css": ".ds-live{font:.75rem 'DM Mono',monospace;letter-spacing:.13em;color:#ff846c;white-space:nowrap}.ds-live:before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:#ff846c;margin-right:7px}" }
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Lime dialog action.",
+      "html": "<button class=\"ds-btn-primary\">Save profile</button>",
+      "css": ".ds-btn-primary{background:#c7ff47;color:#090d13;border:0;border-radius:7px;padding:10px 14px;font:800 .8125rem Manrope,sans-serif;cursor:pointer}.ds-btn-primary:hover{filter:brightness(1.12)}.ds-btn-primary:focus-visible{outline:2px solid #c7ff47;outline-offset:2px}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Cancel and secondary dialog actions.",
+      "html": "<button class=\"ds-btn-secondary\">Cancel</button>",
+      "css": ".ds-btn-secondary{background:#263141;color:#e9edf3;border:0;border-radius:7px;padding:10px 14px;font:800 .8125rem Manrope,sans-serif;cursor:pointer}.ds-btn-secondary:focus-visible{outline:2px solid #c7ff47;outline-offset:2px}"
+    },
+    {
+      "name": "Round Refresh Button",
+      "kind": "button",
+      "refersTo": "button-round",
+      "description": "Circular icon button with a line icon.",
+      "html": "<button class=\"ds-btn-round\" aria-label=\"Refresh\"><svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8\"/><path d=\"M21 3v5h-5\"/></svg></button>",
+      "css": ".ds-btn-round{display:inline-grid;place-items:center;width:38px;height:38px;border-radius:50%;border:1px solid rgba(236,242,255,.11);background:#131a25;color:#e9edf3;cursor:pointer;transition:border-color .15s ease,transform .1s ease}.ds-btn-round:hover{border-color:rgba(236,242,255,.32)}.ds-btn-round:active{transform:scale(.94)}.ds-btn-round:focus-visible{outline:2px solid #c7ff47;outline-offset:2px}"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Settings form field.",
+      "html": "<input class=\"ds-input\" placeholder=\"Erasmuskloof\">",
+      "css": ".ds-input{background:#0a1018;color:#e9edf3;border:1px solid #626d80;border-radius:7px;padding:10px;font:600 .875rem Manrope,sans-serif;caret-color:#c7ff47}.ds-input:focus-visible{outline:2px solid #c7ff47;outline-offset:2px}"
+    },
+    {
+      "name": "Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Every dashboard section.",
+      "html": "<article class=\"ds-panel\"><p class=\"ds-label\">WORLD</p><h2>BBC News</h2></article>",
+      "css": ".ds-panel{background:linear-gradient(135deg,rgba(29,39,53,.94),rgba(16,22,32,.94));border:1px solid rgba(236,242,255,.11);border-radius:18px;padding:25px;box-shadow:0 20px 60px rgba(0,0,0,.18);color:#e9edf3;font-family:Manrope,sans-serif}.ds-label{font:.75rem 'DM Mono',monospace;letter-spacing:.13em;color:#c7ff47;margin:0 0 6px}"
+    },
+    {
+      "name": "Live Badge",
+      "kind": "chip",
+      "description": "Header connection state: LIVE (coral) or OFFLINE with the last good time (grey).",
+      "html": "<span class=\"ds-live\">LIVE</span>",
+      "css": ".ds-live{font:.75rem 'DM Mono',monospace;letter-spacing:.13em;color:#ff846c;white-space:nowrap}.ds-live:before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:#ff846c;margin-right:7px}"
+    },
+    {
+      "name": "Sign-in Card",
+      "kind": "card",
+      "refersTo": ".login-card",
+      "description": "The /login page: night-blue header bar, round sun mark on a hairline, icon fields with small labels, Remember me, lime pill Sign in button.",
+      "html": "<div class=\"ds-login\"><div class=\"ds-login-bar\">MORNING DESK</div><div class=\"ds-login-mark\"><svg viewBox=\"0 0 24 24\" width=\"40\" height=\"40\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"><circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2M12 20v2m-7.07-17.07 1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41\"/></svg></div><h1>Sign in</h1><label class=\"ds-login-field\"><span>Username</span><input></label><label class=\"ds-login-field\"><span>Password</span><input type=\"password\"></label><button class=\"ds-login-btn\">Sign in</button></div>",
+      "css": ".ds-login{max-width:440px;background:linear-gradient(135deg,rgba(29,39,53,.94),rgba(16,22,32,.94));border:1px solid rgba(236,242,255,.11);border-radius:18px;overflow:hidden;text-align:center;padding-bottom:24px;font-family:Manrope,sans-serif;color:#e9edf3}.ds-login-bar{padding:22px 16px;background:linear-gradient(160deg,#161b45,#222868);color:#edf1ff;font:.75rem 'DM Mono',monospace;letter-spacing:.13em}.ds-login-mark{width:88px;height:88px;margin:16px auto 0;border-radius:50%;border:3px solid rgba(30,38,90,.75);background:linear-gradient(145deg,#3d4688,#2a3270);color:#edf1ff;display:grid;place-items:center}.ds-login h1{margin:12px 0 18px;font-size:1.15rem;font-weight:700;letter-spacing:-.03em}.ds-login-field{display:grid;gap:2px;margin:0 24px 14px;padding:8px 12px;text-align:left;background:#0a1018;border:1px solid #626d80;border-radius:7px}.ds-login-field span{font-size:.75rem;color:#8c98aa}.ds-login-field input{border:0;background:transparent;color:#e9edf3;font:inherit;font-size:1rem;padding:2px 0}.ds-login-btn{width:min(100% - 48px,300px);min-height:44px;margin-top:12px;border:0;border-radius:999px;background:#c7ff47;color:#090d13;font:800 .8125rem Manrope,sans-serif}"
+    }
   ],
   "narrative": {
     "northStar": "The Morning Brief",
     "overview": "Morning Desk is a quiet daily briefing, read in a glance before the day starts. The weather and the home's power come first; everything else on the screen is secondary and stays out of their way. The page is dark and calm so it can sit on a screen all day and dim itself at night without glaring. The look is soft and friendly rather than technical: rounded panels, pill and round controls, and generous spacing, so the whole household is comfortable with it. Precision lives in the readouts, not in hard edges: large tabular numbers, small mono labels, and a solar diagram that reads like a lit night-blue instrument set into the page.",
-    "keyCharacteristics": ["Dark charcoal page with softly lifted, rounded panels.", "One action colour (lime), used for primary actions, focus and live accents.", "The solar diagram is its own night-blue world, with flow colours that mean something (green for solar and household load, cyan for the battery).", "Readouts in large tabular numerals; labels in small uppercase mono.", "Honest state: LIVE or OFFLINE in the header, and stale data is labelled as stale."],
+    "keyCharacteristics": [
+      "Dark charcoal page with softly lifted, rounded panels.",
+      "One action colour (lime), used for primary actions, focus and live accents.",
+      "The solar diagram is its own night-blue world, with flow colours that mean something (green for solar and household load, cyan for the battery).",
+      "Readouts in large tabular numerals; labels in small uppercase mono.",
+      "Honest state: LIVE or OFFLINE in the header, and stale data is labelled as stale."
+    ],
     "rules": [
-      { "name": "The One Action Rule", "body": "Lime means \"act here\" or \"you are here\" (primary button, focus, live readout). Don't use it for decoration.", "section": "colors" },
-      { "name": "The Meaningful Flow Rule", "body": "In the solar diagram, colour encodes the source: green for solar and household load, cyan for the battery, coral for the grid. Never recolour a path for looks.", "section": "colors" },
-      { "name": "The 11px Floor Rule", "body": "No text renders below 11px at any width, including the solar diagram on phones.", "section": "typography" },
-      { "name": "The Steady Numbers Rule", "body": "Numbers that refresh in place use tabular figures, so they never jitter.", "section": "typography" },
-      { "name": "The Glow-Means-Live Rule", "body": "A coloured glow appears only on something that is currently active (a live source node, the LIVE badge). Idle elements stay flat.", "section": "elevation" }
+      {
+        "name": "The One Action Rule",
+        "body": "Lime means \"act here\" or \"you are here\" (primary button, focus, live readout). Don't use it for decoration.",
+        "section": "colors"
+      },
+      {
+        "name": "The Meaningful Flow Rule",
+        "body": "In the solar diagram, colour encodes the source: green for solar and household load, cyan for the battery, coral for the grid. Never recolour a path for looks.",
+        "section": "colors"
+      },
+      {
+        "name": "The 11px Floor Rule",
+        "body": "No text renders below 11px at any width, including the solar diagram on phones.",
+        "section": "typography"
+      },
+      {
+        "name": "The Steady Numbers Rule",
+        "body": "Numbers that refresh in place use tabular figures, so they never jitter.",
+        "section": "typography"
+      },
+      {
+        "name": "The Glow-Means-Live Rule",
+        "body": "A coloured glow appears only on something that is currently active (a live source node, the LIVE badge). Idle elements stay flat.",
+        "section": "elevation"
+      }
     ]
   }
 }

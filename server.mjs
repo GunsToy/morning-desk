@@ -242,7 +242,7 @@ app.post('/api/auth/login', handle(async (req, res) => {
   const ok = await auth.verifyPassword(password, record ?? auth.DUMMY_RECORD) && Boolean(record);
   if (!ok) {
     auth.recordFailure(req.ip);
-    throw httpError(401, 'That username and password do not match.');
+    throw httpError(401, 'Username or password is incorrect.');
   }
   auth.clearFailures(req.ip);
   await signIn(req, res, profile ? profile.id : store.ADMIN_USERNAME, req.body.remember === true);

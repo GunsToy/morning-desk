@@ -21,16 +21,17 @@ function showSetup() {
 fetch('/api/session').then(res => res.json()).then(session => {
   if (session.authenticated) location.replace('/');
   else if (session.setupRequired) showSetup();
-}).catch(() => { /* the form still works; the server answers the sign-in itself */ });
+}).catch(() => { /* the form still works; the server answers the sign-in itself */ })
+  .finally(() => $('.login-card').removeAttribute('data-loading'));
 
 $('#login-eye').addEventListener('click', event => {
   const button = event.currentTarget;
   const show = button.getAttribute('aria-pressed') !== 'true';
   for (const input of [form.elements.password, form.elements.confirm]) input.type = show ? 'text' : 'password';
-  button.setAttribute('aria-pressed', String(show));
-  button.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
-  button.querySelector('.eye-show').hidden = show;
-  button.querySelector('.eye-hide').hidden = !show;
+  button.setAttribute('aria-pressed', String(show)); // the label stays "Show password"; pressed says it is on
+  // SVG elements have no .hidden property, so set the attribute itself.
+  button.querySelector('.eye-show').toggleAttribute('hidden', show);
+  button.querySelector('.eye-hide').toggleAttribute('hidden', !show);
 });
 
 form.addEventListener('submit', async event => {

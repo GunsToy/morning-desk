@@ -135,7 +135,7 @@
 :root {
   /* solar diagram: its own night-blue world inside the dark page */
   --solar-panel:#1a1f4a; --solar-bg-top:#161b45; --solar-bg-mid:#222868; --solar-bg-end:#1a2050; --solar-ink:#edf1ff; --solar-label:#c5cef0; --solar-muted:#9eabdb; --node-fill-light:#3d4688; --node-fill-dark:#2a3270; --flow-track:rgba(140,155,220,.25); --flow-solar:#a8f06a; --flow-solar-glint:#e8ffb0; --flow-battery:#5ce2ff; --flow-battery-glint:#b8f4ff;
-  --text-micro:.6875rem; --text-meta:.75rem; --text-control:.8125rem; --text-body-sm:.875rem; --ink:#e9edf3; --muted:#8c98aa; --panel:#151c27; --line:rgba(236,242,255,.11); --lime:#c7ff47; --cyan:#58e2ff; --coral:#ff846c; --page:#090d13; }
+  --text-micro:.6875rem; --text-meta:.75rem; --text-control:.8125rem; --text-body-sm:.875rem; --ink:#e9edf3; --muted:#8c98aa; --panel:#151c27; --line:rgba(236,242,255,.11); --lime:#c7ff47; --cyan:#58e2ff; --coral:#ff846c; --page:#090d13; --field-fill:#0a1018; --field-line:#626d80; }
 .dashboard { max-width:1420px; }
 /* Independent columns: left (Sky + Growatt) is not stretched by CNN height */
 .grid {
@@ -239,7 +239,7 @@ dialog {
   max-width: 500px;
   width: calc(100% - 36px);
 }
-dialog::backdrop { background:rgba(0,0,0,.68);backdrop-filter:blur(3px); }dialog form { padding:27px; } .dialog-heading button { font-size:1.5rem;color:var(--muted);background:transparent;border:0;cursor:pointer; }.dialog-intro { color:var(--muted);font-size:var(--text-body-sm);line-height:1.5;margin:17px 0; }.dialog-intro code { color:var(--cyan); }label { display:grid;gap:7px;font-size:var(--text-control);margin:12px 0;color:#c3cbd7;} input { color:var(--ink);background:#0a1018;border:1px solid var(--line);border-radius:7px;padding:10px;font:inherit; }.coordinate-row { display:grid;grid-template-columns:1fr 1fr;gap:13px;}.dialog-actions { margin-top:22px;gap:10px;justify-content:flex-end; }.dialog-actions button { padding:10px 14px;border:0;border-radius:7px;background:var(--lime);color:var(--page);font-weight:800;cursor:pointer; }.dialog-actions .secondary {background:#263141;color:var(--ink);}
+dialog::backdrop { background:rgba(0,0,0,.68);backdrop-filter:blur(3px); }dialog form { padding:27px; } .dialog-heading button { font-size:1.5rem;color:var(--muted);background:transparent;border:0;cursor:pointer; }.dialog-intro { color:var(--muted);font-size:var(--text-body-sm);line-height:1.5;margin:17px 0; }.dialog-intro code { color:var(--cyan); }label { display:grid;gap:7px;font-size:var(--text-control);margin:12px 0;color:#c3cbd7;} input { color:var(--ink);background:var(--field-fill);border:1px solid var(--field-line);border-radius:7px;padding:10px;font:inherit; }.coordinate-row { display:grid;grid-template-columns:1fr 1fr;gap:13px;}.dialog-actions { margin-top:22px;gap:10px;justify-content:flex-end; }.dialog-actions button { padding:10px 14px;border:0;border-radius:7px;background:var(--lime);color:var(--page);font-weight:800;cursor:pointer; }.dialog-actions .secondary {background:#263141;color:var(--ink);}
 
 html { -webkit-text-size-adjust: 100%; }
 body { overflow-x: hidden; }
@@ -357,7 +357,7 @@ body { overflow-x: hidden; }
   font-weight: 700;
   cursor: pointer;
 }
-#edit-profile { border-radius: 7px; background: #0a1018; padding: 10px; font-weight: 500; font-size: inherit; }
+#edit-profile { border-radius: 7px; background: var(--field-fill); border-color: var(--field-line); padding: 10px; font-weight: 500; font-size: inherit; }
 .inline-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 4px 0 10px; }
 .inline-actions button {
   padding: 8px 12px;
@@ -477,8 +477,7 @@ html, dialog { scrollbar-color: rgba(236,242,255,.2) transparent; }
 .login-card h1 { margin:12px 0 0; font-size:1.15rem; font-weight:700; letter-spacing:-.03em; }
 .login-intro { margin:10px 24px 0; color:var(--muted); font-size:var(--text-body-sm); line-height:1.5; }
 .login-form { padding:18px 24px 0; text-align:left; }
-.login-field { display:grid; grid-template-columns:20px 1fr auto; grid-template-rows:auto auto; column-gap:12px; align-items:center; margin:0 0 14px; padding:8px 4px 8px 12px; background:#0a1018; border:1px solid var(--line); border-radius:7px; }
-.login-field[hidden] { display:none; }
+.login-field { display:grid; grid-template-columns:20px 1fr auto; grid-template-rows:auto auto; column-gap:12px; align-items:center; margin:0 0 14px; padding:8px 4px 8px 12px; background:var(--field-fill); border:1px solid var(--field-line); border-radius:7px; }
 .login-field:focus-within { outline:2px solid var(--lime); outline-offset:2px; }
 .login-field > .icon { grid-row:1 / 3; width:20px; height:20px; color:var(--muted); }
 .login-field label { grid-column:2; margin:0; display:block; font-size:var(--text-meta); color:var(--muted); }
@@ -487,11 +486,17 @@ html, dialog { scrollbar-color: rgba(236,242,255,.2) transparent; }
 .login-field input[readonly] { color:var(--muted); }
 .login-eye { grid-column:3; grid-row:1 / 3; width:44px; height:44px; display:grid; place-items:center; border:0; border-radius:50%; background:transparent; color:var(--muted); cursor:pointer; }
 .login-eye .icon { width:20px; height:20px; }
-.login-eye .icon[hidden] { display:none; }
-.login-remember { margin:2px 0 6px; }
+.login-remember { min-height:44px; margin:2px 0 6px; }
+.login-card[data-loading] { visibility:hidden; } /* until we know whether this is first-run setup */
 .login-status { min-height:1.2em; text-align:center; }
 .login-submit { display:block; width:min(100%,300px); min-height:44px; margin:12px auto 0; border:0; border-radius:999px; background:var(--lime); color:var(--page); font:inherit; font-size:var(--text-control); font-weight:800; cursor:pointer; }
 .login-submit:disabled { opacity:.45; cursor:not-allowed; }
 .login-note { margin:18px 24px 0; color:var(--muted); font-size:var(--text-body-sm); }
-.login-note[hidden] { display:none; }
 @media (hover:hover) { .login-submit:hover:not(:disabled) { filter:brightness(1.12); } .login-eye:hover { color:var(--ink); } }
+
+/* Browser autofill keeps the dark field instead of painting it pale blue.
+   shortcut: Firefox's autofill tint can't be fully overridden; this covers Chrome, Edge and Safari. */
+input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus {
+  -webkit-text-fill-color:var(--ink); caret-color:var(--lime);
+  box-shadow:0 0 0 1000px var(--field-fill) inset; transition:background-color 9999s;
+}

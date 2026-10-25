@@ -401,6 +401,7 @@ async function populateSettings(id) {
   form.elements.newPassword.disabled = managed;
   $('#password-change').disabled = managed;
   $('#password-status').textContent = '';
+  $('#save-status').textContent = '';
   form.elements.currentPassword.value = '';
   form.elements.newPassword.value = '';
 }
@@ -442,7 +443,7 @@ let saving = false;
 async function saveSettings() {
   if (saving) return; // a second click while the first save is in flight would create a new profile twice
   const form = $('#settings-form');
-  const status = $('#settings-status');
+  const status = $('#save-status'); // next to the Save button, where the admin is looking
   if (!form.reportValidity()) return;
   const body = {
     name: form.elements.profileName.value,

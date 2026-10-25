@@ -12,6 +12,7 @@ colors:
   line: "rgba(236,242,255,.11)"
   control-fill: "#131a25"
   field-fill: "#0a1018"
+  field-line: "#626d80"
   secondary-fill: "#263141"
   solar-panel: "#1a1f4a"
   solar-bg-top: "#161b45"
@@ -87,6 +88,12 @@ components:
     textColor: "{colors.ink}"
     rounded: "{rounded.round}"
     size: "38px"
+  button-primary-pill:
+    backgroundColor: "{colors.lime}"
+    textColor: "{colors.page}"
+    typography: "{typography.control}"
+    rounded: "{rounded.pill}"
+    height: "44px"
   button-pill:
     backgroundColor: "{colors.control-fill}"
     textColor: "{colors.ink}"
@@ -208,8 +215,15 @@ Soft, rounded forms throughout. Panels have generous 18px corners (16px on phone
 - **Internal Padding:** 25px (16px on phones).
 
 ### Inputs / Fields
-- **Style:** a Field Fill background (`colors.field-fill`), 1px Hairline border, 7px radius, 10px padding.
+- **Style:** a Field Fill background (`colors.field-fill`), 1px Field Line border (`colors.field-line`, at least 3:1 against both the field and the panel so the field's edge is visible), 7px radius, 10px padding.
+- **Autofill:** browser autofill keeps the Field Fill and Daybreak Ink text; it never paints the field pale.
 - **Focus:** the lime focus ring; the caret is lime.
+
+### Sign-in card
+- **What it is:** the `/login` page. One panel card, at most 440px wide, centred near the top of the page. Its layout follows the household's other self-hosted sign-in (Mealie), drawn in this system.
+- **Parts, top to bottom:** a night-blue header bar (the solar diagram's gradient) with "MORNING DESK" as a Label; a round 88px night-blue mark with a sun line icon, sitting on a hairline; the title ("Sign in", or "Set up Morning Desk" on first run); fields with a leading line icon and a small Overcast Grey label above the value; a show-password eye (44px round, a toggle with a fixed label); "Remember me" (a 44px-tall check row, ticked by default); the status line; the primary pill button; a muted note.
+- **The pill primary:** the sign-in button is the one primary button shaped as a pill (`components.button-primary-pill`, up to 300px wide, 44px tall), because it is the page's only action. Dialog actions stay 7px.
+- **Focus:** the lime ring wraps the whole field, not just the text input.
 
 ### Navigation
 - The header has the page title on the left. On the right are the profile switcher (shown only with two or more profiles), the LIVE/OFFLINE badge, and the Settings pill.
