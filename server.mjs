@@ -5,6 +5,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as store from './store.mjs';
 import * as auth from './auth.mjs';
+import * as sso from './sso.mjs';
+import crypto from 'node:crypto';
 import * as providers from './providers/index.mjs';
 import { describeSettings, keepPreviousFlow, publicSchema, USER_AGENT, FETCH_TIMEOUT_MS } from './providers/common.mjs';
 
@@ -105,6 +107,47 @@ async function sendPage(res, name) {
 }
 app.get('/', (req, res) => auth.sessionFromReq(req) ? sendPage(res, 'index.html') : res.redirect('/login'));
 app.get('/login', (req, res) => auth.sessionFromReq(req) ? res.redirect('/') : sendPage(res, 'login.html'));
+
+// ---- Sign in with Poodle House (sso.mjs) --------------------------------------------------
+// start: remember the request in a short cookie, then off to the provider. callback: check it came back
+// from that same request, ask the provider who it is, and sign in as the house admin or the linked profile.
+const SSO_COOKIE = 'md_sso';
+app.get('/auth/sso/start', async (req, res) => {
+  if (!sso.enabled) return res.redirect('/login');
+  // The provider only returns to the public address, so the whole sign-in happens there (not on a LAN address).
+  const home = new URL(sso.publicUrl);
+  if (req.get('host') !== home.host) return res.redirect(new URL(req.originalUrl, home).href);
+  const state = crypto.randomBytes(24).toString('hex');
+  try {
+    const url = await sso.authorizeUrl(state);
+    res.cookie(SSO_COOKIE, `${state}.${req.query.remember === '1' ? 1 : 0}`, {
+      httpOnly: true, sameSite: 'lax', secure: home.protocol === 'https:', maxAge: 10 * 60 * 1000, path: '/auth/sso'
+    });
+    res.redirect(url);
+  } catch (error) {
+    console.error('Sign-in with the provider could not start:', error);
+    res.redirect('/login?error=sso-failed');
+  }
+});
+
+app.get('/auth/sso/callback', async (req, res) => {
+  const [state, remember] = String(auth.readCookie(req, SSO_COOKIE) ?? '').split('.');
+  res.clearCookie(SSO_COOKIE, { path: '/auth/sso' });
+  if (!sso.enabled) return res.redirect('/login');
+  if (!state || state !== req.query.state) return res.redirect('/login?error=sso-expired');
+  if (req.query.error || !req.query.code) return res.redirect('/login?error=sso-failed');
+  try {
+    const person = await sso.identify(String(req.query.code));
+    const config = await store.read();
+    const who = person.groups.includes(sso.adminGroup) ? store.ADMIN_USERNAME : store.findBySsoUser(config, person.username)?.id;
+    if (!who) return res.redirect('/login?error=sso-not-linked');
+    await signIn(req, res, who, remember === '1');
+    res.redirect('/');
+  } catch (error) {
+    console.error('Sign-in with the provider failed:', error);
+    res.redirect('/login?error=sso-failed');
+  }
+});
 
 // Everything else under /api needs a signed-in session: the dashboard shows the home's location and power.
 const OPEN_API = new Set(['/session', '/auth/login', '/auth/setup', '/auth/logout']);
@@ -221,7 +264,10 @@ app.get('/api/session', handle(async (req, res) => {
     profile: profile?.id ?? null,
     name: profile?.name ?? (user ? 'House admin' : null),
     setupRequired: !auth.effectiveRecord(config),
-    passwordManagedByEnv: auth.envManaged()
+    passwordManagedByEnv: auth.envManaged(),
+    // Whether there is a Morning Desk password to change (someone who only signs in with Poodle House has none).
+    localPassword: user ? Boolean(profile ? profile.login : auth.effectiveRecord(config)) : false,
+    sso: sso.enabled ? { name: sso.name } : null
   });
 }));
 
@@ -320,6 +366,7 @@ const publicProfile = (profile, config) => ({
   batteryKwh: profile.batteryKwh,
   news: profile.news,
   username: profile.login?.username ?? '',
+  ssoUsers: profile.sso,
   isDefault: profile.id === config.defaultProfile
 });
 
@@ -333,12 +380,17 @@ async function loginInput(req) {
     const problem = passwordProblem(password);
     if (problem) throw httpError(400, problem);
   }
-  return { username: login.username === undefined ? undefined : String(login.username), record: password ? await auth.hashPassword(password) : null };
+  return {
+    username: login.username === undefined ? undefined : String(login.username),
+    record: password ? await auth.hashPassword(password) : null,
+    ssoUsers: login.ssoUsers
+  };
 }
 
 function applyLogin(config, profile, login) {
   if (!login) return;
-  const problem = store.setLogin(config, profile, login.username, login.record);
+  const problem = store.setLogin(config, profile, login.username, login.record)
+    ?? (login.ssoUsers === undefined ? null : store.setSsoUsers(config, profile, login.ssoUsers));
   if (problem) throw httpError(400, problem);
 }
 
@@ -379,17 +431,20 @@ app.post('/api/profiles', requireAdmin, handle(async (req, res) => {
 app.put('/api/profiles/:id', handle(async (req, res) => {
   if (!canEdit(req, req.params.id)) throw httpError(403, 'You can only change your own profile.');
   const login = await loginInput(req);
+  let unlinked = false;
   const profile = await store.update(config => {
     const existing = config.profiles.find(item => item.id === req.params.id);
     if (!existing) throw httpError(404, 'Profile not found.');
     const problem = store.applyProfileInput(existing, req.body, NEWS_IDS);
     if (problem) throw httpError(400, problem);
+    const linkedBefore = existing.sso;
     applyLogin(config, existing, login);
+    unlinked = linkedBefore.some(name => !existing.sso.includes(name));
     if (req.body?.makeDefault === true && isAdmin(req)) config.defaultProfile = existing.id;
     return publicProfile(existing, config);
   });
-  // A new password or a removed sign-in signs that profile out everywhere.
-  if (login?.record || login?.username === '') {
+  // A new password, a removed sign-in or an unlinked Poodle House user signs that profile out everywhere.
+  if (login?.record || login?.username === '' || unlinked) {
     auth.destroySessionsFor(req.params.id);
     await saveSessions();
   }

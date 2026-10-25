@@ -25,6 +25,26 @@ Every device signs in on the `/login` page before it sees the dashboard:
 
 An older single-profile `config.json` is upgraded automatically on first save: its location and token become a profile called after the location.
 
+### Sign in with Poodle House
+
+The login page can also offer **Sign in with Poodle House** (or any OpenID Connect provider), so people use one account for the house site, Recipes and this dashboard. Someone already signed in to Poodle House goes straight through without typing a password. The usernames and passwords above keep working next to it.
+
+1. On the provider, register a client whose return address is `https://<this dashboard>/auth/sso/callback` (the Poodle House theme does this for `morningdesk.poodlehouse.co.za`; see its INSTALL.txt).
+2. Next to `docker-compose.yml`, create a `.env` file (it is not in git, so the nightly update never touches it):
+
+   ```
+   SSO_ISSUER=https://poodlehouse.co.za/
+   SSO_CLIENT_ID=morning-desk
+   SSO_CLIENT_SECRET=<the same secret as PH_SSO_DESK_SECRET in wp-config.php>
+   SSO_PUBLIC_URL=https://morningdesk.poodlehouse.co.za
+   ```
+
+   Optional: `SSO_NAME` (button text, default Poodle House) and `SSO_ADMIN_GROUP` (default `house-admin`).
+3. `docker compose up -d` to restart with it. The button appears on the login page.
+4. Sign in as the admin, open **Settings**, and in each profile list the Poodle House usernames that open it (for example `julian, partner`). Administrators on the provider (group `house-admin`) always sign in as the house admin; anyone not listed is told to ask the admin.
+
+The sign-in always happens on `SSO_PUBLIC_URL`: a screen that opened the dashboard by its LAN address is moved there first. Unlinking a username signs that profile out everywhere. Signing out of Poodle House does not sign you out of Morning Desk.
+
 ## Solar providers
 
 Each profile picks one solar provider and keeps its own credentials for it. Right now that is **Growatt**. The Settings screen draws the form from the provider's field list, saved tokens and passwords are never sent back to the browser, and switching provider keeps the other one's saved details.

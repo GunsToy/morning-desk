@@ -22,7 +22,8 @@ export function blankProfile() {
     solar: { provider: providers.DEFAULT_PROVIDER, settings: { [providers.DEFAULT_PROVIDER]: providers.get(providers.DEFAULT_PROVIDER).defaults() } },
     batteryKwh: null, // usable battery capacity; null hides the runtime estimate
     news: [...DEFAULT_NEWS],
-    login: null // { username, salt, hash } once the admin gives the profile a sign-in
+    login: null, // { username, salt, hash } once the admin gives the profile a sign-in
+    sso: [] // Poodle House usernames that open this profile (see sso.mjs)
   };
 }
 
@@ -57,7 +58,8 @@ function cleanProfile(raw = {}) {
     solar: cleanSolar(raw),
     batteryKwh: Number.isFinite(raw.batteryKwh) && raw.batteryKwh > 0 ? raw.batteryKwh : null,
     news: Array.isArray(raw.news) ? raw.news.map(String) : [...base.news],
-    login: cleanLogin(raw.login)
+    login: cleanLogin(raw.login),
+    sso: Array.isArray(raw.sso) ? raw.sso.map(name => String(name).toLowerCase()) : []
   };
 }
 
@@ -186,6 +188,23 @@ export function setLogin(config, profile, username, record = null) {
   const password = record ?? (profile.login ? { salt: profile.login.salt, hash: profile.login.hash } : null);
   if (!password) return 'Set a password for this sign-in.';
   profile.login = { username: name, ...password };
+  return null;
+}
+
+export const findBySsoUser = (config, username) => config.profiles.find(profile => profile.sso.includes(username));
+
+// Links Poodle House usernames to a profile: a list, or a comma-separated string. Returns an error message, or null.
+export function setSsoUsers(config, profile, input) {
+  const names = [...new Set((Array.isArray(input) ? input : String(input ?? '').split(','))
+    .map(name => String(name).trim().toLowerCase()).filter(Boolean))];
+  if (names.length > 20) return 'Link at most 20 Poodle House users to one profile.';
+  const bad = names.find(name => name.length > 60 || /[<>"]/.test(name));
+  if (bad) return `"${bad}" is not a Poodle House username.`;
+  for (const name of names) {
+    const other = config.profiles.find(item => item !== profile && item.sso.includes(name));
+    if (other) return `${name} already opens the profile "${other.name}".`;
+  }
+  profile.sso = names;
   return null;
 }
 

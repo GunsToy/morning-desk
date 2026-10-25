@@ -131,3 +131,17 @@ test('sign-ins and live sessions survive a save; expired sessions and an "admin"
   assert.equal(config.profiles[0].login.username, 'boss');
   assert.deepEqual(config.sessions, [{ hash: 'live', who: 'home', expires: later, remember: true }]);
 });
+
+test('Poodle House users: a comma list, lower-cased, each linked to one profile only', async () => {
+  await writeConfig({ profiles: [{ id: 'home', name: 'Home' }, { id: 'flat', name: 'Flat' }] });
+  const config = await store.read();
+  const [home, flat] = config.profiles;
+  assert.deepEqual(home.sso, [], 'older profiles load with no linked users');
+  assert.equal(store.setSsoUsers(config, home, ' Julian, partner ,julian,, '), null);
+  assert.deepEqual(home.sso, ['julian', 'partner']);
+  assert.equal(store.findBySsoUser(config, 'partner'), home);
+  assert.match(store.setSsoUsers(config, flat, 'partner'), /already opens the profile "Home"/);
+  assert.match(store.setSsoUsers(config, flat, '<script>'), /not a Poodle House username/);
+  assert.equal(store.setSsoUsers(config, home, ''), null);
+  assert.deepEqual(home.sso, [], 'an empty field unlinks everyone');
+});

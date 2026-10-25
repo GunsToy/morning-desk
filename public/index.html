@@ -166,6 +166,10 @@
             <input name="loginPassword" type="password" autocomplete="new-password">
           </label>
           <p class="dialog-intro">Whoever signs in with these sees only this profile and can change its settings. Clear the username to remove the sign-in.</p>
+          <label id="sso-users-row" hidden><span id="sso-users-label">Poodle House users</span>
+            <input name="ssoUsers" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="e.g. julian, partner">
+          </label>
+          <p class="dialog-intro" id="sso-users-note" hidden>Usernames, separated by commas. Each of them signs straight in to this profile; administrators always sign in as the house admin.</p>
         </div>
       </fieldset>
 
@@ -213,10 +217,10 @@
       <fieldset class="settings-section">
         <legend id="password-legend">Your password</legend>
         <p class="dialog-intro" id="password-note">Use at least 8 characters. Changing it signs out every other browser.</p>
-        <label>Current password
+        <label class="password-field">Current password
           <input name="currentPassword" type="password" autocomplete="current-password">
         </label>
-        <label>New password
+        <label class="password-field">New password
           <input name="newPassword" type="password" autocomplete="new-password">
         </label>
         <div class="inline-actions">

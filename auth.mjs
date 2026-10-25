@@ -38,7 +38,7 @@ export const DUMMY_RECORD = await hashPassword(crypto.randomBytes(16).toString('
 
 const hashToken = token => crypto.createHash('sha256').update(token).digest('hex');
 
-function readCookie(req, name) {
+export function readCookie(req, name) {
   for (const part of (req.headers.cookie || '').split(';')) {
     const [key, ...rest] = part.trim().split('=');
     if (key === name) {

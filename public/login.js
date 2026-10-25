@@ -3,6 +3,15 @@ const form = $('#login-form');
 const status = $('#login-status');
 let setup = false;
 
+// Sent back here by a "Sign in with Poodle House" that did not work.
+const SSO_ERRORS = {
+  'sso-not-linked': 'Your account is not linked to a Morning Desk profile yet. Ask the house admin to link it.',
+  'sso-expired': 'That sign-in took too long or was started in another tab. Try again.',
+  'sso-failed': 'Signing in that way did not work. Try again, or use your Morning Desk password.'
+};
+const ssoError = SSO_ERRORS[new URLSearchParams(location.search).get('error')];
+if (ssoError) status.textContent = ssoError;
+
 // First run: no admin password yet, so this page sets one instead of signing in.
 function showSetup() {
   setup = true;
@@ -16,13 +25,23 @@ function showSetup() {
   form.elements.confirm.required = true;
   $('#login-submit').textContent = 'Create admin password';
   $('#login-note').hidden = true;
+  $('#login-sso').hidden = true;
 }
 
 fetch('/api/session').then(res => res.json()).then(session => {
-  if (session.authenticated) location.replace('/');
-  else if (session.setupRequired) showSetup();
+  if (session.authenticated) return location.replace('/');
+  if (session.sso && !session.setupRequired) {
+    $('#login-sso-button').textContent = `Sign in with ${session.sso.name}`;
+    $('#login-sso').hidden = false;
+  }
+  if (session.setupRequired) showSetup();
 }).catch(() => { /* the form still works; the server answers the sign-in itself */ })
   .finally(() => $('.login-card').removeAttribute('data-loading'));
+
+// Remember me applies to this way of signing in too.
+$('#login-sso-button').addEventListener('click', event => {
+  event.currentTarget.href = `/auth/sso/start?remember=${form.elements.remember.checked ? 1 : 0}`;
+});
 
 $('#login-eye').addEventListener('click', event => {
   const button = event.currentTarget;

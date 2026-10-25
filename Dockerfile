@@ -8,7 +8,7 @@ COPY package.json package-lock.json ./
 RUN npm install --omit=dev && npm cache clean --force
 
 # App source
-COPY server.mjs store.mjs auth.mjs ./
+COPY server.mjs store.mjs auth.mjs sso.mjs ./
 COPY providers ./providers
 COPY public ./public
 COPY config.example.json ./config.example.json

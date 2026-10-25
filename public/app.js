@@ -391,12 +391,21 @@ async function populateSettings(id) {
   form.elements.loginUsername.value = data.username ?? '';
   form.elements.loginPassword.value = '';
   form.elements.loginPassword.placeholder = data.username ? 'Saved. Leave blank to keep it' : 'At least 8 characters';
+  for (const selector of ['#sso-users-row', '#sso-users-note']) $(selector).hidden = !(admin && session.sso);
+  if (session.sso) $('#sso-users-label').textContent = `${session.sso.name} users`;
+  form.elements.ssoUsers.value = (data.ssoUsers ?? []).join(', ');
 
   const managed = admin && session.passwordManagedByEnv;
   $('#password-legend').textContent = admin ? 'Admin password' : 'Your password';
-  $('#password-note').textContent = managed
-    ? 'The password is set by the ADMIN_PASSWORD environment variable and cannot be changed here.'
-    : `Signed in as ${admin ? 'the house admin' : session.name}. Use at least 8 characters. Changing it signs out your other browsers.`;
+  // Someone who only signs in with Poodle House has no Morning Desk password here to change.
+  const hasPassword = session.localPassword;
+  $('#password-note').textContent = !hasPassword
+    ? `Signed in as ${session.name} with ${session.sso?.name ?? 'single sign-on'}. Change your password there.`
+    : managed
+      ? 'The password is set by the ADMIN_PASSWORD environment variable and cannot be changed here.'
+      : `Signed in as ${admin ? 'the house admin' : session.name}. Use at least 8 characters. Changing it signs out your other browsers.`;
+  document.querySelectorAll('.password-field').forEach(field => { field.hidden = !hasPassword; });
+  $('#password-change').hidden = !hasPassword;
   form.elements.currentPassword.disabled = managed;
   form.elements.newPassword.disabled = managed;
   $('#password-change').disabled = managed;
@@ -462,7 +471,10 @@ async function saveSettings() {
     news: selectedNews(),
     makeDefault: form.elements.makeDefault.checked
   };
-  if (isAdmin()) body.login = { username: form.elements.loginUsername.value, password: form.elements.loginPassword.value };
+  if (isAdmin()) {
+    body.login = { username: form.elements.loginUsername.value, password: form.elements.loginPassword.value };
+    if (session.sso) body.login.ssoUsers = form.elements.ssoUsers.value;
+  }
   status.textContent = 'Saving…';
   status.classList.remove('ok');
   saving = true;

@@ -491,8 +491,12 @@ html, dialog { scrollbar-color: rgba(236,242,255,.2) transparent; }
 .login-status { min-height:1.2em; text-align:center; }
 .login-submit { display:block; width:min(100%,300px); min-height:44px; margin:12px auto 0; border:0; border-radius:999px; background:var(--lime); color:var(--page); font:inherit; font-size:var(--text-control); font-weight:800; cursor:pointer; }
 .login-submit:disabled { opacity:.45; cursor:not-allowed; }
+.login-sso { padding:0 24px; }
+.login-or { display:flex; align-items:center; gap:12px; margin:18px 0 12px; color:var(--muted); font-family:'DM Mono',monospace; font-size:var(--text-meta); letter-spacing:.13em; text-transform:uppercase; }
+.login-or::before, .login-or::after { content:''; flex:1; border-top:1px solid var(--line); }
+.login-sso-button { display:grid; place-items:center; width:min(100%,300px); min-height:44px; margin:auto; border:1px solid var(--line); border-radius:999px; background:#263141; color:var(--ink); font-size:var(--text-control); font-weight:800; text-decoration:none; }
 .login-note { margin:18px 24px 0; color:var(--muted); font-size:var(--text-body-sm); }
-@media (hover:hover) { .login-submit:hover:not(:disabled) { filter:brightness(1.12); } .login-eye:hover { color:var(--ink); } }
+@media (hover:hover) { .login-submit:hover:not(:disabled), .login-sso-button:hover { filter:brightness(1.12); } .login-eye:hover { color:var(--ink); } }
 
 /* Browser autofill keeps the dark field instead of painting it pale blue.
    shortcut: Firefox's autofill tint can't be fully overridden; this covers Chrome, Edge and Safari. */
