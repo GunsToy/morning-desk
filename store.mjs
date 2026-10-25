@@ -11,6 +11,8 @@ export const DEFAULT_NEWS = ['daily-maverick', 'bbc'];
 export const DEFAULT_LOCATION = { name: 'Cape Town', latitude: -33.9249, longitude: 18.4241, timezone: 'Africa/Johannesburg' };
 
 const ID_PATTERN = /^[a-z0-9][a-z0-9-]{0,31}$/;
+const USERNAME_PATTERN = /^[a-z0-9][a-z0-9._-]{1,31}$/;
+export const ADMIN_USERNAME = 'admin'; // the house admin signs in with this name and the admin password
 
 export function blankProfile() {
   return {
@@ -19,7 +21,8 @@ export function blankProfile() {
     location: { ...DEFAULT_LOCATION },
     solar: { provider: providers.DEFAULT_PROVIDER, settings: { [providers.DEFAULT_PROVIDER]: providers.get(providers.DEFAULT_PROVIDER).defaults() } },
     batteryKwh: null, // usable battery capacity; null hides the runtime estimate
-    news: [...DEFAULT_NEWS]
+    news: [...DEFAULT_NEWS],
+    login: null // { username, salt, hash } once the admin gives the profile a sign-in
   };
 }
 
@@ -27,7 +30,7 @@ export function uniqueId(taken, name) {
   const base = String(name).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 26).replace(/-+$/, '') || 'profile';
   let id = base;
   let n = 2;
-  while (taken.has(id)) id = `${base}-${n++}`;
+  while (taken.has(id) || id === ADMIN_USERNAME) id = `${base}-${n++}`; // 'admin' is the house admin's session
   return id;
 }
 
@@ -53,21 +56,32 @@ function cleanProfile(raw = {}) {
     location: { ...base.location, ...raw.location },
     solar: cleanSolar(raw),
     batteryKwh: Number.isFinite(raw.batteryKwh) && raw.batteryKwh > 0 ? raw.batteryKwh : null,
-    news: Array.isArray(raw.news) ? raw.news.map(String) : [...base.news]
+    news: Array.isArray(raw.news) ? raw.news.map(String) : [...base.news],
+    login: cleanLogin(raw.login)
   };
 }
 
+function cleanLogin(login) {
+  if (!login?.username || !login.salt || !login.hash) return null;
+  return { username: String(login.username), salt: String(login.salt), hash: String(login.hash) };
+}
+
+const cleanSession = session => session && typeof session.hash === 'string' && typeof session.who === 'string' && Number(session.expires) > Date.now()
+  ? { hash: session.hash, who: session.who, expires: Number(session.expires), remember: session.remember === true }
+  : null;
+
 // Turns whatever is on disk into the current shape:
-// { version, admin: {salt, hash} | null, defaultProfile, profiles: [...] }
+// { version, admin: {salt, hash} | null, defaultProfile, profiles: [...], sessions: [...] }
 function upgrade(saved) {
-  const config = { version: 3, admin: null, defaultProfile: '', profiles: [] };
+  const config = { version: 3, admin: null, defaultProfile: '', profiles: [], sessions: [] };
   if (saved && typeof saved === 'object') {
     if (saved.admin?.salt && saved.admin?.hash) config.admin = { salt: String(saved.admin.salt), hash: String(saved.admin.hash) };
+    if (Array.isArray(saved.sessions)) config.sessions = saved.sessions.map(cleanSession).filter(Boolean);
     if (Array.isArray(saved.profiles) && saved.profiles.length) {
       const seen = new Set();
       for (const raw of saved.profiles) {
         const profile = cleanProfile(raw);
-        if (!ID_PATTERN.test(profile.id) || seen.has(profile.id)) profile.id = uniqueId(seen, profile.name);
+        if (!ID_PATTERN.test(profile.id) || profile.id === ADMIN_USERNAME || seen.has(profile.id)) profile.id = uniqueId(seen, profile.name);
         seen.add(profile.id);
         config.profiles.push(profile);
       }
@@ -148,6 +162,30 @@ function applySolarInput(profile, input) {
   const result = applyFields(provider, current, input.values ?? {}, input.clearSecrets ?? []);
   if (result.error) return result.error;
   profile.solar = { provider: id, settings: { ...profile.solar.settings, [id]: result.settings } };
+  return null;
+}
+
+export const findByUsername = (config, username) =>
+  config.profiles.find(profile => profile.login?.username === String(username ?? '').trim().toLowerCase());
+
+// Sets a profile's sign-in. username: undefined keeps it, '' removes the sign-in. record: a new {salt, hash}, or null to keep the password.
+// Returns an error message, or null.
+export function setLogin(config, profile, username, record = null) {
+  if (username === undefined) {
+    if (record && profile.login) profile.login = { ...profile.login, ...record };
+    return record && !profile.login ? 'Choose a username for this sign-in.' : null;
+  }
+  const name = String(username).trim().toLowerCase();
+  if (!name) {
+    profile.login = null;
+    return null;
+  }
+  if (!USERNAME_PATTERN.test(name)) return 'Usernames are 2 to 32 letters, numbers, dots, dashes or underscores.';
+  if (name === ADMIN_USERNAME) return 'The username "admin" is the house admin. Choose another.';
+  if (config.profiles.some(other => other !== profile && other.login?.username === name)) return `Another profile already signs in as "${name}".`;
+  const password = record ?? (profile.login ? { salt: profile.login.salt, hash: profile.login.hash } : null);
+  if (!password) return 'Set a password for this sign-in.';
+  profile.login = { username: name, ...password };
   return null;
 }
 

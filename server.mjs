@@ -86,14 +86,25 @@ app.use('/api', (req, res, next) => {
 });
 
 const publicDir = path.join(__dirname, 'public');
-app.use(express.static(publicDir));
+app.use(express.static(publicDir, { index: false }));
 
-// Explicit root so a missing index never returns bare "Cannot GET /"
-app.get('/', (_req, res) => {
-  const index = path.join(publicDir, 'index.html');
-  res.sendFile(index, err => {
-    if (err) res.status(500).send(`Morning Desk index missing at ${index}`);
+// Explicit pages so a missing file never returns bare "Cannot GET /". Signed out, the dashboard sends you to /login.
+const sendPage = (res, name) => {
+  const file = path.join(publicDir, name);
+  res.sendFile(file, err => {
+    if (err) res.status(500).send(`Morning Desk page missing at ${file}`);
   });
+};
+app.get('/', (req, res) => auth.sessionFromReq(req) ? sendPage(res, 'index.html') : res.redirect('/login'));
+app.get('/login', (req, res) => auth.sessionFromReq(req) ? res.redirect('/') : sendPage(res, 'login.html'));
+
+// Everything else under /api needs a signed-in session: the dashboard shows the home's location and power.
+const OPEN_API = new Set(['/session', '/auth/login', '/auth/setup', '/auth/logout']);
+app.use('/api', (req, res, next) => {
+  if (OPEN_API.has(req.path)) return next();
+  req.user = auth.sessionFromReq(req);
+  if (!req.user) return res.status(401).json({ error: 'Please sign in.' });
+  next();
 });
 
 const NEWS_FEEDS = [
@@ -158,19 +169,27 @@ const handle = fn => async (req, res) => {
   }
 };
 
+const isAdmin = req => req.user?.who === store.ADMIN_USERNAME;
 const requireAdmin = (req, res, next) => {
-  if (!auth.sessionFromReq(req)) return res.status(401).json({ error: 'Admin login required.' });
+  if (!isAdmin(req)) return res.status(403).json({ error: 'Only the house admin can do that.' });
   next();
 };
 
-const setSessionCookie = (req, res, token) => res.cookie(auth.COOKIE_NAME, token, {
-  httpOnly: true,
-  sameSite: 'strict',
-  // A tunnel that is not the trusted proxy still says https here. Faking it only breaks the faker's own login.
-  secure: req.secure || req.get('x-forwarded-proto') === 'https',
-  maxAge: auth.SESSION_TTL,
-  path: '/'
-});
+// Sessions live in memory and are mirrored into config.json, so restarts keep everyone signed in.
+const saveSessions = () => store.update(config => { config.sessions = auth.sessionList(); });
+
+async function signIn(req, res, who, remember) {
+  const token = auth.createSession(who, remember);
+  await saveSessions();
+  res.cookie(auth.COOKIE_NAME, token, {
+    httpOnly: true,
+    sameSite: 'strict',
+    // A tunnel that is not the trusted proxy still says https here. Faking it only breaks the faker's own login.
+    secure: req.secure || req.get('x-forwarded-proto') === 'https',
+    ...(remember ? { maxAge: auth.REMEMBER_TTL } : {}), // without "Remember me" the cookie ends with the browser
+    path: '/'
+  });
+}
 
 const passwordProblem = value =>
   typeof value !== 'string' || value.length < 8 || value.length > 200 ? 'Password must be 8 to 200 characters.' : null;
@@ -183,10 +202,16 @@ function throwIfLockedOut(req, res) {
 }
 
 // ---- Auth ------------------------------------------------------------------------------
+// Who is signed in. role: 'admin' (the house admin, every profile) or 'profile' (that profile only).
 app.get('/api/session', handle(async (req, res) => {
   const config = await store.read();
+  const user = auth.sessionFromReq(req);
+  const profile = user && user.who !== store.ADMIN_USERNAME ? config.profiles.find(item => item.id === user.who) : null;
   res.json({
-    authenticated: Boolean(auth.sessionFromReq(req)),
+    authenticated: Boolean(user),
+    role: user ? (profile ? 'profile' : 'admin') : null,
+    profile: profile?.id ?? null,
+    name: profile?.name ?? (user ? 'House admin' : null),
     setupRequired: !auth.effectiveRecord(config),
     passwordManagedByEnv: auth.envManaged()
   });
@@ -202,35 +227,45 @@ app.post('/api/auth/setup', handle(async (req, res) => {
     if (auth.effectiveRecord(config)) throw httpError(409, 'An admin password is already set.');
     config.admin = record;
   });
-  setSessionCookie(req, res, auth.createSession());
+  await signIn(req, res, store.ADMIN_USERNAME, req.body.remember === true);
   res.json({ ok: true });
 }));
 
 app.post('/api/auth/login', handle(async (req, res) => {
   throwIfLockedOut(req, res);
-  const record = auth.effectiveRecord(await store.read());
-  if (!record) throw httpError(409, 'No admin password is set yet.');
-  const ok = typeof req.body?.password === 'string' && await auth.verifyPassword(req.body.password, record);
+  const config = await store.read();
+  const username = String(req.body?.username ?? '').trim().toLowerCase();
+  const password = typeof req.body?.password === 'string' ? req.body.password : '';
+  const profile = username === store.ADMIN_USERNAME ? null : store.findByUsername(config, username);
+  const record = username === store.ADMIN_USERNAME ? auth.effectiveRecord(config) : profile?.login;
+  if (username === store.ADMIN_USERNAME && !record) throw httpError(409, 'No admin password is set yet.');
+  const ok = await auth.verifyPassword(password, record ?? auth.DUMMY_RECORD) && Boolean(record);
   if (!ok) {
     auth.recordFailure(req.ip);
-    throw httpError(401, 'Incorrect password.');
+    throw httpError(401, 'That username and password do not match.');
   }
   auth.clearFailures(req.ip);
-  setSessionCookie(req, res, auth.createSession());
+  await signIn(req, res, profile ? profile.id : store.ADMIN_USERNAME, req.body.remember === true);
   res.json({ ok: true });
 }));
 
-app.post('/api/auth/logout', (req, res) => {
-  const token = auth.sessionFromReq(req);
-  if (token) auth.destroySession(token);
+app.post('/api/auth/logout', handle(async (req, res) => {
+  const user = auth.sessionFromReq(req);
+  if (user) {
+    auth.destroySession(user.token);
+    await saveSessions();
+  }
   res.clearCookie(auth.COOKIE_NAME, { path: '/' });
   res.json({ ok: true });
-});
+}));
 
-app.post('/api/auth/password', requireAdmin, handle(async (req, res) => {
-  if (auth.envManaged()) throw httpError(409, 'The admin password is set by the ADMIN_PASSWORD environment variable.');
+// Changes the signed-in person's own password: the admin's, or their profile's.
+app.post('/api/auth/password', handle(async (req, res) => {
+  const admin = isAdmin(req);
+  if (admin && auth.envManaged()) throw httpError(409, 'The admin password is set by the ADMIN_PASSWORD environment variable.');
   throwIfLockedOut(req, res);
-  const record = auth.effectiveRecord(await store.read());
+  const config = await store.read();
+  const record = admin ? auth.effectiveRecord(config) : config.profiles.find(item => item.id === req.user.who)?.login;
   const knowsCurrent = typeof req.body?.current === 'string' && await auth.verifyPassword(req.body.current, record);
   if (!knowsCurrent) {
     auth.recordFailure(req.ip);
@@ -239,9 +274,12 @@ app.post('/api/auth/password', requireAdmin, handle(async (req, res) => {
   const problem = passwordProblem(req.body.next);
   if (problem) throw httpError(400, problem);
   const next = await auth.hashPassword(req.body.next);
-  await store.update(config => { config.admin = next; });
-  auth.destroyAllSessions(); // signs out every other browser
-  setSessionCookie(req, res, auth.createSession());
+  await store.update(latest => {
+    if (admin) latest.admin = next;
+    else store.setLogin(latest, latest.profiles.find(item => item.id === req.user.who), undefined, next);
+  });
+  auth.destroySessionsFor(req.user.who); // signs out every other browser
+  await signIn(req, res, req.user.who, req.user.remember);
   res.json({ ok: true });
 }));
 
@@ -251,6 +289,16 @@ function pickProfile(config, id) {
     ?? config.profiles.find(profile => profile.id === config.defaultProfile)
     ?? config.profiles[0];
 }
+
+// The admin may look at any profile (?profile=<id>); a profile's own sign-in only ever sees that profile.
+function profileFor(req, config) {
+  if (isAdmin(req)) return pickProfile(config, req.query.profile);
+  const own = config.profiles.find(profile => profile.id === req.user.who);
+  if (!own) throw httpError(401, 'Please sign in.');
+  return own;
+}
+
+const canEdit = (req, id) => isAdmin(req) || req.user.who === id;
 
 // What the browser may see. Secrets (API tokens, passwords) never leave the server: the browser is only told which are saved.
 const publicProfile = (profile, config) => ({
@@ -263,33 +311,56 @@ const publicProfile = (profile, config) => ({
   },
   batteryKwh: profile.batteryKwh,
   news: profile.news,
+  username: profile.login?.username ?? '',
   isDefault: profile.id === config.defaultProfile
 });
+
+// The admin sets a profile's sign-in in the profile form: { login: { username, password } }. A blank password keeps the saved one.
+async function loginInput(req) {
+  const login = req.body?.login;
+  if (login === undefined || !isAdmin(req)) return null;
+  if (login === null || typeof login !== 'object') throw httpError(400, 'Sign-in details are invalid.');
+  const password = typeof login.password === 'string' && login.password !== '' ? login.password : null;
+  if (password) {
+    const problem = passwordProblem(password);
+    if (problem) throw httpError(400, problem);
+  }
+  return { username: login.username === undefined ? undefined : String(login.username), record: password ? await auth.hashPassword(password) : null };
+}
+
+function applyLogin(config, profile, login) {
+  if (!login) return;
+  const problem = store.setLogin(config, profile, login.username, login.record);
+  if (problem) throw httpError(400, problem);
+}
 
 app.get('/api/solar-providers', (_req, res) => {
   res.json({ defaultProvider: providers.DEFAULT_PROVIDER, providers: providers.list().map(publicSchema) });
 });
 
-app.get('/api/profiles', handle(async (_req, res) => {
+app.get('/api/profiles', handle(async (req, res) => {
   const config = await store.read();
+  const visible = isAdmin(req) ? config.profiles : [profileFor(req, config)];
   res.json({
-    defaultProfile: config.defaultProfile,
-    profiles: config.profiles.map(({ id, name, location }) => ({ id, name, locationName: location.name }))
+    defaultProfile: isAdmin(req) ? config.defaultProfile : visible[0].id,
+    profiles: visible.map(({ id, name, location }) => ({ id, name, locationName: location.name }))
   });
 }));
 
 app.get('/api/config', handle(async (req, res) => {
   const config = await store.read();
-  res.json(publicProfile(pickProfile(config, req.query.profile), config));
+  res.json(publicProfile(profileFor(req, config), config));
 }));
 
 app.post('/api/profiles', requireAdmin, handle(async (req, res) => {
+  const login = await loginInput(req);
   const profile = await store.update(config => {
     if (!req.body?.name) throw httpError(400, 'Profile name is required.');
     const created = store.blankProfile();
     const problem = store.applyProfileInput(created, req.body, NEWS_IDS);
     if (problem) throw httpError(400, problem);
     created.id = store.uniqueId(new Set(config.profiles.map(item => item.id)), created.name);
+    applyLogin(config, created, login);
     config.profiles.push(created);
     if (req.body.makeDefault === true) config.defaultProfile = created.id;
     return publicProfile(created, config);
@@ -297,15 +368,23 @@ app.post('/api/profiles', requireAdmin, handle(async (req, res) => {
   res.status(201).json({ profile });
 }));
 
-app.put('/api/profiles/:id', requireAdmin, handle(async (req, res) => {
+app.put('/api/profiles/:id', handle(async (req, res) => {
+  if (!canEdit(req, req.params.id)) throw httpError(403, 'You can only change your own profile.');
+  const login = await loginInput(req);
   const profile = await store.update(config => {
     const existing = config.profiles.find(item => item.id === req.params.id);
     if (!existing) throw httpError(404, 'Profile not found.');
     const problem = store.applyProfileInput(existing, req.body, NEWS_IDS);
     if (problem) throw httpError(400, problem);
-    if (req.body?.makeDefault === true) config.defaultProfile = existing.id;
+    applyLogin(config, existing, login);
+    if (req.body?.makeDefault === true && isAdmin(req)) config.defaultProfile = existing.id;
     return publicProfile(existing, config);
   });
+  // A new password or a removed sign-in signs that profile out everywhere.
+  if (login?.record || login?.username === '') {
+    auth.destroySessionsFor(req.params.id);
+    await saveSessions();
+  }
   solarCaches.delete(req.params.id);
   res.json({ profile });
 }));
@@ -318,13 +397,15 @@ app.delete('/api/profiles/:id', requireAdmin, handle(async (req, res) => {
     config.profiles.splice(index, 1);
     if (config.defaultProfile === req.params.id) config.defaultProfile = config.profiles[0].id;
   });
+  auth.destroySessionsFor(req.params.id);
+  await saveSessions();
   solarCaches.delete(req.params.id);
   res.json({ ok: true });
 }));
 
 app.get('/api/weather', async (req, res) => {
   try {
-    const { location } = pickProfile(await store.read(), req.query.profile);
+    const { location } = profileFor(req, await store.read());
     const params = new URLSearchParams({
       latitude: location.latitude, longitude: location.longitude, timezone: location.timezone,
       current: 'temperature_2m,apparent_temperature,weather_code,wind_speed_10m',
@@ -353,7 +434,8 @@ app.get('/api/news', async (req, res) => {
 });
 
 app.get('/api/solar', async (req, res) => {
-  const profile = pickProfile(await store.read(), req.query.profile);
+  let profile;
+  try { profile = profileFor(req, await store.read()); } catch (error) { return res.status(error.status ?? 500).json({ error: error.message }); }
   const cache = solarCaches.get(profile.id) ?? { until: 0, value: null };
   const provider = providers.get(profile.solar.provider);
   try {
@@ -379,6 +461,8 @@ app.get('/api/sky', async (_req, res) => {
     res.json({ videoId: match[1] });
   } catch (error) { res.status(502).json({ error: error.message }); }
 });
+
+auth.restoreSessions((await store.read()).sessions);
 
 const PORT = Number(process.env.PORT) || 4123;
 const HOST = process.env.HOST || '0.0.0.0'; // reachable on the local network, not only localhost

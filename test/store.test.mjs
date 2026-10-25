@@ -100,3 +100,34 @@ test('battery capacity survives a save, and configs without it still load', asyn
   await store.update(config => { config.profiles[0].batteryKwh = 15; });
   assert.equal((await store.read()).profiles[0].batteryKwh, 15);
 });
+
+test('profile sign-ins: usernames are checked, unique, and never "admin"', async () => {
+  await writeConfig({ profiles: [{ id: 'home', name: 'Home' }, { id: 'flat', name: 'Flat' }] });
+  const config = await store.read();
+  const [home, flat] = config.profiles;
+  const record = { salt: 's', hash: 'h' };
+  assert.match(store.setLogin(config, home, 'julian'), /Set a password/, 'a new sign-in needs a password');
+  assert.equal(store.setLogin(config, home, ' Julian ', record), null);
+  assert.equal(home.login.username, 'julian');
+  assert.equal(store.findByUsername(config, 'JULIAN'), home);
+  assert.match(store.setLogin(config, flat, 'julian', record), /already signs in/);
+  assert.match(store.setLogin(config, flat, 'admin', record), /house admin/);
+  assert.match(store.setLogin(config, flat, 'a b', record), /letters, numbers/);
+  assert.equal(store.setLogin(config, home, undefined, { salt: 's2', hash: 'h2' }), null, 'a new password keeps the username');
+  assert.deepEqual(home.login, { username: 'julian', salt: 's2', hash: 'h2' });
+  assert.equal(store.setLogin(config, home, ''), null);
+  assert.equal(home.login, null, 'a blank username removes the sign-in');
+});
+
+test('sign-ins and live sessions survive a save; expired sessions and an "admin" profile id do not', async () => {
+  const later = Date.now() + 60_000;
+  await writeConfig({
+    profiles: [{ id: 'admin', name: 'Admin', login: { username: 'boss', salt: 's', hash: 'h' } }],
+    sessions: [{ hash: 'live', who: 'home', expires: later, remember: true }, { hash: 'old', who: 'home', expires: 1 }]
+  });
+  await store.update(() => {});
+  const config = await store.read();
+  assert.notEqual(config.profiles[0].id, 'admin', 'the id "admin" belongs to the house admin session');
+  assert.equal(config.profiles[0].login.username, 'boss');
+  assert.deepEqual(config.sessions, [{ hash: 'live', who: 'home', expires: later, remember: true }]);
+});

@@ -1,6 +1,5 @@
 const $ = selector => document.querySelector(selector);
 const dialog = $('#settings-dialog');
-const authDialog = $('#auth-dialog');
 let config;
 
 // Anything that came from a feed or the server goes through esc() / safeUrl() before it reaches innerHTML.
@@ -23,7 +22,8 @@ let profileList = [];
 let editingId = '';
 let solarProviders = [];
 let editingProfile = null; // what the open settings form was filled from
-let session = { authenticated: false, setupRequired: false, passwordManagedByEnv: false };
+let session = { authenticated: false, role: null, profile: null, name: null, passwordManagedByEnv: false };
+const isAdmin = () => session.role === 'admin';
 const profileUrl = path => `${path}${path.includes('?') ? '&' : '?'}profile=${encodeURIComponent(currentProfile)}`;
 
 async function api(path, { method = 'GET', body } = {}) {
@@ -34,7 +34,7 @@ async function api(path, { method = 'GET', body } = {}) {
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    if (res.status === 401 && path !== '/api/auth/login') session.authenticated = false;
+    if (res.status === 401 && path !== '/api/auth/password') location.replace('/login'); // signed out or the session ran out
     throw Object.assign(new Error(data.error || `Request failed (${res.status})`), { status: res.status });
   }
   return data;
@@ -311,46 +311,6 @@ $('#profile-select').addEventListener('change', event => {
   loadAll({ includeSky: false });
 });
 
-// ---- Admin login -------------------------------------------------------------------------
-function openAuth() {
-  const form = $('#auth-form');
-  const setup = session.setupRequired;
-  $('#auth-title').textContent = setup ? 'Choose an admin password' : 'Unlock settings';
-  $('#auth-intro').textContent = setup
-    ? 'No admin password is set yet. Pick one (at least 8 characters). You will need it to change profiles and settings.'
-    : 'Enter the admin password to change profiles and settings.';
-  $('#auth-submit').textContent = setup ? 'Set password' : 'Unlock';
-  $('#auth-confirm-row').hidden = !setup;
-  form.elements.password.autocomplete = setup ? 'new-password' : 'current-password';
-  form.elements.confirm.required = setup;
-  $('#auth-status').textContent = '';
-  form.reset();
-  authDialog.showModal();
-  form.elements.password.focus();
-}
-
-$('#auth-form').addEventListener('submit', async event => {
-  event.preventDefault();
-  const form = event.target;
-  const status = $('#auth-status');
-  const setup = session.setupRequired;
-  const password = form.elements.password.value;
-  if (setup && password.length < 8) { status.textContent = 'Use at least 8 characters.'; return; }
-  if (setup && password !== form.elements.confirm.value) { status.textContent = 'The two passwords do not match.'; return; }
-  status.textContent = setup ? 'Setting password…' : 'Checking…';
-  try {
-    await api(setup ? '/api/auth/setup' : '/api/auth/login', { method: 'POST', body: { password } });
-    session = { ...session, authenticated: true, setupRequired: false };
-    form.reset();
-    authDialog.close();
-    await openSettings(currentProfile);
-  } catch (error) {
-    status.textContent = error.message;
-  }
-});
-$('#auth-close').addEventListener('click', () => authDialog.close());
-$('#auth-cancel').addEventListener('click', () => authDialog.close());
-
 // ---- Settings ----------------------------------------------------------------------------
 const providerById = id => solarProviders.find(provider => provider.id === id);
 
@@ -425,10 +385,18 @@ async function populateSettings(id) {
   document.querySelectorAll('#news-picker input[name="news"]').forEach(input => { input.checked = chosen.has(input.value); });
   $('#profile-delete').disabled = !id || profileList.length < 2;
 
-  const managed = session.passwordManagedByEnv;
+  // The house admin manages every profile and its sign-in; a profile's own sign-in edits only that profile.
+  const admin = isAdmin();
+  for (const selector of ['#edit-profile-row', '#profile-actions', '#default-row', '#login-fields']) $(selector).hidden = !admin;
+  form.elements.loginUsername.value = data.username ?? '';
+  form.elements.loginPassword.value = '';
+  form.elements.loginPassword.placeholder = data.username ? 'Saved. Leave blank to keep it' : 'At least 8 characters';
+
+  const managed = admin && session.passwordManagedByEnv;
+  $('#password-legend').textContent = admin ? 'Admin password' : 'Your password';
   $('#password-note').textContent = managed
     ? 'The password is set by the ADMIN_PASSWORD environment variable and cannot be changed here.'
-    : 'Use at least 8 characters. Changing it signs out every other browser.';
+    : `Signed in as ${admin ? 'the house admin' : session.name}. Use at least 8 characters. Changing it signs out your other browsers.`;
   form.elements.currentPassword.disabled = managed;
   form.elements.newPassword.disabled = managed;
   $('#password-change').disabled = managed;
@@ -443,15 +411,7 @@ async function openSettings(id) {
   if (!dialog.open) dialog.showModal();
 }
 
-$('#settings-button').addEventListener('click', async () => {
-  try {
-    session = await api('/api/session');
-    if (session.authenticated) await openSettings(currentProfile);
-    else openAuth();
-  } catch (error) {
-    console.error(error);
-  }
-});
+$('#settings-button').addEventListener('click', () => openSettings(currentProfile).catch(console.error));
 $('#settings-close').addEventListener('click', () => dialog.close());
 $('#settings-cancel').addEventListener('click', () => dialog.close());
 
@@ -501,6 +461,7 @@ async function saveSettings() {
     news: selectedNews(),
     makeDefault: form.elements.makeDefault.checked
   };
+  if (isAdmin()) body.login = { username: form.elements.loginUsername.value, password: form.elements.loginPassword.value };
   status.textContent = 'Saving…';
   status.classList.remove('ok');
   saving = true;
@@ -514,12 +475,6 @@ async function saveSettings() {
     await loadProfiles();
     await loadAll({ includeSky: false });
   } catch (error) {
-    if (error.status === 401) { // the session expired while the dialog was open
-      dialog.close();
-      session.setupRequired = false;
-      openAuth();
-      return;
-    }
     status.textContent = error.message;
   } finally {
     saving = false;
@@ -545,7 +500,7 @@ $('#password-change').addEventListener('click', async () => {
     form.elements.currentPassword.value = '';
     form.elements.newPassword.value = '';
     status.classList.add('ok');
-    status.textContent = 'Password changed. Other browsers were signed out.';
+    status.textContent = 'Password changed. Your other browsers were signed out.';
   } catch (error) {
     status.classList.remove('ok');
     status.textContent = error.message;
@@ -554,8 +509,7 @@ $('#password-change').addEventListener('click', async () => {
 
 $('#logout').addEventListener('click', async () => {
   await api('/api/auth/logout', { method: 'POST' }).catch(() => {});
-  session.authenticated = false;
-  dialog.close();
+  location.replace('/login');
 });
 
 document.addEventListener('click', event => {
@@ -568,5 +522,9 @@ document.addEventListener('click', event => {
 });
 updateClock();
 // Sky News only on first load so the live embed is not torn down every 15 minutes
-Promise.all([loadFeeds(), loadProfiles(), loadSolarProviders()]).then(() => loadAll({ includeSky: true }));
+api('/api/session').then(data => {
+  session = data;
+  if (!session.authenticated) return location.replace('/login');
+  return Promise.all([loadFeeds(), loadProfiles(), loadSolarProviders()]).then(() => loadAll({ includeSky: true }));
+}).catch(console.error);
 setInterval(() => loadAll({ includeSky: false }), 15 * 60 * 1000);

@@ -136,27 +136,6 @@
       </div>
     </section>
   </main>
-  <dialog id="auth-dialog" aria-labelledby="auth-title">
-    <form id="auth-form">
-      <div class="dialog-heading">
-        <div><p class="eyebrow">ADMIN</p><h2 id="auth-title">Unlock settings</h2></div>
-        <button type="button" id="auth-close" aria-label="Close" data-icon="close"></button>
-      </div>
-      <p class="dialog-intro" id="auth-intro">Enter the admin password to change profiles and settings.</p>
-      <label>Password
-        <input name="password" type="password" autocomplete="current-password" required>
-      </label>
-      <label id="auth-confirm-row" hidden>Confirm password
-        <input name="confirm" type="password" autocomplete="new-password">
-      </label>
-      <p class="settings-status" id="auth-status"></p>
-      <div class="dialog-actions">
-        <button type="button" class="secondary" id="auth-cancel">Cancel</button>
-        <button type="submit" id="auth-submit">Unlock</button>
-      </div>
-    </form>
-  </dialog>
-
   <dialog id="settings-dialog" aria-labelledby="settings-title">
     <form id="settings-form">
       <div class="dialog-heading">
@@ -168,17 +147,26 @@
 
       <fieldset class="settings-section">
         <legend>Profile</legend>
-        <label>Editing
+        <label id="edit-profile-row">Editing
           <select id="edit-profile"></select>
         </label>
-        <div class="inline-actions">
+        <div class="inline-actions" id="profile-actions">
           <button type="button" id="profile-new">New profile</button>
           <button type="button" class="danger" id="profile-delete">Delete profile</button>
         </div>
         <label>Profile name
           <input name="profileName" required maxlength="40" placeholder="Home">
         </label>
-        <label class="check-row"><input type="checkbox" name="makeDefault"> Default profile (shown first on new devices)</label>
+        <label class="check-row" id="default-row"><input type="checkbox" name="makeDefault"> Default profile (shown first to the house admin)</label>
+        <div id="login-fields">
+          <label>Sign-in username
+            <input name="loginUsername" maxlength="32" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="e.g. julian">
+          </label>
+          <label>Sign-in password
+            <input name="loginPassword" type="password" autocomplete="new-password">
+          </label>
+          <p class="dialog-intro">Whoever signs in with these sees only this profile and can change its settings. Clear the username to remove the sign-in.</p>
+        </div>
       </fieldset>
 
       <fieldset class="settings-section">
@@ -222,7 +210,7 @@
       </div>
 
       <fieldset class="settings-section">
-        <legend>Admin password</legend>
+        <legend id="password-legend">Your password</legend>
         <p class="dialog-intro" id="password-note">Use at least 8 characters. Changing it signs out every other browser.</p>
         <label>Current password
           <input name="currentPassword" type="password" autocomplete="current-password">
@@ -232,7 +220,7 @@
         </label>
         <div class="inline-actions">
           <button type="button" id="password-change">Change password</button>
-          <button type="button" id="logout">Log out</button>
+          <button type="button" id="logout">Sign out</button>
         </div>
         <p class="settings-status" id="password-status"></p>
       </fieldset>

@@ -373,7 +373,6 @@ body { overflow-x: hidden; }
 .inline-actions button.danger { color: var(--coral); }
 .inline-actions button:disabled, .dialog-actions button:disabled { opacity: .45; cursor: not-allowed; }
 .settings-section .check-row { margin: 8px 0 4px; }
-#auth-dialog { max-width: 400px; }
 
 @media (max-width: 520px) {
   .header-actions { gap: 10px; }
@@ -466,3 +465,33 @@ html, dialog { scrollbar-color: rgba(236,242,255,.2) transparent; }
 .settings-open .icon { width:1.15em; height:1.15em; }
 .weather-icon, .weather-panel .forecast-day b { display:inline-grid; place-items:center; line-height:1; }
 .source-link .icon, .stream-fallback .icon, .stream-message .icon { width:.9em; height:.9em; }
+
+/* —— Sign-in page: one card, laid out like Mealie's, in the desk's own colours —— */
+.login-page { min-height:100vh; min-height:100dvh; display:grid; justify-items:center; align-content:start; padding:clamp(16px,7vh,72px) 16px calc(24px + env(safe-area-inset-bottom)); }
+.login-card { width:100%; max-width:440px; background:linear-gradient(135deg,rgba(29,39,53,.94),rgba(16,22,32,.94)); border:1px solid var(--line); border-radius:18px; box-shadow:0 20px 60px rgba(0,0,0,.18); overflow:hidden; text-align:center; padding-bottom:24px; }
+.login-bar { padding:22px 16px; background:linear-gradient(160deg,var(--solar-bg-top),var(--solar-bg-mid)); color:var(--solar-ink); font-family:'DM Mono',monospace; font-size:var(--text-meta); letter-spacing:.13em; }
+.login-mark-row { position:relative; padding-top:16px; }
+.login-mark-row::before { content:''; position:absolute; left:0; right:0; top:60px; border-top:1px solid var(--line); }
+.login-mark { position:relative; width:88px; height:88px; margin:auto; border-radius:50%; border:3px solid rgba(30,38,90,.75); background:linear-gradient(145deg,var(--node-fill-light),var(--node-fill-dark)); color:var(--solar-ink); display:grid; place-items:center; }
+.login-mark .icon { width:40px; height:40px; }
+.login-card h1 { margin:12px 0 0; font-size:1.15rem; font-weight:700; letter-spacing:-.03em; }
+.login-intro { margin:10px 24px 0; color:var(--muted); font-size:var(--text-body-sm); line-height:1.5; }
+.login-form { padding:18px 24px 0; text-align:left; }
+.login-field { display:grid; grid-template-columns:20px 1fr auto; grid-template-rows:auto auto; column-gap:12px; align-items:center; margin:0 0 14px; padding:8px 4px 8px 12px; background:#0a1018; border:1px solid var(--line); border-radius:7px; }
+.login-field[hidden] { display:none; }
+.login-field:focus-within { outline:2px solid var(--lime); outline-offset:2px; }
+.login-field > .icon { grid-row:1 / 3; width:20px; height:20px; color:var(--muted); }
+.login-field label { grid-column:2; margin:0; display:block; font-size:var(--text-meta); color:var(--muted); }
+.login-field input { grid-column:2; min-width:0; padding:2px 0; border:0; border-radius:0; background:transparent; font-size:1rem; caret-color:var(--lime); }
+.login-field input:focus-visible { outline:none; }
+.login-field input[readonly] { color:var(--muted); }
+.login-eye { grid-column:3; grid-row:1 / 3; width:44px; height:44px; display:grid; place-items:center; border:0; border-radius:50%; background:transparent; color:var(--muted); cursor:pointer; }
+.login-eye .icon { width:20px; height:20px; }
+.login-eye .icon[hidden] { display:none; }
+.login-remember { margin:2px 0 6px; }
+.login-status { min-height:1.2em; text-align:center; }
+.login-submit { display:block; width:min(100%,300px); min-height:44px; margin:12px auto 0; border:0; border-radius:999px; background:var(--lime); color:var(--page); font:inherit; font-size:var(--text-control); font-weight:800; cursor:pointer; }
+.login-submit:disabled { opacity:.45; cursor:not-allowed; }
+.login-note { margin:18px 24px 0; color:var(--muted); font-size:var(--text-body-sm); }
+.login-note[hidden] { display:none; }
+@media (hover:hover) { .login-submit:hover:not(:disabled) { filter:brightness(1.12); } .login-eye:hover { color:var(--ink); } }

@@ -6,20 +6,21 @@ Dashboard: `http://<host>:4123`
 
 `config.json` is gitignored and mounted into the container so the Growatt tokens are not committed.
 
-## Profiles and the admin password
+## Profiles and signing in
 
-A profile bundles a location, a Growatt account (OpenAPI address and token) and a set of news channels. Make one per household, site or person. If there is more than one, a switcher appears in the header. Each device remembers its choice, and `http://<host>:4123/?profile=<id>` opens a specific profile, which is handy for a wall display.
+A profile bundles a location, a Growatt account (OpenAPI address and token) and a set of news channels. Make one per household, site or person.
 
-Anyone on the network can view the dashboard, but changing settings needs the admin password:
+Every device signs in on the `/login` page before it sees the dashboard:
 
-- On the first visit, **Settings** asks you to choose the password. Until you do, anyone who opens the page can claim it, so do this straight after installing, or set `ADMIN_PASSWORD` (see below) instead.
-- The password is stored as a salted scrypt hash in `config.json`. Sessions last 12 hours, are cleared when the app restarts, and eight wrong passwords from one address lock it out for ten minutes.
+- The **house admin** signs in as `admin`. On the very first visit the login page asks you to choose that password. Until you do, anyone who opens the page can claim it, so do this straight after installing, or set `ADMIN_PASSWORD` (see below) instead. The admin sees every profile (a switcher appears in the header, and `/?profile=<id>` opens one) and can create, edit and delete them.
+- **Each profile** can have its own sign-in: in **Settings**, the admin gives the profile a username and password. Whoever signs in with it sees only that profile, can change its settings and their own password, and nothing else. Clearing the username removes the sign-in.
+- **Remember me** keeps a device signed in for 90 days, which suits a wall display; without it the sign-in ends after 12 hours or when the browser closes. Sign-ins survive restarts and updates (they are kept in `config.json` as hashes, never as the cookie itself).
+- Passwords are stored as salted scrypt hashes. Eight wrong passwords from one address lock it out for ten minutes. A new password, a removed sign-in or a deleted profile signs that profile out everywhere.
 - To set the password from the environment instead, uncomment `ADMIN_PASSWORD` in `docker-compose.yml`. It then replaces the stored one and cannot be changed from the settings screen.
 - Growatt tokens never leave the server: the browser only learns whether a token is saved.
 - If you put nginx in front, pass `Host` and `X-Forwarded-Proto` so the login cookie and the same-site check work: `proxy_set_header Host $host;` and `proxy_set_header X-Forwarded-Proto $scheme;`.
 - The app only believes `X-Forwarded-*` headers from a proxy it trusts, so nobody on the network can fake their address to dodge the lockout. By default that is a proxy on the same machine as Node (`loopback`). If nginx runs elsewhere, set `TRUST_PROXY` in `docker-compose.yml` to the address nginx connects from: its LAN address, or for nginx on the Docker host itself the Compose network gateway (`docker network inspect morning-desk_default`, usually `172.18.0.1`).
 - The same goes for a Cloudflare Tunnel: set `TRUST_PROXY` to the address cloudflared connects from. Until then every visitor through the tunnel shares one lockout counter. The login cookie is marked secure either way.
-- Reaching the app from the internet? Put Cloudflare Access (or another login) in front of it: the dashboard's readings, including the profile's map coordinates, are readable without the admin password.
 - Forgot the password? Delete the `"admin"` block from `config.json` and restart; the next visit lets you choose a new one.
 
 An older single-profile `config.json` is upgraded automatically on first save: its location and token become a profile called after the location.
