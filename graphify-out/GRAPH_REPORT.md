@@ -1,136 +1,132 @@
-# Graph Report - morning-desk  (2026-10-24)
+# Graph Report - morning-desk  (2026-10-25)
 
 ## Corpus Check
-- 9 files · ~15,472 words
+- 17 files · ~19,622 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 285 nodes · 428 edges · 13 communities (11 shown, 2 thin omitted)
-- Extraction: 91% EXTRACTED · 9% INFERRED · 0% AMBIGUOUS · INFERRED: 37 edges (avg confidence: 0.87)
-- Token cost: 51,049 input · 0 output
+- 333 nodes · 437 edges · 49 communities (12 shown, 37 thin omitted)
+- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 15 edges (avg confidence: 0.88)
+- Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
-- Product, Layout & Deployment
-- Front-end App
-- Provider Common Helpers
-- Profile Store
+- Dashboard Client (app.js)
+- Store, Tests & Field Rules
+- Settings & Sign-in UI
+- Solar Provider Contract
+- Server Routes & Access
+- Design System Rules
+- Sessions & Password Auth
 - Docker Compose
-- Auth & Sessions
 - CI Test Workflow
-- Config & Providers
 - Package Manifest
 - Proxmox Installer
-- Install & Update Scripts
-- Docker Entrypoint
+- Provider Registry
+- Install Scripts
+- Nightly Update Script
+- Container Entrypoint
 
 ## God Nodes (most connected - your core abstractions)
-1. `Settings dialog` - 13 edges
+1. `Morning Desk Design System` - 12 edges
 2. `loadAll()` - 12 edges
 3. `morning-desk` - 9 edges
-4. `esc()` - 8 edges
-5. `fetchReadings()` - 7 edges
-6. `loadSolar()` - 7 edges
-7. `saveSettings()` - 7 edges
-8. `healthcheck` - 6 edges
-9. `install-proxmox.sh script` - 6 edges
-10. `Weather panel` - 6 edges
+4. `Dashboard page (index.html)` - 9 edges
+5. `esc()` - 8 edges
+6. `fetchReadings()` - 7 edges
+7. `loadSolar()` - 7 edges
+8. `populateSettings()` - 7 edges
+9. `saveSettings()` - 7 edges
+10. `Morning Desk (README)` - 7 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `Auth dialog` --implements--> `Admin Password`  [INFERRED]
+- `Solar diagram markup (#solar-diagram)` --implements--> `Solar Flow Diagram (signature component)`  [INFERRED]
+  public/index.html → DESIGN.md
+- `Dashboard page (index.html)` --implements--> `Dashboard two-column grid layout`  [INFERRED]
+  public/index.html → DESIGN.md
+- `Profile switcher (#profile-select)` --implements--> `Profiles`  [INFERRED]
   public/index.html → README.md
-- `Admin password change section` --implements--> `Admin Password`  [INFERRED]
-  public/index.html → README.md
-- `Solar power-flow diagram` --shares_data_with--> `Growatt solar provider`  [INFERRED]
-  public/index.html → README.md
-- `Settings dialog` --shares_data_with--> `config.json`  [EXTRACTED]
-  public/index.html → README.md
-- `install.sh script` --calls--> `install-update-timer.sh script`  [EXTRACTED]
-  install.sh → install-update-timer.sh
+- `Dashboard page (index.html)` --references--> `DM Mono font`  [EXTRACTED]
+  public/index.html → DESIGN.md
+- `Confirm password row (first-run setup)` --implements--> `House admin sign-in`  [INFERRED]
+  public/login.html → README.md
 
 ## Import Cycles
 - None detected.
 
 ## Hyperedges (group relationships)
-- **Admin authentication and lockout security** — readme_admin_password, readme_admin_password_env, readme_trust_proxy, readme_nginx_reverse_proxy [EXTRACTED 1.00]
-- **Install and auto-update flow** — install, install_update_timer, update, readme_daily_update_gate [INFERRED 0.85]
-- **Profile bundles location, solar provider and news channels** — public_index_solar_provider_fields, public_index_news_picker, public_index_settings_dialog, readme_config_json [INFERRED 0.85]
-- **Solar power flow display** — public_index_solar_panel, design_solar_flow_diagram, design_meaningful_flow_rule, product_purpose_power, product_growatt_openapi [INFERRED 0.85]
-- **Honest state across product and design** — product_principle_honest_state, design_honest_state_labelling, public_index_live_dot, design_glow_means_live_rule [INFERRED 0.75]
 - **Low-cost always-on hardware constraint** — product_principle_light_on_hardware, design_cheap_motion_rule, design_solar_flow_diagram, product_docker_deployment [INFERRED 0.75]
+- **Sign-in flow (local accounts and Poodle House SSO)** — public_login, readme_house_admin, readme_sso_poodle_house, readme_remember_me, readme_scrypt_password_hashing, design_sign_in_card [INFERRED 0.85]
+- **Solar flow diagram design and implementation** — design_solar_flow_diagram, design_solar_diagram_palette, design_meaningful_flow_rule, design_glow_means_live_rule, public_index_solar_diagram [INFERRED 0.85]
 
-## Communities (13 total, 2 thin omitted)
+## Communities (49 total, 37 thin omitted)
 
-### Community 0 - "Product, Layout & Deployment"
-Cohesion: 0.07
-Nodes (10): Auth dialog, Morning Desk dashboard page, News channel picker, News stack, profile-select switcher, Settings dialog, Sky News live panel, Solar power-flow diagram (+2 more)
-
-### Community 1 - "Front-end App"
+### Community 0 - "Dashboard Client (app.js)"
 Cohesion: 0.10
-Nodes (41): api(), authDialog, batteryRuntime(), blankProfile(), clockTime(), codeMap, dialog, energy() (+33 more)
+Nodes (40): api(), batteryRuntime(), blankProfile(), clockTime(), codeMap, dialog, energy(), esc() (+32 more)
 
-### Community 2 - "Provider Common Helpers"
+### Community 1 - "Store, Tests & Field Rules"
 Cohesion: 0.08
-Nodes (28): applyFields(), DEFAULT_MAX, describeSettings(), FETCH_TIMEOUT_MS, FLOW_KEYS, keepPreviousFlow(), publicSchema(), secretFields() (+20 more)
+Nodes (23): applyFields(), ADMIN_USERNAME, applyProfileInput(), applySolarInput(), blankProfile(), cleanLogin(), cleanProfile(), cleanSession() (+15 more)
 
-### Community 3 - "Profile Store"
+### Community 2 - "Settings & Sign-in UI"
+Cohesion: 0.09
+Nodes (27): Inline SVG line icons (Lucide, icon() helper), Password change / sign out section, Profile switcher (#profile-select), Settings dialog (#settings-dialog), Poodle House users field (ssoUsers), Confirm password row (first-run setup), form, Show-password toggle (#login-eye) (+19 more)
+
+### Community 3 - "Solar Provider Contract"
+Cohesion: 0.11
+Nodes (26): DEFAULT_MAX, describeSettings(), FETCH_TIMEOUT_MS, FLOW_KEYS, keepPreviousFlow(), publicSchema(), secretFields(), USER_AGENT (+18 more)
+
+### Community 4 - "Server Routes & Access"
+Cohesion: 0.11
+Nodes (23): app, applyLogin(), canEdit(), decode(), decodeEntities(), __dirname, httpError(), isAdmin() (+15 more)
+
+### Community 5 - "Design System Rules"
+Cohesion: 0.09
+Nodes (18): button-primary-pill component, Dashboard two-column grid layout, DM Mono font, Ember Coral (#ff846c), Manrope font, Mealie, Morning Desk Design System, Morning Lime (#c7ff47) (+10 more)
+
+### Community 6 - "Sessions & Password Auth"
 Cohesion: 0.10
-Nodes (19): applyProfileInput(), applySolarInput(), blankProfile(), cleanProfile(), cleanSolar(), configPath, DEFAULT_LOCATION, DEFAULT_NEWS (+11 more)
+Nodes (14): COOKIE_NAME, createSession(), destroySession(), DUMMY_RECORD, failures, hashPassword(), hashToken(), readCookie() (+6 more)
 
-### Community 5 - "Docker Compose"
-Cohesion: 0.10
-Nodes (18): interval, retries, start_period, test, timeout, build, container_name, environment (+10 more)
-
-### Community 6 - "Auth & Sessions"
+### Community 8 - "Docker Compose"
 Cohesion: 0.12
-Nodes (9): COOKIE_NAME, failures, hashPassword(), readCookie(), scrypt, SESSION_TTL, sessionFromReq(), sessions (+1 more)
+Nodes (15): interval, retries, start_period, test, timeout, build, container_name, environment (+7 more)
 
-### Community 7 - "CI Test Workflow"
+### Community 9 - "CI Test Workflow"
 Cohesion: 0.13
 Nodes (14): jobs, test, name, permissions, contents, run, uses, with (+6 more)
 
-### Community 8 - "Config & Providers"
-Cohesion: 0.16
-Nodes (8): config.example.json, all, byId, DEFAULT_PROVIDER, config.json, Growatt solar provider, Morning Desk, Profile
-
-### Community 9 - "Package Manifest"
+### Community 10 - "Package Manifest"
 Cohesion: 0.20
 Nodes (10): dependencies, express@^5.1.0, name, private, scripts, start, test, type (+2 more)
 
-### Community 10 - "Proxmox Installer"
-Cohesion: 0.39
-Nodes (7): ensure_template(), log(), next_ctid(), prompt_ip(), select_storage(), install-proxmox.sh script, Minimum container requirements
+### Community 11 - "Proxmox Installer"
+Cohesion: 0.46
+Nodes (6): ensure_template(), log(), next_ctid(), prompt_ip(), select_storage(), install-proxmox.sh script
 
-### Community 11 - "Install & Update Scripts"
-Cohesion: 0.32
-Nodes (4): install.sh script, install-update-timer.sh script, log(), update.sh script
-
-## Ambiguous Edges - Review These
-- `Victron provider (on a branch)` → `Settings: Solar section (provider, fields, battery kWh)`  [AMBIGUOUS]
-  public/index.html · relation: references
+### Community 12 - "Provider Registry"
+Cohesion: 0.29
+Nodes (3): all, byId, DEFAULT_PROVIDER
 
 ## Knowledge Gaps
-- **4 isolated node(s):** `config.example.json`, `Solar provider settings fields`, `nginx reverse proxy`, `Minimum container requirements`
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 107 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **2 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **12 isolated node(s):** `Signal Cyan (#58e2ff)`, `Night mode overlay`, `Mealie`, `Poodle House`, `Proxmox install script` (+7 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 164 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **37 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Solar provider plugin` connect `Config & Providers` to `Provider Common Helpers`?**
-  _High betweenness centrality (0.267) - this node is a cross-community bridge._
-- **Are the 3 inferred relationships involving `Settings dialog` (e.g. with `app.js script` and `Auth dialog`) actually correct?**
-  _`Settings dialog` has 3 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `config.example.json`, `Solar provider settings fields`, `nginx reverse proxy` to the rest of the system?**
-  _4 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `Product, Layout & Deployment` be split into smaller, more focused modules?**
-  _Cohesion score 0.06648936170212766 - nodes in this community are weakly interconnected._
-- **Why does `config.json` connect `Config & Providers` to `Product, Layout & Deployment`, `Docker Compose`?**
-  _High betweenness centrality (0.232) - this node is a cross-community bridge._
-- **Should `Front-end App` be split into smaller, more focused modules?**
-  _Cohesion score 0.09966777408637874 - nodes in this community are weakly interconnected._
-
-### Low-confidence Hints
-_AMBIGUOUS edges — the extractor was unsure. Verify before acting on these._
-
-- **What is the exact relationship between `Victron provider (on a branch)` and `Settings: Solar section (provider, fields, battery kWh)`?**
-  _Edge tagged AMBIGUOUS (relation: references) - confidence is low._
+- **Why does `express` connect `Package Manifest` to `Server Routes & Access`?**
+  _High betweenness centrality (0.023) - this node is a cross-community bridge._
+- **What connects `Signal Cyan (#58e2ff)`, `Night mode overlay`, `Mealie` to the rest of the system?**
+  _12 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `Dashboard Client (app.js)` be split into smaller, more focused modules?**
+  _Cohesion score 0.10452961672473868 - nodes in this community are weakly interconnected._
+- **Why does `Morning Desk Design System` connect `Design System Rules` to `Settings & Sign-in UI`?**
+  _High betweenness centrality (0.010) - this node is a cross-community bridge._
+- **Should `Store, Tests & Field Rules` be split into smaller, more focused modules?**
+  _Cohesion score 0.07807807807807808 - nodes in this community are weakly interconnected._
+- **Why does `Dashboard page (index.html)` connect `Design System Rules` to `Settings & Sign-in UI`?**
+  _High betweenness centrality (0.009) - this node is a cross-community bridge._
+- **Should `Settings & Sign-in UI` be split into smaller, more focused modules?**
+  _Cohesion score 0.09113300492610837 - nodes in this community are weakly interconnected._
