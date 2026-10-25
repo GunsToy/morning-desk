@@ -1,4 +1,5 @@
 import express from 'express';
+import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -89,12 +90,19 @@ const publicDir = path.join(__dirname, 'public');
 app.use(express.static(publicDir, { index: false }));
 
 // Explicit pages so a missing file never returns bare "Cannot GET /". Signed out, the dashboard sends you to /login.
-const sendPage = (res, name) => {
+// The app version is added to the page's own CSS and JS links: Cloudflare tells browsers to keep those
+// files for hours, and a new version must not be drawn with the old stylesheet.
+const VERSION = JSON.parse(await fs.readFile(path.join(__dirname, 'package.json'), 'utf8')).version;
+async function sendPage(res, name) {
   const file = path.join(publicDir, name);
-  res.sendFile(file, err => {
-    if (err) res.status(500).send(`Morning Desk page missing at ${file}`);
-  });
-};
+  try {
+    const html = await fs.readFile(file, 'utf8');
+    res.set('Cache-Control', 'no-cache').type('html')
+      .send(html.replace(/(href|src)="(styles\.css|app\.js|login\.js)"/g, `$1="$2?v=${VERSION}"`));
+  } catch {
+    res.status(500).send(`Morning Desk page missing at ${file}`);
+  }
+}
 app.get('/', (req, res) => auth.sessionFromReq(req) ? sendPage(res, 'index.html') : res.redirect('/login'));
 app.get('/login', (req, res) => auth.sessionFromReq(req) ? res.redirect('/') : sendPage(res, 'login.html'));
 
