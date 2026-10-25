@@ -13,7 +13,8 @@ services:
       # Optional: fix the admin password here instead of choosing it on first visit.
       # - ADMIN_PASSWORD=change-me-please
       # Optional: address of an nginx in front of the app (see README, "Profiles and the admin password").
-      # - TRUST_PROXY=172.18.0.1
+      # Proxies whose X-Forwarded-For is believed (see README). Set it in .env, e.g. TRUST_PROXY=192.168.0.20, 173.245.48.0/20, ...
+      - TRUST_PROXY=${TRUST_PROXY:-}
       # "Sign in with Poodle House": put these in a .env file next to this one (see README, "Sign in with Poodle House").
       # .env is not in git, so the nightly update never touches it. Left empty, the button does not appear.
       - SSO_ISSUER=${SSO_ISSUER:-}
