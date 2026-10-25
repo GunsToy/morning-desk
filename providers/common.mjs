@@ -11,7 +11,8 @@
 //   explainError(e)      - OPTIONAL: turns an error from fetchReadings into a message for the dashboard
 //   minIntervalMs        - OPTIONAL: never poll more often than this (the dashboard polls every 15 minutes)
 //
-// Each field is { name, label, type: 'url' | 'text' | 'password', secret?, required?, placeholder?, maxLength? }.
+// Each field is { name, label, type: 'url' | 'text' | 'password' | 'select', secret?, required?, placeholder?, maxLength? }.
+// A 'select' field also has options: [{ value, label }], and only those values are accepted.
 // Secret fields are write-only: the browser is told whether one is stored, never what it is.
 //
 // fetchReadings returns the same shape for every provider (watts unless noted; null when unknown):
@@ -66,7 +67,10 @@ export function applyFields(provider, current, values = {}, clear = []) {
       continue;
     }
     if (text.length > max) return { error: `${field.label} is too long.` };
-    if (field.type === 'url') {
+    if (field.type === 'select') {
+      if (!field.options.some(option => option.value === text)) return { error: `${field.label}: pick one from the list.` };
+      next[field.name] = text;
+    } else if (field.type === 'url') {
       let url;
       try { url = new URL(text); }
       catch { return { error: `${field.label} must be a valid URL.` }; }
@@ -101,7 +105,7 @@ export const publicSchema = provider => {
   return {
     id: provider.id,
     label: provider.label,
-    fields: provider.fields.map(({ name, label, type, secret = false, required = false, placeholder = '' }) => ({ name, label, type, secret, required, placeholder })),
+    fields: provider.fields.map(({ name, label, type, secret = false, required = false, placeholder = '', options }) => ({ name, label, type, secret, required, placeholder, ...(options ? { options } : {}) })),
     defaults: Object.fromEntries(provider.fields.filter(field => !field.secret).map(field => [field.name, defaults[field.name] ?? '']))
   };
 };

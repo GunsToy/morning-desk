@@ -342,6 +342,12 @@ function renderSolarFields(providerId) {
     const has = saved.secretsSet.includes(field.name);
     const placeholder = field.secret ? (has ? 'Saved. Leave blank to keep it' : field.placeholder) : field.placeholder;
     const value = field.secret ? '' : saved.values[field.name] ?? '';
+    if (field.type === 'select') {
+      return `<label>${esc(field.label)}
+      <select name="solar_${esc(field.name)}"${field.required ? ' required' : ''}>${field.options.map(option =>
+        `<option value="${esc(option.value)}"${option.value === value ? ' selected' : ''}>${esc(option.label)}</option>`).join('')}</select>
+    </label>`;
+    }
     return `<label>${esc(field.label)}
       <input name="solar_${esc(field.name)}" type="${field.type === 'password' ? 'password' : field.type === 'url' ? 'url' : 'text'}"
         value="${esc(value)}" placeholder="${esc(placeholder)}" autocomplete="off"${field.required ? ' required' : ''}>

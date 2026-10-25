@@ -1,7 +1,15 @@
 // Growatt OpenAPI adapter. The functions below are the original Growatt code, moved here unchanged.
 import { USER_AGENT, FETCH_TIMEOUT_MS } from './common.mjs';
 
-const DEFAULT_SERVER = 'https://openapi.growatt.com/v1';
+// Growatt's regional OpenAPI servers. These are the only addresses ever called: the region is picked from
+// this list, never typed, so nobody with a profile can point the server at another machine.
+const SERVERS = [
+  { value: 'https://openapi.growatt.com/v1', label: 'Other regions (Europe, Africa, Asia)' },
+  { value: 'https://openapi-cn.growatt.com/v1', label: 'China' },
+  { value: 'https://openapi-us.growatt.com/v1', label: 'North America' },
+  { value: 'https://openapi-au.growatt.com/v1', label: 'Australia and New Zealand' }
+];
+const DEFAULT_SERVER = SERVERS[0].value;
 
 function normaliseSolar(payload) {
   const source = payload.data ?? payload;
@@ -107,7 +115,9 @@ function openApiBase(server) {
   const value = (server || '').replace(/\/+$/, '');
   // The older ShineServer URL cannot authenticate OpenAPI tokens. Upgrade it automatically.
   if (!value || /:\/\/server(?:-[a-z]+)?\.growatt\.com$/i.test(value)) return 'https://openapi.growatt.com/v1';
-  return /\/v1$/i.test(value) ? value : `${value}/v1`;
+  const base = /\/v1$/i.test(value) ? value : `${value}/v1`;
+  // Anything saved before the region list existed that is not one of Growatt's servers falls back to the default.
+  return SERVERS.some(server => server.value === base) ? base : DEFAULT_SERVER;
 }
 
 async function growattOpenApiRequest(baseUrl, endpoint, token, params = {}) {
@@ -167,7 +177,7 @@ export default {
   id: 'growatt',
   label: 'Growatt',
   fields: [
-    { name: 'server', label: 'OpenAPI address', type: 'url', required: true },
+    { name: 'server', label: 'Growatt region', type: 'select', options: SERVERS, required: true },
     { name: 'apiToken', label: 'API token', type: 'password', secret: true, placeholder: 'Paste your OpenAPI token' }
   ],
 
@@ -175,7 +185,7 @@ export default {
 
   // Earlier versions stored these values under other names; keep reading them.
   clean: (raw = {}) => ({
-    server: raw.server ?? raw.apiBase ?? DEFAULT_SERVER,
+    server: openApiBase(raw.server ?? raw.apiBase),
     apiToken: raw.apiToken ?? raw.token ?? raw.thirdPartyKey ?? ''
   }),
 

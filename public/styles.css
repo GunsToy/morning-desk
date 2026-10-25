@@ -358,6 +358,7 @@ body { overflow-x: hidden; }
   cursor: pointer;
 }
 #edit-profile { border-radius: 7px; background: var(--field-fill); border-color: var(--field-line); padding: 10px; font-weight: 500; font-size: inherit; }
+#solar-fields select { color: var(--ink); background: var(--field-fill); border: 1px solid var(--field-line); border-radius: 7px; padding: 10px; font: inherit; font-weight: 500; }
 .inline-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 4px 0 10px; }
 .inline-actions button {
   padding: 8px 12px;

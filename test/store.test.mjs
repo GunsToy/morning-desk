@@ -40,7 +40,7 @@ test('older token names in a profile growatt block are carried over', async () =
   const [a, b] = (await store.read()).profiles;
   assert.equal(growattOf(a).apiToken, 'from-token');
   assert.equal(growattOf(b).apiToken, 'from-key');
-  assert.equal(growattOf(b).server, 'https://example.test/v1');
+  assert.equal(growattOf(b).server, 'https://openapi.growatt.com/v1', 'an address that is not a Growatt server falls back to the default');
 });
 
 test('a blank token in the settings form keeps the stored one; a new one replaces it', () => {
@@ -144,4 +144,13 @@ test('Poodle House users: a comma list, lower-cased, each linked to one profile 
   assert.match(store.setSsoUsers(config, flat, '<script>'), /not a Poodle House username/);
   assert.equal(store.setSsoUsers(config, home, ''), null);
   assert.deepEqual(home.sso, [], 'an empty field unlinks everyone');
+});
+
+test('the Growatt address is one of Growatt\'s regional servers, never a typed address', () => {
+  const profile = store.blankProfile();
+  assert.match(store.applyProfileInput(profile, { solar: { values: { server: 'http://192.168.0.1/admin' } } }), /pick one from the list/);
+  assert.match(store.applyProfileInput(profile, { growatt: { server: 'http://192.168.0.1' } }), /pick one from the list/, 'the older request shape too');
+  assert.equal(growattOf(profile).server, 'https://openapi.growatt.com/v1', 'a refused address leaves the saved one alone');
+  assert.equal(store.applyProfileInput(profile, { solar: { values: { server: 'https://openapi-au.growatt.com/v1' } } }), null);
+  assert.equal(growattOf(profile).server, 'https://openapi-au.growatt.com/v1');
 });
