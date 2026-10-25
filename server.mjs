@@ -166,7 +166,8 @@ const requireAdmin = (req, res, next) => {
 const setSessionCookie = (req, res, token) => res.cookie(auth.COOKIE_NAME, token, {
   httpOnly: true,
   sameSite: 'strict',
-  secure: req.secure,
+  // A tunnel that is not the trusted proxy still says https here. Faking it only breaks the faker's own login.
+  secure: req.secure || req.get('x-forwarded-proto') === 'https',
   maxAge: auth.SESSION_TTL,
   path: '/'
 });

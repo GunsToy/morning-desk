@@ -18,6 +18,8 @@ Anyone on the network can view the dashboard, but changing settings needs the ad
 - Growatt tokens never leave the server: the browser only learns whether a token is saved.
 - If you put nginx in front, pass `Host` and `X-Forwarded-Proto` so the login cookie and the same-site check work: `proxy_set_header Host $host;` and `proxy_set_header X-Forwarded-Proto $scheme;`.
 - The app only believes `X-Forwarded-*` headers from a proxy it trusts, so nobody on the network can fake their address to dodge the lockout. By default that is a proxy on the same machine as Node (`loopback`). If nginx runs elsewhere, set `TRUST_PROXY` in `docker-compose.yml` to the address nginx connects from: its LAN address, or for nginx on the Docker host itself the Compose network gateway (`docker network inspect morning-desk_default`, usually `172.18.0.1`).
+- The same goes for a Cloudflare Tunnel: set `TRUST_PROXY` to the address cloudflared connects from. Until then every visitor through the tunnel shares one lockout counter. The login cookie is marked secure either way.
+- Reaching the app from the internet? Put Cloudflare Access (or another login) in front of it: the dashboard's readings, including the profile's map coordinates, are readable without the admin password.
 - Forgot the password? Delete the `"admin"` block from `config.json` and restart; the next visit lets you choose a new one.
 
 An older single-profile `config.json` is upgraded automatically on first save: its location and token become a profile called after the location.
