@@ -27,7 +27,7 @@ An older single-profile `config.json` is upgraded automatically on first save: i
 
 ### Sign in with Poodle House
 
-The login page can also offer **Sign in with Poodle House** (or any OpenID Connect provider), so people use one account for the house site, Recipes and this dashboard. Someone already signed in to Poodle House goes straight through without typing a password. The usernames and passwords above keep working next to it.
+The login page can also offer **Sign in with Poodle House** (or any OpenID Connect provider), so people use one account for the house site and this dashboard. Someone already signed in to Poodle House goes straight through without typing a password. The usernames and passwords above keep working next to it.
 
 1. On the provider, register a client whose return address is `https://<this dashboard>/auth/sso/callback` (the Poodle House theme does this for `morningdesk.poodlehouse.co.za`; see its INSTALL.txt).
 2. Next to `docker-compose.yml`, create a `.env` file (it is not in git, so the nightly update never touches it):
