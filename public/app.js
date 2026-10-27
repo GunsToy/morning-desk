@@ -161,6 +161,8 @@ function batteryRuntime(capacityKwh, percent, charging, watts) {
   return charging ? `Full in ≈ ${text}` : `≈ ${text} left`;
 }
 
+// Below this the grid input is off (load shedding or an outage); a little stray voltage can read while it is down.
+const GRID_DOWN_VOLTS = 50;
 async function loadSolar() {
   const requested = currentProfile;
   const res = await fetch(profileUrl('/api/solar'));
@@ -192,6 +194,11 @@ async function loadSolar() {
   $('#solar-name').textContent = data.plant;
   $('#solar-pv').textContent = unit(data.pv);
   $('#solar-grid').textContent = unit(data.grid);
+  // Grid voltage shows whether the grid is up even while nothing is imported (hidden when the inverter does not report it).
+  const gv = Number(data.gridVoltage), gridLine = $('#solar-grid-voltage');
+  gridLine.hidden = data.gridVoltage == null || !Number.isFinite(gv);
+  gridLine.classList.toggle('grid-down', gv < GRID_DOWN_VOLTS);
+  gridLine.textContent = gv < GRID_DOWN_VOLTS ? 'Grid down' :`Grid ${Math.round(gv)} V`;
   $('#solar-consumption').textContent = unit(data.consumption);
   $('#solar-source').textContent = primaryInput;
   $('#solar-flow-summary').textContent = data.flowSummary || '';
@@ -252,6 +259,7 @@ function resetSolar() {
   $('#solar-updated').textContent = '';
   $('#solar-battery-power-label').innerHTML = '— <strong id="solar-battery-power">—</strong>';
   $('#solar-battery-runtime').hidden = true;
+  $('#solar-grid-voltage').hidden = true;
   document.querySelectorAll('.flow-badge').forEach(badge => { badge.textContent = ''; badge.hidden = true; });
 }
 

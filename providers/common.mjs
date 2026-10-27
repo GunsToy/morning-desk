@@ -17,7 +17,8 @@
 //
 // fetchReadings returns the same shape for every provider (watts unless noted; null when unknown):
 //   plant, status, updatedAt, power, today (kWh), total (kWh),
-//   pv, grid, battery (discharging W), batteryCharge (charging W), batteryPercent, batteryVoltage, consumption,
+//   pv, grid, gridVoltage (V, reported even when nothing is imported), battery (discharging W), batteryCharge (charging W),
+//   batteryPercent, batteryVoltage, consumption,
 //   activeSource, flowSummary, flowPv, flowGrid, flowBatteryOut, flowBatteryIn, flowLoad, hasFlowData
 
 export const USER_AGENT = 'MorningDesk/1.0 (personal dashboard)';
@@ -25,7 +26,7 @@ export const USER_AGENT = 'MorningDesk/1.0 (personal dashboard)';
 export const FETCH_TIMEOUT_MS = 15_000;
 
 const FLOW_KEYS = [
-  'pv', 'grid', 'battery', 'batteryCharge', 'batteryPercent', 'batteryVoltage', 'consumption',
+  'pv', 'grid', 'gridVoltage', 'battery', 'batteryCharge', 'batteryPercent', 'batteryVoltage', 'consumption',
   'activeSource', 'flowSummary', 'flowPv', 'flowGrid', 'flowBatteryOut', 'flowBatteryIn', 'flowLoad'
 ];
 

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>Morning Desk</title>
+  <rect width="64" height="64" rx="14" fill="#090d13"/>
+  <g stroke-width="4" stroke-linecap="round">
+    <path d="M32 16v6M13.6 23.6l4.3 4.3M50.4 23.6l-4.3 4.3" stroke="#c7ff47"/>
+    <path d="M20 42a12 12 0 0 1 24 0z" fill="#c7ff47"/>
+    <path d="M12 42h40" stroke="#e9edf3"/>
+    <path d="M22 50h20" stroke="#8c98aa"/>
+  </g>
+</svg>

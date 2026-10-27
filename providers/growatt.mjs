@@ -49,6 +49,9 @@ function normaliseSolar(payload) {
     'pAcInPut', 'pacInput', 'gridImportPower', 'grid_import_power', 'pGridImport', 'pgridImport',
     'importPower', 'gridImport', 'pToUser', 'pacToUser', 'gridPower', 'grid_power', 'pGrid', 'pgrid'
   )));
+  // Voltage on the grid input: shows whether the grid is up even while nothing is imported. Not 'vac', which is the
+  // inverter's own output on off-grid models and reads 230 V during an outage.
+  const gridVoltage = finite(numeric(find('vGrid', 'vgrid', 'gridVoltage', 'grid_voltage', 'vAcInput', 'vacInput', 'vAcInPut')));
   const batteryPercent = finite(numeric(find(
     'capacity', 'batteryPercent', 'battery_percent', 'batterySoc', 'battery_soc', 'soc', 'SOC', 'soc1', 'bmsSoc'
   )));
@@ -94,6 +97,7 @@ function normaliseSolar(payload) {
     updatedAt: find('time', 'updateTime', 'lastUpdateTime', 'last_update_time', 'updatedAt') ?? null,
     pv,
     grid,
+    gridVoltage,
     battery,
     batteryCharge,
     batteryPercent,

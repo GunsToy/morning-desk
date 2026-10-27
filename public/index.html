@@ -10,12 +10,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" />
+  <link rel="icon" href="logo.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <main class="dashboard">
     <header>
-      <div><p class="eyebrow">HOME DESK</p></div>
+      <div class="brand"><img src="logo.svg" alt="" width="32" height="32" /><h1 class="eyebrow">HOME DESK</h1></div>
       <div class="header-actions"><select id="profile-select" aria-label="Switch profile" hidden></select><span class="live-dot">LIVE</span><button class="icon-button settings-open" id="settings-button" aria-label="Open settings" data-icon="settings"> Settings</button></div>
     </header>
     <section class="grid">
@@ -41,7 +42,8 @@
       </article>
 
       <div class="col-stack col-left">
-      <article class="panel sky-panel">
+      <article class="panel sky-panel" aria-labelledby="sky-title">
+        <h2 class="visually-hidden" id="sky-title">Sky News live</h2>
         <div class="sky-toolbar"><span class="channel-badge">LIVE</span></div>
         <div class="video-wrap" id="sky-video"><p class="loading">Finding the current Sky News live stream…</p></div>
         <a class="stream-fallback" href="https://www.youtube.com/@SkyNews/streams" target="_blank" rel="noreferrer">Video unavailable? Open the live stream <span data-icon="external" data-icon-at="end"></span></a>
@@ -50,7 +52,7 @@
         <div class="solar-diagram" id="solar-diagram" data-source="standby">
           <div class="solar-diagram-heading">
             <div>
-              <p class="diagram-title" id="solar-source">—</p>
+              <h2 class="diagram-title" id="solar-source">—</h2>
               <p class="diagram-flow-summary" id="solar-flow-summary">—</p>
             </div>
             <button class="refresh" data-refresh="solar" aria-label="Refresh solar" data-icon="refresh"></button>
@@ -78,6 +80,7 @@
                   <svg viewBox="0 0 48 48" width="34" height="34" aria-hidden="true"><path d="M24 6v8M18 14h12M20 22h8v16h-8zM16 38h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M24 14v8" stroke="currentColor" stroke-width="2"/></svg>
                 </div>
                 <p class="node-label">Import: <strong id="solar-grid">—</strong></p>
+                <p class="node-label node-grid-voltage" id="solar-grid-voltage" hidden></p>
               </div>
 
               <div class="flow-link flow-horizontal flow-grid-inv" id="flow-grid" aria-hidden="true">

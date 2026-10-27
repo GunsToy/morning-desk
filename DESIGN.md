@@ -4,10 +4,13 @@ description: A quiet daily briefing of the weather and the home's power, on a da
 colors:
   lime: "#c7ff47"
   coral: "#ff846c"
+  coral-glint: "#ffc8b8"
   cyan: "#58e2ff"
   ink: "#e9edf3"
   muted: "#8c98aa"
   panel: "#151c27"
+  panel-top: "rgba(29,39,53,.94)"
+  panel-bottom: "rgba(16,22,32,.94)"
   page: "#090d13"
   line: "rgba(236,242,255,.11)"
   control-fill: "#131a25"
@@ -15,6 +18,11 @@ colors:
   field-line: "#626d80"
   secondary-fill: "#263141"
   solar-panel: "#1a1f4a"
+  solar-halo: "rgba(80,96,180,.22)"
+  solar-control-fill: "rgba(12,17,52,.4)"
+  solar-control-line: "rgba(213,221,255,.14)"
+  node-rim: "rgba(30,38,90,.75)"
+  node-inner-line: "rgba(200,210,255,.08)"
   solar-bg-top: "#161b45"
   solar-bg-mid: "#222868"
   solar-bg-end: "#1a2050"
@@ -122,7 +130,7 @@ Morning Desk is a quiet daily briefing, read in a glance before the day starts. 
 The look is soft and friendly rather than technical: rounded panels, pill and round controls, and generous spacing, so the whole household is comfortable with it. Precision lives in the readouts, not in hard edges: large tabular numbers, small mono labels, and a solar diagram that reads like a lit night-blue instrument set into the page.
 
 **Key Characteristics:**
-- Dark charcoal page with softly lifted, rounded panels.
+- Flat near-black page (no background glows) with softly lifted, rounded panels.
 - One action colour (lime), used for primary actions, focus and live accents.
 - The solar diagram is its own night-blue world, with flow colours that mean something (green for solar and household load, cyan for the battery).
 - Readouts in large tabular numerals; labels in small uppercase mono.
@@ -136,25 +144,27 @@ A near-black page, slate panels, and three accents that each carry one meaning.
 - **Morning Lime** (`colors.lime`): the one action and focus colour. Primary buttons, the keyboard focus ring, text selection and the caret, the power readout and active news indices.
 
 ### Secondary
-- **Ember Coral** (`colors.coral`): "live" and attention. The header LIVE badge, the Sky News LIVE tag, destructive actions.
+- **Ember Coral** (`colors.coral`): "live" and attention. The header LIVE badge, the Sky News LIVE tag, destructive actions. Its light form, `colors.coral-glint`, is the lit grid node icon.
 - **Signal Cyan** (`colors.cyan`): links and the battery. Source links, link hovers, battery badges.
 
 ### Neutral
 - **Daybreak Ink** (`colors.ink`): primary text on dark.
 - **Overcast Grey** (`colors.muted`): secondary text, labels, and the OFFLINE badge.
+- **Panel gradient** (`colors.panel-top` → `colors.panel-bottom`): the diagonal fill of dashboard panels and the sign-in card.
 - **Slate Panel** (`colors.panel`) and **Night Page** (`colors.page`): panel and page backgrounds; Night Page is also the text colour on lime buttons.
 - **Hairline** (`colors.line`): borders and dividers, always faint.
 
 ### Solar diagram
 - **Night-blue ground** (`colors.solar-bg-top`, `colors.solar-bg-mid`, `colors.solar-bg-end`, `colors.solar-panel`): the diagram's own gradient background.
 - **Moonlit text** (`colors.solar-ink`, `colors.solar-label`, `colors.solar-muted`): heading, node labels, and secondary lines inside the diagram.
-- **Node fill** (`colors.node-fill-light` → `colors.node-fill-dark`): the round node buttons' gradient.
+- **Node fill** (`colors.node-fill-light` → `colors.node-fill-dark`): the round node buttons' gradient, with a `colors.node-rim` border (also on the sign-in mark) and a `colors.node-inner-line` inner edge. `colors.solar-halo` is the soft light behind the nodes; `colors.solar-control-fill` and `colors.solar-control-line` draw the refresh button inside the diagram.
 - **Flow colours** (`colors.flow-solar` + glint, `colors.flow-battery` + glint, `colors.flow-track`): the moving dashes on each active power path, and the unlit track under them.
+- **Text and icons inside the diagram** use only the moonlit tokens above; watt badges use the flow colour of their path (`colors.flow-solar`, `colors.coral`, `colors.flow-battery`) with Night Page text. The node glows are alpha tints of the same flow colours and are not separate tokens.
 
 ### Named Rules
-**The One Action Rule.** Lime means "act here" or "you are here" (primary button, focus, live readout). Don't use it for decoration.
+**The One Action Rule.** Lime means "act here" or "you are here" (primary button, focus, live readout). Don't use it for decoration: section labels, news regions and settings legends are Overcast Grey.
 
-**The Meaningful Flow Rule.** In the solar diagram, colour encodes the source: green for solar and household load, cyan for the battery, coral for the grid. Never recolour a path for looks.
+**The Meaningful Flow Rule.** In the solar diagram, colour encodes the source: green for solar and household load, cyan for the battery, coral for the grid. Never recolour a path for looks. Status "OK" (the connected dot and a saved-settings message) uses the solar green, `colors.flow-solar`.
 
 ## Typography
 
@@ -221,12 +231,12 @@ Soft, rounded forms throughout. Panels have generous 18px corners (16px on phone
 
 ### Sign-in card
 - **What it is:** the `/login` page. One panel card, at most 440px wide, centred near the top of the page. Its layout follows the household's other self-hosted sign-in (Mealie), drawn in this system.
-- **Parts, top to bottom:** a night-blue header bar (the solar diagram's gradient) with "MORNING DESK" as a Label; a round 88px night-blue mark with a sun line icon, sitting on a hairline; the title ("Sign in", or "Set up Morning Desk" on first run); fields with a leading line icon and a small Overcast Grey label above the value; a show-password eye (44px round, a toggle with a fixed label); "Remember me" (a 44px-tall check row, ticked by default); the status line; the primary pill button; a muted note.
+- **Parts, top to bottom:** a night-blue header bar (the solar diagram's gradient) with "MORNING DESK" as a Label; a round 88px night-blue mark holding the logo's rising sun (52px), sitting on a hairline; the title ("Sign in", or "Set up Morning Desk" on first run); fields with a leading line icon and a small Overcast Grey label above the value; a show-password eye (44px round, a toggle with a fixed label); "Remember me" (a 44px-tall check row, ticked by default); the status line; the primary pill button; a muted note.
 - **The pill primary:** the sign-in button is the one primary button shaped as a pill (`components.button-primary-pill`, up to 300px wide, 44px tall), because it is the page's only action. Dialog actions stay 7px.
 - **Focus:** the lime ring wraps the whole field, not just the text input.
 
 ### Navigation
-- The header has the page title on the left. On the right are the profile switcher (shown only with two or more profiles), the LIVE/OFFLINE badge, and the Settings pill.
+- The header has the logo (`public/logo.svg`, 32px: a lime sun rising over a desk line, also the favicon) and "HOME DESK" as the page's `h1` in Label style on the left. On the right are the profile switcher (shown only with two or more profiles), the LIVE/OFFLINE badge, and the Settings pill.
 
 ### The Solar Flow Diagram (signature)
 - **What it is:** a night-blue instrument showing PV, grid, inverter, home and battery as round nodes, joined by thin tracks. Light travels along each active track in the direction the power flows, with a watt badge on each path.
