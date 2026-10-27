@@ -14,8 +14,10 @@
 }
 .solar-diagram .refresh{width:28px;height:28px;flex-shrink:0;background:var(--solar-control-fill);border-color:var(--solar-control-line)}
 
-.diagram-stage{display:grid;grid-template-rows:auto minmax(36px,auto) auto minmax(36px,auto) auto;justify-items:center;align-items:center;padding:6px 0 4px;gap:2px}
-.diagram-row{display:grid;grid-template-columns:1fr minmax(48px,auto) 1fr minmax(48px,auto) 1fr;align-items:center;width:100%;max-width:440px;column-gap:2px}
+.diagram-stage{--node:72px;display:grid;grid-template-rows:auto minmax(36px,auto) auto minmax(36px,auto) auto;justify-items:center;align-items:center;padding:6px 0 4px;gap:2px}
+/* Nodes align by their circles (top), not by their labels, so the side lines meet every circle at its centre.
+   --link is the width of the two line columns; --col is one node column, worked out from it. */
+.diagram-row{--link:56px;--col:calc((100% - 2 * var(--link)) / 3);position:relative;display:grid;grid-template-columns:1fr var(--link) 1fr var(--link) 1fr;align-items:start;width:100%;max-width:440px}
 
 .node-block{display:grid;justify-items:center;gap:8px}
 .node-label{margin:0;font-family:'DM Mono',monospace;font-size:var(--text-meta);letter-spacing:.02em;color:var(--solar-label);line-height:1.3}
@@ -26,7 +28,7 @@
 .node-grid-voltage.grid-down{color:var(--coral);font-weight:600}
 
 .flow-node{
-  width:72px;height:72px;border-radius:50%;
+  width:var(--node);height:var(--node);border-radius:50%;position:relative;z-index:1;
   border:3px solid var(--node-rim);
   background:linear-gradient(145deg,var(--node-fill-light),var(--node-fill-dark));
   box-shadow:inset 0 0 0 1px var(--node-inner-line),0 4px 16px rgba(0,0,0,.2);
@@ -45,20 +47,27 @@
   font-family:'DM Mono',monospace;font-size:var(--text-micro);font-weight:600;letter-spacing:.02em;
   color:var(--page);background:var(--flow-solar);padding:2px 6px;border-radius:999px;line-height:1.2;
   white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.25);
+  position:relative;z-index:2; /* on narrow screens a badge is wider than its column: keep it above the circles */
 }
 .flow-badge[hidden]{display:none !important}
 .flow-grid-inv .flow-badge,.flow-inv-home .flow-badge{background:var(--coral);color:var(--page)}
 .flow-inv-bat .flow-badge{background:var(--flow-battery);color:var(--page)}
-.flow-track{position:relative;display:block;overflow:hidden;border-radius:3px}
-.flow-vertical .flow-track{width:3px;height:22px;background:var(--flow-track)}
-.flow-horizontal .flow-track{width:28px;height:3px;background:var(--flow-track)}
+.flow-track{position:relative;display:block;overflow:hidden;border-radius:3px;background:var(--flow-track)}
+.flow-vertical .flow-track{width:3px;height:30px}
+/* Side lines run from circle centre to circle centre, behind the circles, so they always join the nodes.
+   The badge sits in the line's own column, just above the line. */
+.flow-horizontal{position:static;height:calc(var(--node) / 2 - 4px);align-content:end}
+.flow-horizontal .flow-track{position:absolute;top:calc(var(--node) / 2 - 1.5px);width:calc(var(--col) + var(--link));height:3px}
+.flow-grid-inv .flow-track{left:calc(var(--col) / 2)}
+.flow-inv-home .flow-track{left:calc(var(--col) * 1.5 + var(--link))}
+/* A row of dashes one 16px period longer than the line; sliding it by exactly one period loops seamlessly. */
 .flow-dash{
-  position:absolute;display:block;border-radius:3px;
-  background:linear-gradient(90deg,transparent,var(--flow-solar) 40%,var(--flow-solar-glint) 50%,var(--flow-solar) 60%,transparent);
-  opacity:0;
+  --dash:var(--flow-solar);
+  position:absolute;display:block;opacity:0;
 }
-.flow-vertical .flow-dash{left:0;top:0;width:100%;height:40%;transform:translateY(-100%)}
-.flow-horizontal .flow-dash{top:0;left:0;height:100%;width:40%;transform:translateX(-100%)}
+.flow-horizontal .flow-dash{top:0;bottom:0;left:-16px;right:0;background:repeating-linear-gradient(90deg,var(--dash) 0 8px,transparent 8px 16px)}
+.flow-vertical .flow-dash{left:0;right:0;top:-16px;bottom:0;background:repeating-linear-gradient(180deg,var(--dash) 0 8px,transparent 8px 16px)}
+.flow-inv-bat .flow-dash{--dash:var(--flow-battery)}
 
 /* Active flow animations */
 .solar-diagram.flow-pv-on .flow-pv-inv,
@@ -72,23 +81,17 @@
 .solar-diagram.flow-bat-in .flow-inv-bat .flow-dash,
 .solar-diagram.flow-bat-out .flow-inv-bat .flow-dash{opacity:1}
 
-/* Moved with transform, not top/left, so the endless loop never triggers layout. The dash is 40% of its
-   track, so -100% to 250% of its own size is the same path as the old -40% to 100% of the track. */
-@keyframes flow-down{from{transform:translateY(-100%)}to{transform:translateY(250%)}}
-@keyframes flow-right{from{transform:translateX(-100%)}to{transform:translateX(250%)}}
-@keyframes flow-up{from{transform:translateY(250%)}to{transform:translateY(-100%)}}
+/* Moved with transform, not top/left, so the endless loop never triggers layout. One period is 16px. */
+@keyframes flow-down{from{transform:translateY(0)}to{transform:translateY(16px)}}
+@keyframes flow-right{from{transform:translateX(0)}to{transform:translateX(16px)}}
+@keyframes flow-up{from{transform:translateY(16px)}to{transform:translateY(0)}}
 
-.solar-diagram.flow-pv-on .flow-pv-inv .flow-dash{animation:flow-down 1.1s linear infinite}
-.solar-diagram.flow-grid-on .flow-grid-inv .flow-dash{animation:flow-right 1.1s linear infinite}
-.solar-diagram.flow-load-on .flow-inv-home .flow-dash{animation:flow-right 1.1s linear infinite}
-.solar-diagram.flow-bat-in .flow-inv-bat .flow-dash{
-  background:linear-gradient(180deg,transparent,var(--flow-battery) 40%,var(--flow-battery-glint) 50%,var(--flow-battery) 60%,transparent);
-  animation:flow-down 1.1s linear infinite;
-}
-.solar-diagram.flow-bat-out .flow-inv-bat .flow-dash{
-  background:linear-gradient(180deg,transparent,var(--flow-battery) 40%,var(--flow-battery-glint) 50%,var(--flow-battery) 60%,transparent);
-  animation:flow-up 1.1s linear infinite;
-}
+.solar-diagram{--flow-speed:.5s}
+.solar-diagram.flow-pv-on .flow-pv-inv .flow-dash{animation:flow-down var(--flow-speed) linear infinite}
+.solar-diagram.flow-grid-on .flow-grid-inv .flow-dash{animation:flow-right var(--flow-speed) linear infinite}
+.solar-diagram.flow-load-on .flow-inv-home .flow-dash{animation:flow-right var(--flow-speed) linear infinite}
+.solar-diagram.flow-bat-in .flow-inv-bat .flow-dash{animation:flow-down var(--flow-speed) linear infinite}
+.solar-diagram.flow-bat-out .flow-inv-bat .flow-dash{animation:flow-up var(--flow-speed) linear infinite}
 
 /* Glow active nodes by source / flow */
 .solar-diagram.flow-pv-on .solar-node,
@@ -299,17 +302,16 @@ body { overflow-x: hidden; }
     min-height: 0;
     padding: 12px 10px 14px;
   }
-  .diagram-stage { width: 100%; padding: 4px 0; }
+  .diagram-stage { --node: 52px; width: 100%; padding: 4px 0; }
   .diagram-row {
+    --link: 22px;
     width: 100%;
     max-width: 100%;
-    grid-template-columns: minmax(0, 1fr) 22px minmax(0, 1fr) 22px minmax(0, 1fr);
-    column-gap: 0;
+    grid-template-columns: minmax(0, 1fr) var(--link) minmax(0, 1fr) var(--link) minmax(0, 1fr);
   }
-  .flow-node { width: 52px; height: 52px; border-width: 2px; }
+  .flow-node { border-width: 2px; }
   .flow-node svg { width: 24px; height: 24px; }
-  .flow-horizontal .flow-track { width: 16px; }
-  .flow-vertical .flow-track { height: 16px; }
+  .flow-vertical .flow-track { height: 22px; }
   .flow-badge { font-size: var(--text-micro); padding: 1px 5px; }
   .node-label,
   .node-battery-power { font-size: var(--text-micro); max-width: 7.2rem; }
@@ -332,12 +334,9 @@ body { overflow-x: hidden; }
 }
 
 @media (max-width: 420px) {
-  .diagram-row {
-    grid-template-columns: minmax(0, 1fr) 14px minmax(0, 1fr) 14px minmax(0, 1fr);
-  }
-  .flow-node { width: 44px; height: 44px; }
+  .diagram-stage { --node: 44px; }
+  .diagram-row { --link: 14px; }
   .flow-node svg { width: 20px; height: 20px; }
-  .flow-horizontal .flow-track { width: 12px; }
   .node-label { font-size: var(--text-micro); max-width: 6.2rem; }
   .weather-date-label { font-size: .95rem; }
 }
@@ -411,15 +410,11 @@ h1, h2 { text-wrap:balance; }
   .inline-actions button, .dialog-actions button, .check-row, dialog select { min-height:44px; }
 }
 
-/* Reduced motion: the flow paths stop moving. The lit track, the watt badge and the node glow still show
-   which paths carry power, and a static gradient on the track points the way the power flows. */
+/* Reduced motion: the dashes drift three times slower instead of stopping. Windows with "Animation effects"
+   off reports reduced motion to every browser, and a diagram that never moves reads as broken; the direction
+   of the flow is the information here. */
 @media (prefers-reduced-motion: reduce) {
-  /* !important: the per-path rules that start each animation are more specific than this one */
-  .solar-diagram .flow-dash { animation:none !important; transform:none; width:100%; height:100%; }
-  .solar-diagram .flow-horizontal .flow-dash { background:linear-gradient(90deg, transparent, var(--flow-solar)); }
-  .solar-diagram .flow-vertical .flow-dash { background:linear-gradient(180deg, transparent, var(--flow-solar)); }
-  .solar-diagram.flow-bat-in .flow-inv-bat .flow-dash { background:linear-gradient(180deg, transparent, var(--flow-battery)); }
-  .solar-diagram.flow-bat-out .flow-inv-bat .flow-dash { background:linear-gradient(0deg, transparent, var(--flow-battery)); }
+  .solar-diagram { --flow-speed:1.5s; }
 }
 
 /* Header: the Settings pill never breaks its label; on phones the actions drop to their own row when the

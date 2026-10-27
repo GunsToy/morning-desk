@@ -240,7 +240,8 @@ Soft, rounded forms throughout. Panels have generous 18px corners (16px on phone
 
 ### The Solar Flow Diagram (signature)
 - **What it is:** a night-blue instrument showing PV, grid, inverter, home and battery as round nodes, joined by thin tracks. Light travels along each active track in the direction the power flows, with a watt badge on each path.
-- **Motion:** the dashes move with `transform` only (1.1s linear loop), so the browser never redoes the layout. With reduced motion, they stop, and a static gradient on each lit track shows the direction.
+- **Lines:** each side line runs from circle centre to circle centre, behind the circles, so it always joins the nodes; nodes in a row align by their circles. The watt badge sits just above its line.
+- **Motion:** a row of 8px dashes (16px period) slides along each lit line with `transform` only (0.5s linear loop, exactly one period), so the browser never redoes the layout. With reduced motion they drift three times slower (1.5s) instead of stopping: Windows with "Animation effects" off reports reduced motion to every browser, and a diagram that never moves reads as broken.
 
 ## Do's and Don'ts
 
