@@ -64,7 +64,9 @@
               <div class="flow-node solar-node" aria-label="Solar panels">
                 <svg viewBox="0 0 48 48" width="36" height="36" aria-hidden="true"><rect x="8" y="12" width="32" height="24" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 20h32M8 28h32M18 12v24M30 12v24" stroke="currentColor" stroke-width="1.5"/></svg>
               </div>
-              <p class="node-label">PV Power: <strong id="solar-pv">—</strong></p>
+              <div class="node-aside">
+                <p class="node-label">PV Power: <strong id="solar-pv">—</strong></p>
+              </div>
             </div>
 
             <!-- Arrow PV → Inverter -->
@@ -119,9 +121,11 @@
               <div class="flow-node battery-node" aria-label="Battery">
                 <svg viewBox="0 0 48 48" width="34" height="34" aria-hidden="true"><rect x="12" y="12" width="24" height="28" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 12V8h8v4" stroke="currentColor" stroke-width="2"/><path d="M20 24h8M24 20v8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
               </div>
-              <p class="node-label">Battery: <strong id="solar-battery-voltage">—</strong></p>
-              <p class="node-label node-battery-power" id="solar-battery-power-label">— <strong id="solar-battery-power">—</strong></p>
-              <p class="node-label node-battery-runtime" id="solar-battery-runtime" hidden></p>
+              <div class="node-aside">
+                <p class="node-label">Battery: <strong id="solar-battery-voltage">—</strong></p>
+                <p class="node-label node-battery-power" id="solar-battery-power-label">— <strong id="solar-battery-power">—</strong></p>
+                <p class="node-label node-battery-runtime" id="solar-battery-runtime" hidden></p>
+              </div>
             </div>
           </div>
 

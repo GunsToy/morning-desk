@@ -14,7 +14,7 @@
 }
 .solar-diagram .refresh{width:28px;height:28px;flex-shrink:0;background:var(--solar-control-fill);border-color:var(--solar-control-line)}
 
-.diagram-stage{--node:72px;display:grid;grid-template-rows:auto minmax(36px,auto) auto minmax(36px,auto) auto;justify-items:center;align-items:center;padding:6px 0 4px;gap:2px}
+.diagram-stage{--node:72px;display:grid;grid-template-rows:auto minmax(36px,auto) auto minmax(36px,auto) auto;justify-items:center;align-items:center;padding:6px 0 4px}
 /* Nodes align by their circles (top), not by their labels, so the side lines meet every circle at its centre.
    --link is the width of the two line columns; --col is one node column, worked out from it. */
 .diagram-row{--link:56px;--col:calc((100% - 2 * var(--link)) / 3);position:relative;display:grid;grid-template-columns:1fr var(--link) 1fr var(--link) 1fr;align-items:start;width:100%;max-width:440px}
@@ -26,6 +26,10 @@
 .node-battery-power{color:var(--flow-battery-glint)}
 .node-grid-voltage{color:var(--solar-muted)}
 .node-grid-voltage.grid-down{color:var(--coral);font-weight:600}
+/* PV, inverter and battery labels sit beside the circle, out of the way of the vertical lines. */
+.node-pv,.node-inverter,.node-battery{position:relative;justify-self:center}
+.node-aside{position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%);display:grid;gap:4px;text-align:left;width:max-content}
+.node-inverter .node-mode{position:absolute;bottom:calc(100% + 4px);left:calc(50% + 10px);white-space:nowrap}
 
 .flow-node{
   width:var(--node);height:var(--node);border-radius:50%;position:relative;z-index:1;
@@ -53,7 +57,10 @@
 .flow-grid-inv .flow-badge,.flow-inv-home .flow-badge{background:var(--coral);color:var(--page)}
 .flow-inv-bat .flow-badge{background:var(--flow-battery);color:var(--page)}
 .flow-track{position:relative;display:block;overflow:hidden;border-radius:3px;background:var(--flow-track)}
-.flow-vertical .flow-track{width:3px;height:30px}
+/* Vertical lines fill their row, so they run circle edge to circle edge; the badge sits to the left of the line. */
+.flow-vertical{align-self:stretch;place-items:stretch center}
+.flow-vertical .flow-track{width:3px}
+.flow-vertical .flow-badge{position:absolute;top:50%;right:calc(50% + 8px);transform:translateY(-50%)}
 /* Side lines run from circle centre to circle centre, behind the circles, so they always join the nodes.
    The badge sits in the line's own column, just above the line. */
 .flow-horizontal{position:static;height:calc(var(--node) / 2 - 4px);align-content:end}
@@ -311,7 +318,6 @@ body { overflow-x: hidden; }
   }
   .flow-node { border-width: 2px; }
   .flow-node svg { width: 24px; height: 24px; }
-  .flow-vertical .flow-track { height: 22px; }
   .flow-badge { font-size: var(--text-micro); padding: 1px 5px; }
   .node-label,
   .node-battery-power { font-size: var(--text-micro); max-width: 7.2rem; }
