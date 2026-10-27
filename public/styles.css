@@ -14,10 +14,11 @@
 }
 .solar-diagram .refresh{width:28px;height:28px;flex-shrink:0;background:var(--solar-control-fill);border-color:var(--solar-control-line)}
 
-.diagram-stage{--node:72px;display:grid;grid-template-rows:auto minmax(36px,auto) auto minmax(36px,auto) auto;justify-items:center;align-items:center;padding:6px 0 4px}
+.diagram-stage{--node:72px;display:grid;grid-template-rows:auto minmax(36px,auto) auto minmax(52px,auto) auto;justify-items:center;align-items:center;padding:6px 0 4px}
 /* Nodes align by their circles (top), not by their labels, so the side lines meet every circle at its centre.
    --link is the width of the two line columns; --col is one node column, worked out from it. */
-.diagram-row{--link:56px;--col:calc((100% - 2 * var(--link)) / 3);position:relative;display:grid;grid-template-columns:1fr var(--link) 1fr var(--link) 1fr;align-items:start;width:100%;max-width:440px}
+.diagram-row{--link:56px;--col:calc((100% - 2 * var(--link)) / 3);position:relative;display:grid;grid-template-columns:1fr var(--link) 1fr var(--link) 1fr;align-items:start;width:100%;max-width:440px;
+  height:var(--node)} /* only the circles count: the grid/home labels hang below, so the battery line starts at the inverter */
 
 .node-block{display:grid;justify-items:center;gap:8px}
 .node-label{margin:0;font-family:'DM Mono',monospace;font-size:var(--text-meta);letter-spacing:.02em;color:var(--solar-label);line-height:1.3}
