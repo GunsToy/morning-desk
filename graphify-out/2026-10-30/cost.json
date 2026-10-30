@@ -1,0 +1,31 @@
+{
+  "runs": [
+    {
+      "date": "2026-10-23T21:56:19.514644+00:00",
+      "input_tokens": 49712,
+      "output_tokens": 0,
+      "files": 18
+    },
+    {
+      "date": "2026-10-23T22:37:50.130526+00:00",
+      "input_tokens": 41846,
+      "output_tokens": 0,
+      "files": 11
+    },
+    {
+      "date": "2026-10-24T14:19:16.383861+00:00",
+      "input_tokens": 51049,
+      "output_tokens": 0,
+      "files": 9
+    },
+    {
+      "date": "2026-10-25T10:01:03.154019+00:00",
+      "input_tokens": 57835,
+      "output_tokens": 0,
+      "files": 17,
+      "note": "subagent total tokens (in+out combined)"
+    }
+  ],
+  "total_input_tokens": 200442,
+  "total_output_tokens": 0
+}

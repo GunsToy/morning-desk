@@ -1,99 +1,99 @@
-# Graph Report - morning-desk  (2026-10-27)
+# Graph Report - morning-desk  (2026-10-30)
 
 ## Corpus Check
-- 24 files · ~20,308 words
-- Verdict: corpus is large enough that graph structure adds value.
-- Unclassified: 4 file(s) not represented in the graph (top: (none) 3, .css 1)
+- Corpus is ~20,394 words - fits in a single context window. You may not need a graph.
 
 ## Summary
-- 293 nodes · 427 edges · 17 communities (13 shown, 4 thin omitted)
-- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 15 edges (avg confidence: 0.88)
+- 304 nodes · 441 edges · 20 communities (14 shown, 6 thin omitted)
+- Extraction: 90% EXTRACTED · 10% INFERRED · 0% AMBIGUOUS · INFERRED: 45 edges (avg confidence: 0.89)
 - Token cost: 0 input · 0 output
 
-## Graph Freshness
-- Built from commit: `b5a88d31`
-- Run `git rev-parse HEAD` and compare to check if the graph is stale.
-- Run `graphify update .` after code changes (no API cost).
-
 ## Community Hubs (Navigation)
-- Dashboard Client (app.js)
-- Store, Tests & Field Rules
-- Settings & Sign-in UI
-- Solar Provider Contract
-- Server Routes & Access
-- Design System Rules
-- Sessions & Password Auth
-- store.test.mjs
+- Dashboard Frontend
+- Profile Store
+- Solar Providers and SSO
+- Express Server
+- Dashboard Design Concepts
+- Session Auth
+- Brand and Sign-in UI
+- Profiles and Settings Docs
 - Docker Compose
 - CI Test Workflow
 - Package Manifest
 - Proxmox Installer
 - Provider Registry
+- Login Script
 - Install Scripts
-- Nightly Update Script
-- Container Entrypoint
-- Product
+- Update Script
+- Docker Entrypoint
+- Daily Self-Update
+- Container Requirements
 
 ## God Nodes (most connected - your core abstractions)
 1. `loadAll()` - 12 edges
-2. `Morning Desk Design System` - 12 edges
-3. `morning-desk` - 9 edges
-4. `Dashboard page (index.html)` - 9 edges
-5. `esc()` - 8 edges
-6. `Product` - 8 edges
-7. `fetchReadings()` - 7 edges
-8. `loadSolar()` - 7 edges
-9. `populateSettings()` - 7 edges
-10. `saveSettings()` - 7 edges
+2. `morning-desk` - 9 edges
+3. `esc()` - 8 edges
+4. `fetchReadings()` - 7 edges
+5. `loadSolar()` - 7 edges
+6. `populateSettings()` - 7 edges
+7. `saveSettings()` - 7 edges
+8. `Profile sign-in and house admin` - 7 edges
+9. `Morning Desk logo: lime sun rising over a desk line` - 7 edges
+10. `healthcheck` - 6 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `Profile switcher (#profile-select)` --implements--> `Profiles`  [INFERRED]
-  public/index.html → README.md
-- `Dashboard page (index.html)` --implements--> `Dashboard two-column grid layout`  [INFERRED]
-  public/index.html → DESIGN.md
-- `Solar diagram markup (#solar-diagram)` --implements--> `Solar Flow Diagram (signature component)`  [INFERRED]
-  public/index.html → DESIGN.md
-- `Settings dialog (#settings-dialog)` --implements--> `Solar provider plugin system (providers/)`  [INFERRED]
-  public/index.html → README.md
-- `Poodle House users field (ssoUsers)` --implements--> `Sign in with Poodle House (OIDC SSO)`  [INFERRED]
-  public/index.html → README.md
+- `Morning Desk logo: lime sun rising over a desk line` --references--> `Night Page (#090d13)`  [INFERRED]
+  public/logo.svg → DESIGN.md
+- `Login mark (inline rising-sun logo)` --semantically_similar_to--> `Morning Desk logo: lime sun rising over a desk line`  [INFERRED] [semantically similar]
+  public/login.html → public/logo.svg
+- `Morning Desk logo: lime sun rising over a desk line` --references--> `Morning Lime (#c7ff47)`  [INFERRED]
+  public/logo.svg → DESIGN.md
+- `Dashboard layout grid` --references--> `Dashboard page (index.html)`  [INFERRED]
+  DESIGN.md → public/index.html
+- `Sign-in card` --references--> `Morning Desk logo: lime sun rising over a desk line`  [EXTRACTED]
+  DESIGN.md → public/logo.svg
 
 ## Import Cycles
 - None detected.
 
 ## Hyperedges (group relationships)
-- **Sign-in flow (local accounts and Poodle House SSO)** — public_login, readme_house_admin, readme_sso_poodle_house, readme_remember_me, readme_scrypt_password_hashing, design_sign_in_card [INFERRED 0.85]
-- **Solar flow diagram design and implementation** — design_solar_flow_diagram, design_solar_diagram_palette, design_meaningful_flow_rule, design_glow_means_live_rule, public_index_solar_diagram [INFERRED 0.85]
+- **Light-on-hardware constraints** — product_light_on_hardware, design_cheap_effects, readme_min_interval_ms, readme_container_requirements [INFERRED 0.75]
+- **Home power at a glance (solar diagram)** — product_power_question, public_index_solar_panel, design_solar_flow_diagram, design_meaningful_flow_rule, readme_solar_providers [INFERRED 0.85]
+- **Sign-in flow (password, remember me, Poodle House SSO)** — public_login_login_page, public_login_login_form, public_login_sso_button, readme_profile_sign_in, readme_poodle_house_sso, readme_remember_me [INFERRED 0.85]
 
-## Communities (17 total, 4 thin omitted)
+## Communities (20 total, 6 thin omitted)
 
-### Community 0 - "Dashboard Client (app.js)"
+### Community 0 - "Dashboard Frontend"
 Cohesion: 0.10
 Nodes (40): api(), batteryRuntime(), blankProfile(), clockTime(), codeMap, dialog, energy(), esc() (+32 more)
 
-### Community 1 - "Store, Tests & Field Rules"
-Cohesion: 0.11
-Nodes (22): applyFields(), ADMIN_USERNAME, applyProfileInput(), applySolarInput(), blankProfile(), cleanLogin(), cleanProfile(), cleanSession() (+14 more)
+### Community 1 - "Profile Store"
+Cohesion: 0.07
+Nodes (23): applyFields(), ADMIN_USERNAME, applyProfileInput(), applySolarInput(), blankProfile(), cleanLogin(), cleanProfile(), cleanSession() (+15 more)
 
-### Community 2 - "Settings & Sign-in UI"
-Cohesion: 0.09
-Nodes (27): Inline SVG line icons (Lucide, icon() helper), Password change / sign out section, Profile switcher (#profile-select), Settings dialog (#settings-dialog), Poodle House users field (ssoUsers), Confirm password row (first-run setup), form, Show-password toggle (#login-eye) (+19 more)
-
-### Community 3 - "Solar Provider Contract"
+### Community 2 - "Solar Providers and SSO"
 Cohesion: 0.11
 Nodes (26): DEFAULT_MAX, describeSettings(), FETCH_TIMEOUT_MS, FLOW_KEYS, keepPreviousFlow(), publicSchema(), secretFields(), USER_AGENT (+18 more)
 
-### Community 4 - "Server Routes & Access"
+### Community 3 - "Express Server"
 Cohesion: 0.11
 Nodes (23): app, applyLogin(), canEdit(), decode(), decodeEntities(), __dirname, httpError(), isAdmin() (+15 more)
 
-### Community 5 - "Design System Rules"
-Cohesion: 0.09
-Nodes (18): button-primary-pill component, Dashboard two-column grid layout, DM Mono font, Ember Coral (#ff846c), Manrope font, Mealie, Morning Desk Design System, Morning Lime (#c7ff47) (+10 more)
+### Community 4 - "Dashboard Design Concepts"
+Cohesion: 0.10
+Nodes (18): Dashboard layout grid, Morning Desk Design System, Night mode overlay, Solar Flow Diagram (signature), Typography (Manrope + DM Mono), Household users and admin, Morning Desk product definition, RSS news feeds and Sky News YouTube stream (+10 more)
 
-### Community 6 - "Sessions & Password Auth"
+### Community 5 - "Session Auth"
 Cohesion: 0.10
 Nodes (14): COOKIE_NAME, createSession(), destroySession(), DUMMY_RECORD, failures, hashPassword(), hashToken(), readCookie() (+6 more)
+
+### Community 6 - "Brand and Sign-in UI"
+Cohesion: 0.13
+Nodes (17): Button components, Color tokens, Ember Coral (#ff846c), Header navigation, Inline SVG line icons (icon() helper, Lucide), Input fields, Morning Lime (#c7ff47), Night Page (#090d13) (+9 more)
+
+### Community 7 - "Profiles and Settings Docs"
+Cohesion: 0.13
+Nodes (18): config.example.json (Erasmuskloof example), Growatt OpenAPI, Profiles (per home or screen), Victron provider (branch), Settings dialog (profiles), Login form (username, password, remember me), login.js (sign-in script), Sign in with Poodle House button (+10 more)
 
 ### Community 8 - "Docker Compose"
 Cohesion: 0.12
@@ -115,29 +115,29 @@ Nodes (6): ensure_template(), log(), next_ctid(), prompt_ip(), select_storage(),
 Cohesion: 0.29
 Nodes (3): all, byId, DEFAULT_PROVIDER
 
-### Community 16 - "Product"
-Cohesion: 0.22
-Nodes (8): Capabilities and Constraints, Evidence on Hand, Operating Context, Platform, Product, Product Principles, Product Purpose, Users
+### Community 13 - "Login Script"
+Cohesion: 0.40
+Nodes (3): form, SSO_ERRORS, status
 
 ## Knowledge Gaps
-- **12 isolated node(s):** `Password change / sign out section`, `Show-password toggle (#login-eye)`, `Cloudflare proxy/tunnel`, `Poodle House`, `Proxmox install script` (+7 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 127 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **4 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **19 isolated node(s):** `Ember Coral (#ff846c)`, `Signal Cyan (#58e2ff)`, `Dashboard layout grid`, `Night mode overlay`, `Panel card` (+14 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 126 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **6 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `express` connect `Package Manifest` to `Server Routes & Access`?**
-  _High betweenness centrality (0.030) - this node is a cross-community bridge._
-- **What connects `Password change / sign out section`, `Show-password toggle (#login-eye)`, `Cloudflare proxy/tunnel` to the rest of the system?**
-  _12 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `Dashboard Client (app.js)` be split into smaller, more focused modules?**
+- **Why does `express` connect `Package Manifest` to `Express Server`?**
+  _High betweenness centrality (0.028) - this node is a cross-community bridge._
+- **What connects `Ember Coral (#ff846c)`, `Signal Cyan (#58e2ff)`, `Dashboard layout grid` to the rest of the system?**
+  _19 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `Dashboard Frontend` be split into smaller, more focused modules?**
   _Cohesion score 0.10452961672473868 - nodes in this community are weakly interconnected._
-- **Why does `Morning Desk Design System` connect `Design System Rules` to `Settings & Sign-in UI`?**
-  _High betweenness centrality (0.013) - this node is a cross-community bridge._
-- **Should `Store, Tests & Field Rules` be split into smaller, more focused modules?**
-  _Cohesion score 0.10846560846560846 - nodes in this community are weakly interconnected._
-- **Why does `Dashboard page (index.html)` connect `Design System Rules` to `Settings & Sign-in UI`?**
-  _High betweenness centrality (0.012) - this node is a cross-community bridge._
-- **Should `Settings & Sign-in UI` be split into smaller, more focused modules?**
-  _Cohesion score 0.09113300492610837 - nodes in this community are weakly interconnected._
+- **Why does `Sign-in page (login.html)` connect `Brand and Sign-in UI` to `Profiles and Settings Docs`?**
+  _High betweenness centrality (0.010) - this node is a cross-community bridge._
+- **Should `Profile Store` be split into smaller, more focused modules?**
+  _Cohesion score 0.07422402159244265 - nodes in this community are weakly interconnected._
+- **Should `Solar Providers and SSO` be split into smaller, more focused modules?**
+  _Cohesion score 0.10591133004926108 - nodes in this community are weakly interconnected._
+- **Should `Express Server` be split into smaller, more focused modules?**
+  _Cohesion score 0.10582010582010581 - nodes in this community are weakly interconnected._

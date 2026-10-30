@@ -1,17 +1,1 @@
-{
-  "0": "Dashboard Client (app.js)",
-  "1": "Store, Tests & Field Rules",
-  "2": "Settings & Sign-in UI",
-  "3": "Solar Provider Contract",
-  "4": "Server Routes & Access",
-  "5": "Design System Rules",
-  "6": "Sessions & Password Auth",
-  "8": "Docker Compose",
-  "9": "CI Test Workflow",
-  "10": "Package Manifest",
-  "11": "Proxmox Installer",
-  "12": "Provider Registry",
-  "13": "Install Scripts",
-  "14": "Nightly Update Script",
-  "15": "Container Entrypoint"
-}
+{"0": "Dashboard Frontend", "1": "Profile Store", "2": "Solar Providers and SSO", "3": "Express Server", "4": "Dashboard Design Concepts", "5": "Session Auth", "6": "Brand and Sign-in UI", "7": "Profiles and Settings Docs", "8": "Docker Compose", "9": "CI Test Workflow", "10": "Package Manifest", "11": "Proxmox Installer", "12": "Provider Registry", "13": "Login Script", "14": "Install Scripts", "15": "Update Script", "16": "Docker Entrypoint", "17": "Daily Self-Update", "18": "Container Requirements", "19": "Glanceable Principle"}

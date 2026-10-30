@@ -1,0 +1,17 @@
+{
+  "0": "Dashboard Client (app.js)",
+  "1": "Store, Tests & Field Rules",
+  "2": "Settings & Sign-in UI",
+  "3": "Solar Provider Contract",
+  "4": "Server Routes & Access",
+  "5": "Design System Rules",
+  "6": "Sessions & Password Auth",
+  "8": "Docker Compose",
+  "9": "CI Test Workflow",
+  "10": "Package Manifest",
+  "11": "Proxmox Installer",
+  "12": "Provider Registry",
+  "13": "Install Scripts",
+  "14": "Nightly Update Script",
+  "15": "Container Entrypoint"
+}
