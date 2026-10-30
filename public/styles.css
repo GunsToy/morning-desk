@@ -55,7 +55,7 @@
   position:relative;z-index:2; /* on narrow screens a badge is wider than its column: keep it above the circles */
 }
 .flow-badge[hidden]{display:none !important}
-.flow-grid-inv .flow-badge,.flow-inv-home .flow-badge{background:var(--coral);color:var(--page)}
+.flow-grid-inv .flow-badge{background:var(--coral);color:var(--page)}
 .flow-inv-bat .flow-badge{background:var(--flow-battery);color:var(--page)}
 .flow-track{position:relative;display:block;overflow:hidden;border-radius:3px;background:var(--flow-track)}
 /* Vertical lines fill their row, so they run circle edge to circle edge; the badge sits to the left of the line. */
@@ -115,8 +115,9 @@
   color:var(--coral-glint);
 }
 .solar-diagram.flow-load-on .home-node{
-  border-color:rgba(200,210,255,.4);
-  box-shadow:inset 0 0 0 1px rgba(220,230,255,.15),0 0 14px rgba(160,180,255,.25);
+  border-color:rgba(180,230,90,.55);
+  box-shadow:inset 0 0 0 1px rgba(220,255,120,.25),0 0 20px rgba(180,230,80,.35);
+  color:var(--flow-solar-glint);
 }
 .solar-diagram.flow-bat-in .battery-node,
 .solar-diagram.flow-bat-out .battery-node,
