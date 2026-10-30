@@ -163,7 +163,10 @@ function batteryRuntime(capacityKwh, percent, charging, watts) {
 
 // Below this the grid input is off (load shedding or an outage); a little stray voltage can read while it is down.
 const GRID_DOWN_VOLTS = 50;
+const SOLAR_REFRESH_MS = 15 * 60 * 1000;
+let nextSolarRefresh = Date.now() + SOLAR_REFRESH_MS;
 async function loadSolar() {
+  nextSolarRefresh = Date.now() + SOLAR_REFRESH_MS; // set first so a failed load still retries on schedule
   const requested = currentProfile;
   const res = await fetch(profileUrl('/api/solar'));
   const data = await res.json();
@@ -283,7 +286,7 @@ function markWeatherStale(error) {
     : 'Weather unavailable right now';
 }
 
-async function loadAll({ includeSky = false } = {}) {
+async function loadAll({ includeSky = false, includeSolar = true } = {}) {
   updateClock(); // wall displays run for days: the date must follow the 15-minute refresh
   try {
     const requested = currentProfile;
@@ -304,7 +307,8 @@ async function loadAll({ includeSky = false } = {}) {
       renderProfileSelect();
     }
     storage.set('md.profile', currentProfile);
-    const tasks = [loadWeather().catch(markWeatherStale), loadNewsPanels(), loadSolar()];
+    const tasks = [loadWeather().catch(markWeatherStale), loadNewsPanels()];
+    if (includeSolar) tasks.push(loadSolar());
     if (includeSky) tasks.push(loadSky());
     await Promise.all(tasks);
   } catch (error) {
@@ -554,4 +558,10 @@ api('/api/session').then(data => {
   if (!session.authenticated) return location.replace('/login');
   return Promise.all([loadFeeds(), loadProfiles(), loadSolarProviders()]).then(() => loadAll({ includeSky: true }));
 }).catch(console.error);
-setInterval(() => loadAll({ includeSky: false }), 15 * 60 * 1000);
+// Solar runs on its own clock (below), so every solar load, manual or not, restarts its countdown.
+setInterval(() => loadAll({ includeSky: false, includeSolar: false }), 15 * 60 * 1000);
+setInterval(() => {
+  if (Date.now() >= nextSolarRefresh) loadSolar().catch(console.error);
+  const seconds = Math.max(0, Math.round((nextSolarRefresh - Date.now()) / 1000));
+  $('#solar-next').textContent = `NEXT REFRESH ${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+}, 1000);
