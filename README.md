@@ -43,7 +43,7 @@ The login page can also offer **Sign in with Poodle House** (or any OpenID Conne
 3. `docker compose up -d` to restart with it. The button appears on the login page.
 4. Sign in as the admin, open **Settings**, and in each profile list the Poodle House usernames that open it (for example `julian, partner`). Administrators on the provider (group `house-admin`) always sign in as the house admin; anyone not listed is told to ask the admin.
 
-The sign-in always happens on `SSO_PUBLIC_URL`: a screen that opened the dashboard by its LAN address is moved there first. Unlinking a username signs that profile out everywhere. Signing out of Poodle House does not sign you out of Morning Desk.
+The sign-in always happens on `SSO_PUBLIC_URL`: a screen that opened the dashboard by its LAN address is moved there first. The first sign-in of a listed username pins it to that Poodle House account, so someone who later takes the same username (a rename or a reused name) is refused. If a person's account is replaced, unlink and relink their username. Unlinking a username signs that profile out everywhere. Signing out of Poodle House does not sign you out of Morning Desk.
 
 ## Solar providers
 

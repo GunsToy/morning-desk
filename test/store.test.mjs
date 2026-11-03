@@ -146,6 +146,28 @@ test('Poodle House users: a comma list, lower-cased, each linked to one profile 
   assert.deepEqual(home.sso, [], 'an empty field unlinks everyone');
 });
 
+test('Poodle House sign-in: a linked username is pinned to the first provider account that uses it', async () => {
+  await writeConfig({ profiles: [{ id: 'home', name: 'Home' }, { id: 'flat', name: 'Flat' }] });
+  const config = await store.read();
+  const [home, flat] = config.profiles;
+  store.setSsoUsers(config, home, 'alice');
+  store.setSsoUsers(config, flat, 'bob');
+
+  assert.equal(store.claimSsoUser(config, 'alice', 'sub-1'), 'home', 'first sign-in pins alice');
+  assert.equal(store.claimSsoUser(config, 'alice', 'sub-1'), 'home', 'the same account keeps signing in');
+  assert.equal(store.claimSsoUser(config, 'alice', 'sub-2'), null, 'another account that takes the name is refused');
+  assert.equal(store.claimSsoUser(config, 'bob', 'sub-1'), null, 'one account cannot hold two linked usernames');
+  assert.equal(store.claimSsoUser(config, 'carol', 'sub-3'), null, 'an unlinked username opens nothing');
+  assert.equal(store.claimSsoUser(config, 'bob', ''), null, 'no subject, no sign-in');
+
+  store.setSsoUsers(config, home, ''); // unlinking forgets the pin
+  store.setSsoUsers(config, home, 'alice');
+  assert.equal(store.claimSsoUser(config, 'alice', 'sub-2'), 'home', 'after an unlink and relink, a new account can pin it');
+
+  await store.update(latest => { latest.profiles[0].ssoSubjects = { alice: 'sub-2' }; latest.profiles[0].sso = ['alice']; });
+  assert.deepEqual((await store.read()).profiles[0].ssoSubjects, { alice: 'sub-2' }, 'pins survive a save');
+});
+
 test('the Growatt address is one of Growatt\'s regional servers, never a typed address', () => {
   const profile = store.blankProfile();
   assert.match(store.applyProfileInput(profile, { solar: { values: { server: 'http://192.168.0.1/admin' } } }), /pick one from the list/);

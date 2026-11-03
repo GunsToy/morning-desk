@@ -23,7 +23,8 @@ export function blankProfile() {
     batteryKwh: null, // usable battery capacity; null hides the runtime estimate
     news: [...DEFAULT_NEWS],
     login: null, // { username, salt, hash } once the admin gives the profile a sign-in
-    sso: [] // Poodle House usernames that open this profile (see sso.mjs)
+    sso: [], // Poodle House usernames that open this profile (see sso.mjs)
+    ssoSubjects: {} // username -> the provider account (`sub`) it was pinned to on its first sign-in
   };
 }
 
@@ -59,9 +60,14 @@ function cleanProfile(raw = {}) {
     batteryKwh: Number.isFinite(raw.batteryKwh) && raw.batteryKwh > 0 ? raw.batteryKwh : null,
     news: Array.isArray(raw.news) ? raw.news.map(String) : [...base.news],
     login: cleanLogin(raw.login),
-    sso: Array.isArray(raw.sso) ? raw.sso.map(name => String(name).toLowerCase()) : []
+    sso: Array.isArray(raw.sso) ? raw.sso.map(name => String(name).toLowerCase()) : [],
+    ssoSubjects: cleanSsoSubjects(raw.ssoSubjects)
   };
 }
+
+const cleanSsoSubjects = raw => Object.fromEntries(Object.entries(raw && typeof raw === 'object' ? raw : {})
+  .filter(([, subject]) => typeof subject === 'string' && subject)
+  .map(([name, subject]) => [name.toLowerCase(), subject]));
 
 function cleanLogin(login) {
   if (!login?.username || !login.salt || !login.hash) return null;
@@ -193,6 +199,20 @@ export function setLogin(config, profile, username, record = null) {
 
 export const findBySsoUser = (config, username) => config.profiles.find(profile => profile.sso.includes(username));
 
+// Which profile a Poodle House sign-in opens: its id, or null. The first sign-in of a linked username pins it to that
+// provider account. After that, another account that takes the username (a rename, a reused name, a case variant) is
+// refused, and one account cannot hold two linked usernames. Unlinking a username (setSsoUsers) forgets its pin.
+export function claimSsoUser(config, username, subject) {
+  const profile = findBySsoUser(config, username);
+  if (!profile || !subject) return null;
+  const pinned = profile.ssoSubjects[username];
+  if (pinned) return pinned === subject ? profile.id : null;
+  const heldElsewhere = config.profiles.some(item => Object.entries(item.ssoSubjects).some(([name, sub]) => sub === subject && name !== username));
+  if (heldElsewhere) return null;
+  profile.ssoSubjects[username] = subject;
+  return profile.id;
+}
+
 // Links Poodle House usernames to a profile: a list, or a comma-separated string. Returns an error message, or null.
 export function setSsoUsers(config, profile, input) {
   const names = [...new Set((Array.isArray(input) ? input : String(input ?? '').split(','))
@@ -205,6 +225,7 @@ export function setSsoUsers(config, profile, input) {
     if (other) return `${name} already opens the profile "${other.name}".`;
   }
   profile.sso = names;
+  profile.ssoSubjects = Object.fromEntries(Object.entries(profile.ssoSubjects).filter(([name]) => names.includes(name)));
   return null;
 }
 

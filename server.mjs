@@ -138,9 +138,14 @@ app.get('/auth/sso/callback', async (req, res) => {
   if (req.query.error || !req.query.code) return res.redirect('/login?error=sso-failed');
   try {
     const person = await sso.identify(String(req.query.code));
-    const config = await store.read();
-    const who = person.groups.includes(sso.adminGroup) ? store.ADMIN_USERNAME : store.findBySsoUser(config, person.username)?.id;
-    if (!who) return res.redirect('/login?error=sso-not-linked');
+    // A profile link is pinned to the provider account on first use (store.claimSsoUser), so this saves config.json.
+    const who = person.groups.includes(sso.adminGroup)
+      ? store.ADMIN_USERNAME
+      : await store.update(config => store.claimSsoUser(config, person.username, person.subject));
+    if (!who) {
+      console.warn(`Sign-in with the provider refused for "${person.username}": not linked, or linked to another provider account.`);
+      return res.redirect('/login?error=sso-not-linked');
+    }
     await signIn(req, res, who, remember === '1');
     res.redirect('/');
   } catch (error) {
@@ -245,11 +250,16 @@ async function signIn(req, res, who, remember) {
 const passwordProblem = value =>
   typeof value !== 'string' || value.length < 8 || value.length > 200 ? 'Password must be 8 to 200 characters.' : null;
 
+// Checks the lockout and counts this attempt in one synchronous step, before any await. Counting only after the
+// slow password check let a burst of parallel requests all pass the check before any of them was counted.
+// A correct password clears the count again.
 function throwIfLockedOut(req, res) {
   const retry = auth.loginRetryAfter(req.ip);
-  if (!retry) return;
-  res.set('Retry-After', String(retry));
-  throw httpError(429, `Too many wrong passwords. Try again in ${Math.ceil(retry / 60)} minute(s).`);
+  if (retry) {
+    res.set('Retry-After', String(retry));
+    throw httpError(429, `Too many wrong passwords. Try again in ${Math.ceil(retry / 60)} minute(s).`);
+  }
+  auth.recordFailure(req.ip);
 }
 
 // ---- Auth ------------------------------------------------------------------------------
@@ -294,10 +304,7 @@ app.post('/api/auth/login', handle(async (req, res) => {
   const record = username === store.ADMIN_USERNAME ? auth.effectiveRecord(config) : profile?.login;
   if (username === store.ADMIN_USERNAME && !record) throw httpError(409, 'No admin password is set yet.');
   const ok = await auth.verifyPassword(password, record ?? auth.DUMMY_RECORD) && Boolean(record);
-  if (!ok) {
-    auth.recordFailure(req.ip);
-    throw httpError(401, 'Username or password is incorrect.');
-  }
+  if (!ok) throw httpError(401, 'Username or password is incorrect.'); // already counted by throwIfLockedOut
   auth.clearFailures(req.ip);
   await signIn(req, res, profile ? profile.id : store.ADMIN_USERNAME, req.body.remember === true);
   res.json({ ok: true });
@@ -321,10 +328,8 @@ app.post('/api/auth/password', handle(async (req, res) => {
   const config = await store.read();
   const record = admin ? auth.effectiveRecord(config) : config.profiles.find(item => item.id === req.user.who)?.login;
   const knowsCurrent = typeof req.body?.current === 'string' && await auth.verifyPassword(req.body.current, record);
-  if (!knowsCurrent) {
-    auth.recordFailure(req.ip);
-    throw httpError(401, 'The current password is incorrect.');
-  }
+  if (!knowsCurrent) throw httpError(401, 'The current password is incorrect.'); // already counted by throwIfLockedOut
+  auth.clearFailures(req.ip);
   const problem = passwordProblem(req.body.next);
   if (problem) throw httpError(400, problem);
   const next = await auth.hashPassword(req.body.next);

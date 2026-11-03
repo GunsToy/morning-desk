@@ -36,7 +36,8 @@ export async function authorizeUrl(state) {
   return url.href;
 }
 
-// Trades the one-time code for the person's details: { username, groups }.
+// Trades the one-time code for the person's details: { username, subject, groups }.
+// subject is the provider's permanent account id (`sub`); usernames can change or be reused, so links are pinned to it.
 // The code is only good with our client secret, and the details come straight from the provider over HTTPS,
 // so the id_token's signature does not need checking here.
 export async function identify(code) {
@@ -49,6 +50,7 @@ export async function identify(code) {
   if (!tokens.access_token) throw new Error('The provider sent no access token.');
   const claims = await fetchJson(userinfoUrl, { headers: { Authorization: `Bearer ${tokens.access_token}` } });
   const username = String(claims.preferred_username ?? claims.username ?? '').trim().toLowerCase();
-  if (!username) throw new Error('The provider did not say who signed in.');
-  return { username, groups: Array.isArray(claims.groups) ? claims.groups.map(String) : [] };
+  const subject = String(claims.sub ?? '').trim();
+  if (!username || !subject) throw new Error('The provider did not say who signed in.');
+  return { username, subject, groups: Array.isArray(claims.groups) ? claims.groups.map(String) : [] };
 }
