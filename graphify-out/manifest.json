@@ -48,22 +48,22 @@
     "semantic_hash": "c9f1c5dd86c7bfbdab34aaddef6fd0b6"
   },
   "providers/common.mjs": {
-    "mtime": 1793081019.739582,
-    "seen": 1793340989.7501853,
-    "ast_hash": "8f5029421cee952398138efe05cb3376",
-    "semantic_hash": "8f5029421cee952398138efe05cb3376"
+    "mtime": 1793687340.6270063,
+    "seen": 1793687841.5895236,
+    "ast_hash": "42337aabbfa3305ab3f9ff7d7427c553",
+    "semantic_hash": "42337aabbfa3305ab3f9ff7d7427c553"
   },
   "providers/growatt.mjs": {
-    "mtime": 1793081019.826924,
-    "seen": 1793340989.750187,
-    "ast_hash": "551817fd7ebe84fd3f29013d0630c5a1",
-    "semantic_hash": "551817fd7ebe84fd3f29013d0630c5a1"
+    "mtime": 1793687354.7344887,
+    "seen": 1793687841.5895255,
+    "ast_hash": "82174ae4b7d84ac74903a6f2c27f77ec",
+    "semantic_hash": "82174ae4b7d84ac74903a6f2c27f77ec"
   },
   "providers/index.mjs": {
-    "mtime": 1793076287.9865985,
-    "seen": 1793340989.750189,
-    "ast_hash": "519e3b957ee4eada0928b105860b5a7d",
-    "semantic_hash": "519e3b957ee4eada0928b105860b5a7d"
+    "mtime": 1793687440.3730278,
+    "seen": 1793687841.589527,
+    "ast_hash": "03a66b327d20747d4249635e3a7d1525",
+    "semantic_hash": "03a66b327d20747d4249635e3a7d1525"
   },
   "public/app.js": {
     "mtime": 1793685838.4659364,
@@ -90,10 +90,10 @@
     "semantic_hash": "712f5710c0ae81153e6acf38046e54a8"
   },
   "README.md": {
-    "mtime": 1793685838.458423,
-    "seen": 1793686321.2476997,
-    "ast_hash": "a8dccff08f5a722261947fe38fa30538",
-    "semantic_hash": "a8dccff08f5a722261947fe38fa30538"
+    "mtime": 1793687495.7460258,
+    "seen": 1793687841.589545,
+    "ast_hash": "7724df97714eeab32b6e2165efb9840d",
+    "semantic_hash": "7724df97714eeab32b6e2165efb9840d"
   },
   "public/index.html": {
     "mtime": 1793339825.0810778,
@@ -160,5 +160,23 @@
     "seen": 1793340989.7502115,
     "ast_hash": "fea0eddb16560db346685355c82bc2ac",
     "semantic_hash": "fea0eddb16560db346685355c82bc2ac"
+  },
+  "providers/sunsynk.mjs": {
+    "mtime": 1793687439.7508457,
+    "seen": 1793687841.5895283,
+    "ast_hash": "66be986865abe69abe2b9c57dfdc3791",
+    "semantic_hash": "66be986865abe69abe2b9c57dfdc3791"
+  },
+  "providers/victron.mjs": {
+    "mtime": 1793687412.675018,
+    "seen": 1793687841.5895295,
+    "ast_hash": "ae37bcdded8a4d4e103cdce721d5360e",
+    "semantic_hash": "ae37bcdded8a4d4e103cdce721d5360e"
+  },
+  "test/providers.test.mjs": {
+    "mtime": 1793687477.717151,
+    "seen": 1793687841.5895402,
+    "ast_hash": "e563e9cf1a90a84d4e98ddb3316bbde3",
+    "semantic_hash": "e563e9cf1a90a84d4e98ddb3316bbde3"
   }
 }
