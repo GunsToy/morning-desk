@@ -38,6 +38,47 @@ export function keepPreviousFlow(readings, previous = {}) {
   return { configured: true, ...readings, ...kept };
 }
 
+// The flow part of a readings object, worked out the same way for every provider from five figures in watts
+// (null when unknown): pv, grid (import), battery (discharging), batteryCharge (charging), consumption.
+const FLOW_MIN_WATTS = 20; // below this a line counts as idle, so standby trickle does not light the diagram
+export function summariseFlow({ pv, grid, battery, batteryCharge, consumption }) {
+  const live = value => Number.isFinite(value) && value >= FLOW_MIN_WATTS;
+  const flowPv = live(pv), flowGrid = live(grid), flowBatteryOut = live(battery), flowBatteryIn = live(batteryCharge), flowLoad = live(consumption);
+
+  const candidates = [['PV', pv], ['BATTERY', battery], ['GRID', grid]]
+    .filter(([, value]) => Number.isFinite(value) && Math.abs(value) >= FLOW_MIN_WATTS);
+  const activeSource = candidates.sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))[0]?.[0] ?? 'STANDBY';
+
+  const feeding = [];
+  if (flowPv) feeding.push(`PV ${Math.round(pv)}W`);
+  if (flowGrid) feeding.push(`Grid ${Math.round(grid)}W`);
+  if (flowBatteryOut) feeding.push(`Battery ${Math.round(battery)}W`);
+  const sinking = [];
+  if (flowLoad) sinking.push(`Load ${Math.round(consumption)}W`);
+  if (flowBatteryIn) sinking.push(`Charge ${Math.round(batteryCharge)}W`);
+  const flowSummary = [feeding.length ? feeding.join(' + ') : 'No source', sinking.length ? sinking.join(' · ') : 'Idle'].join(' → ');
+
+  return {
+    activeSource, flowSummary, flowPv, flowGrid, flowBatteryOut, flowBatteryIn, flowLoad,
+    hasFlowData: [pv, consumption, battery, batteryCharge, grid].some(Number.isFinite)
+  };
+}
+
+// A number from a provider's JSON, or null for missing, blank or non-numeric values.
+export const numberOrNull = value => {
+  if (value === undefined || value === null || value === '') return null;
+  const number = Number(value);
+  return Number.isFinite(number) ? number : null;
+};
+
+// Splits one signed battery power into the two figures the dashboard shows. dischargePositive says which way
+// the provider counts: true when a positive number means the battery is discharging.
+export function splitBatteryPower(power, dischargePositive) {
+  if (!Number.isFinite(power)) return { battery: null, batteryCharge: null };
+  const discharging = dischargePositive ? power : -power;
+  return { battery: Math.max(0, discharging), batteryCharge: Math.max(0, -discharging) };
+}
+
 export const secretFields = provider => provider.fields.filter(field => field.secret);
 
 const DEFAULT_MAX = { url: 300, text: 200, password: 500 };

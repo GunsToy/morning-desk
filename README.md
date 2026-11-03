@@ -47,7 +47,15 @@ The sign-in always happens on `SSO_PUBLIC_URL`: a screen that opened the dashboa
 
 ## Solar providers
 
-Each profile picks one solar provider and keeps its own credentials for it. Right now that is **Growatt**. The Settings screen draws the form from the provider's field list, saved tokens and passwords are never sent back to the browser, and switching provider keeps the other one's saved details.
+Each profile picks one solar provider and keeps its own credentials for it. The Settings screen draws the form from the provider's field list, saved tokens and passwords are never sent back to the browser, and switching provider keeps the other one's saved details.
+
+| Provider | What to enter | Where to get it |
+|---|---|---|
+| **Growatt** | Region and OpenAPI token | The Growatt ShineServer / ShinePhone account settings |
+| **Sunsynk / Deye** | Sunsynk Connect email and password | The account you use in the Sunsynk Connect app. Deye inverters work if they are registered there. Sunsynk has no API tokens, so the password itself is saved in `config.json`; give Morning Desk its own Sunsynk login if you can. |
+| **Victron VRM** | VRM access token, and optionally the installation ID | VRM: Preferences → Integrations → Access tokens. The installation ID is the number in the installation's VRM address; leave it blank to use your first installation. |
+
+Sunsynk's API is unofficial and can change without notice. If its readings ever show the battery charging while it is discharging (or grid import while exporting), the sign convention in `providers/sunsynk.mjs` needs flipping.
 
 A provider is one file in `providers/` that fetches readings from a vendor's cloud and returns them in a common shape. `providers/common.mjs` documents the shape and the field list, and `providers/index.mjs` is where a new provider is registered. A provider with a strict API quota can set `minIntervalMs` so it is polled less often than the dashboard's 15 minutes.
 

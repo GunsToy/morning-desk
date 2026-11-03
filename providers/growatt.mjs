@@ -1,5 +1,5 @@
 // Growatt OpenAPI adapter. The functions below are the original Growatt code, moved here unchanged.
-import { USER_AGENT, FETCH_TIMEOUT_MS } from './common.mjs';
+import { USER_AGENT, FETCH_TIMEOUT_MS, summariseFlow } from './common.mjs';
 
 // Growatt's regional OpenAPI servers. These are the only addresses ever called: the region is picked from
 // this list, never typed, so nobody with a profile can point the server at another machine.
@@ -59,32 +59,6 @@ function normaliseSolar(payload) {
     'vBat', 'vbat', 'batteryVoltage', 'battery_voltage', 'batVoltage', 'bat_voltage', 'vBattery'
   )));
 
-  const flowPv = Number.isFinite(pv) && pv >= 20;
-  const flowGrid = Number.isFinite(grid) && grid >= 20;
-  const flowBatteryOut = Number.isFinite(battery) && battery >= 20;
-  const flowBatteryIn = Number.isFinite(batteryCharge) && batteryCharge >= 20;
-  const flowLoad = Number.isFinite(consumption) && consumption >= 20;
-
-  const candidates = [
-    ['PV', pv],
-    ['BATTERY', battery],
-    ['GRID', grid]
-  ].filter(([, value]) => Number.isFinite(value) && Math.abs(value) >= 20);
-  const activeSource = candidates.sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))[0]?.[0] ?? 'STANDBY';
-
-  // Human-readable list of everything currently contributing / consuming
-  const feeding = [];
-  if (flowPv) feeding.push(`PV ${Math.round(pv)}W`);
-  if (flowGrid) feeding.push(`Grid ${Math.round(grid)}W`);
-  if (flowBatteryOut) feeding.push(`Battery ${Math.round(battery)}W`);
-  const sinking = [];
-  if (flowLoad) sinking.push(`Load ${Math.round(consumption)}W`);
-  if (flowBatteryIn) sinking.push(`Charge ${Math.round(batteryCharge)}W`);
-  const flowSummary = [
-    feeding.length ? feeding.join(' + ') : 'No source',
-    sinking.length ? sinking.join(' · ') : 'Idle'
-  ].join(' → ');
-
   const statusRaw = find('spf5000StatusText', 'statusText', 'status', 'plantStatus');
   const status = statusRaw == null ? 'Connected' : String(statusRaw);
 
@@ -103,15 +77,8 @@ function normaliseSolar(payload) {
     batteryPercent,
     batteryVoltage,
     consumption,
-    activeSource,
-    flowSummary,
-    // Flow flags drive animated arrows on the diagram
-    flowPv,
-    flowGrid,
-    flowBatteryOut,
-    flowBatteryIn,
-    flowLoad,
-    hasFlowData: [pv, consumption, battery, batteryCharge, grid].some(Number.isFinite)
+    // activeSource, flowSummary and the flow flags that drive the diagram's animated arrows
+    ...summariseFlow({ pv, grid, battery, batteryCharge, consumption })
   };
 }
 
