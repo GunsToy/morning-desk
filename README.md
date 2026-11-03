@@ -1,6 +1,6 @@
 # Morning Desk
 
-Local dashboard: solar (Growatt), weather, Sky News live and news feeds.
+Local dashboard: solar (Growatt, Sunsynk / Deye or Victron VRM), weather, Sky News live and news feeds.
 
 Dashboard: `http://<host>:4123`
 

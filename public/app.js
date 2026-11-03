@@ -354,6 +354,10 @@ function renderSolarFields(providerId) {
     const has = saved.secretsSet.includes(field.name);
     const placeholder = field.secret ? (has ? 'Saved. Leave blank to keep it' : field.placeholder) : field.placeholder;
     const value = field.secret ? '' : saved.values[field.name] ?? '';
+    // A list with one choice (a provider with a single server) is not worth a menu: send it without showing it.
+    if (field.type === 'select' && field.options.length < 2) {
+      return `<input type="hidden" name="solar_${esc(field.name)}" value="${esc(field.options[0]?.value ?? '')}">`;
+    }
     if (field.type === 'select') {
       return `<label>${esc(field.label)}
       <select name="solar_${esc(field.name)}"${field.required ? ' required' : ''}>${field.options.map(option =>
