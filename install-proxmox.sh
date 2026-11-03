@@ -159,6 +159,33 @@ prompt_ip() {
   fi
 }
 
+# The admin password and trusted proxy go into the app's .env (see docker-compose.yml).
+GENERATED_PASSWORD=""
+prompt_settings() {
+  echo
+  while true; do
+    read -r -s -p "Admin password (8 to 200 characters, no single quotes; leave blank to generate one): " ADMIN_PASSWORD; echo
+    if [ -z "$ADMIN_PASSWORD" ]; then
+      ADMIN_PASSWORD="$(head -c 18 /dev/urandom | base64 | tr -d '/+=')"
+      GENERATED_PASSWORD="$ADMIN_PASSWORD"
+      break
+    fi
+    if [ "${#ADMIN_PASSWORD}" -lt 8 ] || [ "${#ADMIN_PASSWORD}" -gt 200 ]; then echo "The password must be 8 to 200 characters."; continue; fi
+    if [[ "$ADMIN_PASSWORD" == *"'"* ]]; then echo "Single quotes cannot be used in the password."; continue; fi
+    local confirm
+    read -r -s -p "Type it again: " confirm; echo
+    [ "$ADMIN_PASSWORD" = "$confirm" ] && break
+    echo "The passwords did not match."
+  done
+  local addresses='^[0-9A-Fa-f.:/, ]*$'
+  while true; do
+    echo "Address of the proxy in front of Morning Desk (nginx, Cloudflare tunnel), e.g. 192.168.0.20."
+    read -r -p "Comma-separate several; leave blank if there is none: " TRUST_PROXY
+    [[ "$TRUST_PROXY" =~ $addresses ]] && break
+    echo "Use IP addresses or ranges only, e.g. 192.168.0.20, 173.245.48.0/20."
+  done
+}
+
 CTID="$(next_ctid)"
 log "Next CTID: $CTID"
 TEMPLATE_STORAGE="$(select_storage vztmpl "Template storage (where CT templates are stored):" "$TEMPLATE_STORAGE")"
@@ -166,6 +193,7 @@ ROOTFS_STORAGE="$(select_storage rootdir "Root disk storage (where the container
 log "Template storage: $TEMPLATE_STORAGE"
 log "Rootfs storage:   $ROOTFS_STORAGE"
 prompt_ip
+prompt_settings
 
 if pct status "$CTID" >/dev/null 2>&1; then
   echo "CTID $CTID already exists."
@@ -227,6 +255,18 @@ pct exec "$CTID" -- bash -lc "
     cp config.example.json config.json
   fi
   chmod +x install.sh update.sh install-update-timer.sh
+"
+
+# Written on this host and copied in with pct push, so the password never appears on a command line.
+ENV_FILE="$(mktemp)" # mktemp creates it readable by root only
+trap 'rm -f "$ENV_FILE"' EXIT
+printf "ADMIN_PASSWORD='%s'\nTRUST_PROXY='%s'\n" "$ADMIN_PASSWORD" "$TRUST_PROXY" > "$ENV_FILE"
+pct push "$CTID" "$ENV_FILE" /root/morning-desk/.env --perms 600
+rm -f "$ENV_FILE"
+
+pct exec "$CTID" -- bash -lc "
+  set -euo pipefail
+  cd /root/morning-desk
   docker compose up -d --build
   ./install-update-timer.sh
 "
@@ -238,6 +278,11 @@ echo "  Hostname: $HOSTNAME"
 echo "  IP:       ${IP_SHOW:-see pct exec $CTID -- hostname -I}"
 echo "  Dashboard: http://${IP_SHOW:-<container-ip>}:4123"
 echo "  Shell:    pct enter $CTID   (root has no password; set one with: pct exec $CTID -- passwd)"
+echo "  Settings: /root/morning-desk/.env (admin password, trusted proxy)"
+if [ -n "$GENERATED_PASSWORD" ]; then
+  echo "  Admin password (generated): $GENERATED_PASSWORD"
+  echo "    Sign in as \"admin\" with it, and store it in your password manager."
+fi
 echo "  Edit the Growatt token:"
 echo "    pct enter $CTID"
 echo "    nano /root/morning-desk/config.json"

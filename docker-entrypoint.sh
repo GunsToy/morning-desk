@@ -7,4 +7,7 @@ if [ ! -f /app/config.json ]; then
   echo "Created /app/config.json from example. Edit it (or use the gear icon) to add your Growatt token."
 fi
 
-exec node server.mjs
+# The app runs as node, not root. It must be able to write config.json (settings and sessions are saved there),
+# so hand the file to node on every start; this also fixes a file that was created by root on the host.
+chown node:node /app/config.json
+exec su-exec node node server.mjs

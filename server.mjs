@@ -146,7 +146,9 @@ app.get('/auth/sso/callback', async (req, res) => {
       console.warn(`Sign-in with the provider refused for "${person.username}": not linked, or linked to another provider account.`);
       return res.redirect('/login?error=sso-not-linked');
     }
-    await signIn(req, res, who, remember === '1');
+    // An admin by provider group gets a 12-hour session, never "Remember me": the group is only checked at sign-in,
+    // so someone removed from it upstream must not stay the house admin here for 90 days.
+    await signIn(req, res, who, remember === '1' && who !== store.ADMIN_USERNAME);
     res.redirect('/');
   } catch (error) {
     console.error('Sign-in with the provider failed:', error);
@@ -430,6 +432,10 @@ app.post('/api/profiles', requireAdmin, handle(async (req, res) => {
     if (req.body.makeDefault === true) config.defaultProfile = created.id;
     return publicProfile(created, config);
   });
+  // A deleted profile's id can be given out again. A sign-in that was mid-way when it was deleted could have left a
+  // session for that id behind, and it must not open the new profile.
+  auth.destroySessionsFor(profile.id);
+  await saveSessions();
   res.status(201).json({ profile });
 }));
 

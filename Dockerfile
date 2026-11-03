@@ -4,8 +4,9 @@ WORKDIR /app
 
 # Install production dependencies. npm install is used instead of npm ci
 # so a slightly stale lockfile does not break the image build.
+# su-exec lets the entrypoint drop from root to the node user.
 COPY package.json package-lock.json ./
-RUN npm install --omit=dev && npm cache clean --force
+RUN npm install --omit=dev && npm cache clean --force && apk add --no-cache su-exec
 
 # App source
 COPY server.mjs store.mjs auth.mjs sso.mjs ./
@@ -15,8 +16,8 @@ COPY config.example.json ./config.example.json
 COPY docker-entrypoint.sh ./docker-entrypoint.sh
 RUN chmod +x /app/docker-entrypoint.sh
 
-# Run as root so the mounted config.json stays writable.
-# (Homelab dashboard; the volume is typically owned by root on the host.)
+# The app runs as the unprivileged node user. The entrypoint starts as root only to hand the mounted
+# config.json (owned by root on the host) to that user, then drops root before starting the app.
 
 ENV NODE_ENV=production \
     PORT=4123 \
