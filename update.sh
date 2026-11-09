@@ -43,6 +43,9 @@ if [ "${SKIP_TEST_CHECK:-0}" != 1 ]; then
   log "Tests passed on GitHub"
 fi
 
+# The installers chmod +x their scripts; without this git calls that a local change and refuses to merge.
+git config core.fileMode false
+
 # Fast-forward to exactly the commit that was checked, not whatever main is by now.
 git merge --ff-only --quiet "$REMOTE"
 
