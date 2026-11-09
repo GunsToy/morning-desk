@@ -1,13 +1,19 @@
-# Graph Report - morning-desk  (2026-11-03)
+# Graph Report - morning-desk  (2026-11-09)
 
 ## Corpus Check
-- 7 files · ~0 words
+- 27 files · ~24,317 words
 - Verdict: corpus is large enough that graph structure adds value.
+- Unclassified: 5 file(s) not represented in the graph (top: (none) 4, .css 1)
 
 ## Summary
-- 344 nodes · 540 edges · 15 communities (12 shown, 3 thin omitted)
-- Extraction: 92% EXTRACTED · 8% INFERRED · 0% AMBIGUOUS · INFERRED: 42 edges (avg confidence: 0.87)
+- 344 nodes · 542 edges · 15 communities (12 shown, 3 thin omitted)
+- Extraction: 92% EXTRACTED · 8% INFERRED · 0% AMBIGUOUS · INFERRED: 43 edges (avg confidence: 0.87)
 - Token cost: 0 input · 0 output
+
+## Graph Freshness
+- Built from commit: `7c3dfb74`
+- Run `git rev-parse HEAD` and compare to check if the graph is stale.
+- Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - Solar Provider Adapters
@@ -31,11 +37,11 @@
 3. `morning-desk` - 9 edges
 4. `esc()` - 8 edges
 5. `install-proxmox.sh script` - 7 edges
-6. `Morning Desk logo: lime sun rising over a desk line` - 7 edges
-7. `summariseFlow()` - 7 edges
-8. `fetchReadings()` - 7 edges
-9. `loadSolar()` - 7 edges
-10. `populateSettings()` - 7 edges
+6. `summariseFlow()` - 7 edges
+7. `fetchReadings()` - 7 edges
+8. `loadSolar()` - 7 edges
+9. `populateSettings()` - 7 edges
+10. `saveSettings()` - 7 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Login mark (inline rising-sun logo)` --semantically_similar_to--> `Morning Desk logo: lime sun rising over a desk line`  [INFERRED] [semantically similar]
@@ -64,7 +70,7 @@
 
 ### Community 0 - "Solar Provider Adapters"
 Cohesion: 0.07
-Nodes (44): applyFields(), DEFAULT_MAX, describeSettings(), FETCH_TIMEOUT_MS, FLOW_KEYS, keepPreviousFlow(), numberOrNull(), publicSchema() (+36 more)
+Nodes (43): applyFields(), DEFAULT_MAX, FETCH_TIMEOUT_MS, FLOW_KEYS, keepPreviousFlow(), numberOrNull(), publicSchema(), secretFields() (+35 more)
 
 ### Community 1 - "Brand and Page Design"
 Cohesion: 0.05
@@ -84,10 +90,10 @@ Nodes (24): services, ensure_template(), log(), next_ctid(), prompt_ip(), prompt
 
 ### Community 5 - "HTTP Server Routes"
 Cohesion: 0.10
-Nodes (23): app, applyLogin(), canEdit(), decode(), decodeEntities(), __dirname, httpError(), isAdmin() (+15 more)
+Nodes (25): describeSettings(), app, applyLogin(), canEdit(), decode(), decodeEntities(), __dirname, httpError() (+17 more)
 
 ### Community 6 - "Sessions and Passwords"
-Cohesion: 0.10
+Cohesion: 0.11
 Nodes (14): COOKIE_NAME, createSession(), destroySession(), DUMMY_RECORD, failures, hashPassword(), hashToken(), readCookie() (+6 more)
 
 ### Community 7 - "README Concepts"
@@ -116,7 +122,7 @@ Nodes (3): form, SSO_ERRORS, status
 
 ## Knowledge Gaps
 - **22 isolated node(s):** `Sign in with Poodle House button`, `Ember Coral (#ff846c)`, `Input fields`, `Dashboard layout grid`, `Night mode overlay` (+17 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 132 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 131 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **3 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
@@ -129,7 +135,7 @@ _Questions this graph is uniquely positioned to answer:_
 - **What connects `Sign in with Poodle House button`, `Ember Coral (#ff846c)`, `Input fields` to the rest of the system?**
   _22 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Solar Provider Adapters` be split into smaller, more focused modules?**
-  _Cohesion score 0.07077922077922078 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07012987012987013 - nodes in this community are weakly interconnected._
 - **Why does `Sign in with Poodle House (OIDC SSO)` connect `README Concepts` to `Installers and Env Settings`?**
   _High betweenness centrality (0.181) - this node is a cross-community bridge._
 - **Should `Brand and Page Design` be split into smaller, more focused modules?**
