@@ -1,4 +1,5 @@
 import fs from 'node:fs/promises';
+import { constants as fsConstants } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as providers from './providers/index.mjs';
@@ -81,9 +82,11 @@ const cleanSession = session => session && typeof session.hash === 'string' && t
 // Turns whatever is on disk into the current shape:
 // { version, admin: {salt, hash} | null, defaultProfile, profiles: [...], sessions: [...] }
 function upgrade(saved) {
-  const config = { version: 3, admin: null, defaultProfile: '', profiles: [], sessions: [] };
+  // envAdmin: a hash of the ADMIN_PASSWORD last started with, so a changed one can sign out the old admin sessions.
+  const config = { version: 3, admin: null, envAdmin: null, defaultProfile: '', profiles: [], sessions: [] };
   if (saved && typeof saved === 'object') {
     if (saved.admin?.salt && saved.admin?.hash) config.admin = { salt: String(saved.admin.salt), hash: String(saved.admin.hash) };
+    if (saved.envAdmin?.salt && saved.envAdmin?.hash) config.envAdmin = { salt: String(saved.envAdmin.salt), hash: String(saved.envAdmin.hash) };
     if (Array.isArray(saved.sessions)) config.sessions = saved.sessions.map(cleanSession).filter(Boolean);
     if (Array.isArray(saved.profiles) && saved.profiles.length) {
       const seen = new Set();
@@ -133,8 +136,18 @@ async function load(strict) {
 export const read = () => load(false);
 
 async function save(config) {
-  // Written in place (not renamed over) because Docker bind-mounts this single file.
-  await fs.writeFile(configPath, `${JSON.stringify(config, null, 2)}\n`, { mode: 0o600 });
+  // Written in place (not renamed over) because Docker bind-mounts this single file, but never truncated first:
+  // an empty file loads as a fresh install with the admin setup open. A crash here leaves the old text, the new
+  // text, or a mix that load(true) refuses.
+  const data = Buffer.from(`${JSON.stringify(config, null, 2)}\n`);
+  const file = await fs.open(configPath, fsConstants.O_RDWR | fsConstants.O_CREAT, 0o600);
+  try {
+    await file.write(data, 0, data.length, 0);
+    await file.truncate(data.length);
+    await file.sync();
+  } finally {
+    await file.close();
+  }
 }
 
 let queue = Promise.resolve();

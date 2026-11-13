@@ -176,3 +176,16 @@ test('the Growatt address is one of Growatt\'s regional servers, never a typed a
   assert.equal(store.applyProfileInput(profile, { solar: { values: { server: 'https://openapi-au.growatt.com/v1' } } }), null);
   assert.equal(growattOf(profile).server, 'https://openapi-au.growatt.com/v1');
 });
+
+test('a save that shrinks config.json leaves only the new text (written in place, never truncated to empty first)', async () => {
+  await writeConfig({ profiles: [{ id: 'home', name: 'Home', growatt: { apiToken: 'x'.repeat(5000) } }] });
+  await store.update(config => { config.profiles[0].solar.settings.growatt.apiToken = ''; });
+  const text = await fs.readFile(configPath, 'utf8');
+  assert.equal(growattOf(JSON.parse(text).profiles[0]).apiToken, '', 'no tail of the longer old file is left behind');
+});
+
+test('the hash of the ADMIN_PASSWORD last started with survives a save', async () => {
+  await writeConfig({ envAdmin: { salt: 's', hash: 'h' } });
+  await store.update(() => {});
+  assert.deepEqual((await store.read()).envAdmin, { salt: 's', hash: 'h' });
+});
