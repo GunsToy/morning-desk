@@ -1,0 +1,17 @@
+{
+  "0": "Solar Provider Adapters",
+  "1": "Brand and Page Design",
+  "2": "Dashboard Front-end",
+  "3": "Config Store and Profiles",
+  "4": "Installers and Env Settings",
+  "5": "HTTP Server Routes",
+  "6": "Sessions and Passwords",
+  "7": "README Concepts",
+  "8": "CI Test Workflow",
+  "9": "Docker Compose Service",
+  "10": "Package Manifest",
+  "11": "Login Page Script",
+  "12": "Container Entrypoint",
+  "13": "Nightly Self-Update",
+  "14": "Glanceable Design Principle"
+}
