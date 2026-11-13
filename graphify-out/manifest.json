@@ -1,27 +1,27 @@
 {
   "auth.mjs": {
     "mtime": 1794585401.5717487,
-    "seen": 1794586022.4168398,
+    "seen": 1794586591.5403008,
     "ast_hash": "40bdb0144c567a49d27d2dd08be56109",
-    "semantic_hash": ""
+    "semantic_hash": "40bdb0144c567a49d27d2dd08be56109"
   },
   "config.example.json": {
     "mtime": 1794551698.0007682,
-    "seen": 1794586022.416845,
+    "seen": 1794586591.54031,
     "ast_hash": "57bc3d79df612784d5dd52611f2239d2",
-    "semantic_hash": ""
+    "semantic_hash": "57bc3d79df612784d5dd52611f2239d2"
   },
   "docker-compose.yml": {
     "mtime": 1794551698.0007682,
-    "seen": 1794586022.416849,
+    "seen": 1794586591.540318,
     "ast_hash": "d034ec33c840ad8f102dc738800e305a",
-    "semantic_hash": ""
+    "semantic_hash": "d034ec33c840ad8f102dc738800e305a"
   },
   "docker-entrypoint.sh": {
     "mtime": 1794585767.6265264,
-    "seen": 1794586022.416853,
+    "seen": 1794586591.5403254,
     "ast_hash": "ee7f69b7088e24fe74458c375cb68cf8",
-    "semantic_hash": ""
+    "semantic_hash": "ee7f69b7088e24fe74458c375cb68cf8"
   },
   "install-proxmox.sh": {
     "mtime": 1794551698.0167685,
@@ -37,117 +37,117 @@
   },
   "install.sh": {
     "mtime": 1794585767.6265264,
-    "seen": 1794586022.4168642,
+    "seen": 1794586591.5403507,
     "ast_hash": "d87f21cae3c4e29d1da7a41838a7ea2f",
-    "semantic_hash": ""
+    "semantic_hash": "d87f21cae3c4e29d1da7a41838a7ea2f"
   },
   "package.json": {
     "mtime": 1794551698.0207686,
-    "seen": 1794586022.4168675,
+    "seen": 1794586591.540358,
     "ast_hash": "768fdefd469202d3b4cee0f8a5ddb62e",
-    "semantic_hash": ""
+    "semantic_hash": "768fdefd469202d3b4cee0f8a5ddb62e"
   },
   "providers/common.mjs": {
     "mtime": 1794551698.0207686,
-    "seen": 1794586022.4168706,
+    "seen": 1794586591.5403647,
     "ast_hash": "42337aabbfa3305ab3f9ff7d7427c553",
-    "semantic_hash": ""
+    "semantic_hash": "42337aabbfa3305ab3f9ff7d7427c553"
   },
   "providers/growatt.mjs": {
     "mtime": 1794551698.0207686,
-    "seen": 1794586022.416874,
+    "seen": 1794586591.5403721,
     "ast_hash": "82174ae4b7d84ac74903a6f2c27f77ec",
-    "semantic_hash": ""
+    "semantic_hash": "82174ae4b7d84ac74903a6f2c27f77ec"
   },
   "providers/index.mjs": {
     "mtime": 1794551698.0207686,
-    "seen": 1794586022.4168777,
+    "seen": 1794586591.5403788,
     "ast_hash": "d31607d5d364cfe7852fc13d74849324",
-    "semantic_hash": ""
+    "semantic_hash": "d31607d5d364cfe7852fc13d74849324"
   },
   "public/app.js": {
     "mtime": 1794585401.5717487,
-    "seen": 1794586022.416888,
+    "seen": 1794586591.5403998,
     "ast_hash": "00d713f12275258cbf103c25b1dc518e",
-    "semantic_hash": ""
+    "semantic_hash": "00d713f12275258cbf103c25b1dc518e"
   },
   "server.mjs": {
     "mtime": 1794585401.5797489,
-    "seen": 1794586022.4168942,
+    "seen": 1794586591.5404155,
     "ast_hash": "ba94c7787112c5fd3ddbfb92296b0e27",
-    "semantic_hash": ""
+    "semantic_hash": "ba94c7787112c5fd3ddbfb92296b0e27"
   },
   "store.mjs": {
     "mtime": 1794585401.5797489,
-    "seen": 1794586022.4169009,
+    "seen": 1794586591.54043,
     "ast_hash": "af38cc0960136233e512b85d8f4d96da",
-    "semantic_hash": ""
+    "semantic_hash": "af38cc0960136233e512b85d8f4d96da"
   },
   "update.sh": {
     "mtime": 1794551698.0247686,
-    "seen": 1794586022.416919,
+    "seen": 1794586591.5404654,
     "ast_hash": "39aeae6909d10e0cc82ae44803017890",
-    "semantic_hash": ""
+    "semantic_hash": "39aeae6909d10e0cc82ae44803017890"
   },
   "README.md": {
     "mtime": 1794585401.5717487,
-    "seen": 1794586022.4169319,
+    "seen": 1794586591.5405107,
     "ast_hash": "9ea7288698ccedfbf2289c7d4537b30f",
-    "semantic_hash": ""
+    "semantic_hash": "9ea7288698ccedfbf2289c7d4537b30f"
   },
   "public/index.html": {
     "mtime": 1794585401.5757487,
-    "seen": 1794586022.4169405,
+    "seen": 1794586591.5405316,
     "ast_hash": "5319788082f50cc8c68e14a0bdd4dfe8",
-    "semantic_hash": ""
+    "semantic_hash": "5319788082f50cc8c68e14a0bdd4dfe8"
   },
   ".github/workflows/test.yml": {
     "mtime": 1794551697.996768,
-    "seen": 1794586022.416817,
+    "seen": 1794586591.5402658,
     "ast_hash": "e16608d252ea6142fa39e3a8b6f57b6d",
-    "semantic_hash": ""
+    "semantic_hash": "e16608d252ea6142fa39e3a8b6f57b6d"
   },
   "test/store.test.mjs": {
     "mtime": 1794585401.5797489,
-    "seen": 1794586022.4169157,
+    "seen": 1794586591.5404587,
     "ast_hash": "b0ea532fad69a0e020fd73fd27f0f9a9",
-    "semantic_hash": ""
+    "semantic_hash": "b0ea532fad69a0e020fd73fd27f0f9a9"
   },
   ".impeccable/design.json": {
     "mtime": 1794585401.5677485,
-    "seen": 1794586022.4168322,
+    "seen": 1794586591.5402882,
     "ast_hash": "fa9d66cee221333300a6162681df81f3",
-    "semantic_hash": ""
+    "semantic_hash": "fa9d66cee221333300a6162681df81f3"
   },
   "DESIGN.md": {
     "mtime": 1794585401.5677485,
-    "seen": 1794586022.4169257,
+    "seen": 1794586591.5404968,
     "ast_hash": "e3d2f2bbb6b07a6a983ab12eaaf97923",
-    "semantic_hash": ""
+    "semantic_hash": "e3d2f2bbb6b07a6a983ab12eaaf97923"
   },
   "PRODUCT.md": {
     "mtime": 1794551698.0007682,
-    "seen": 1794586022.4169288,
+    "seen": 1794586591.5405035,
     "ast_hash": "8e7ab4ad4216158e7606fdec1db48c5b",
-    "semantic_hash": ""
+    "semantic_hash": "8e7ab4ad4216158e7606fdec1db48c5b"
   },
   "public/login.js": {
     "mtime": 1794551698.0207686,
-    "seen": 1794586022.416891,
+    "seen": 1794586591.5404077,
     "ast_hash": "3f35f1469058f16adc76e40eba8e02a9",
-    "semantic_hash": ""
+    "semantic_hash": "3f35f1469058f16adc76e40eba8e02a9"
   },
   "sso.mjs": {
     "mtime": 1794551698.0207686,
-    "seen": 1794586022.4168973,
+    "seen": 1794586591.5404222,
     "ast_hash": "81b1da4337d11d3d8b09f2186a5e0f00",
-    "semantic_hash": ""
+    "semantic_hash": "81b1da4337d11d3d8b09f2186a5e0f00"
   },
   "public/login.html": {
     "mtime": 1794585401.5757487,
-    "seen": 1794586022.4169436,
+    "seen": 1794586591.5405385,
     "ast_hash": "2f5b43fdbb9ae48d082ec389b0aaac2c",
-    "semantic_hash": ""
+    "semantic_hash": "2f5b43fdbb9ae48d082ec389b0aaac2c"
   },
   "test/growatt.test.mjs": {
     "mtime": 1794551698.0247686,
@@ -157,62 +157,62 @@
   },
   "providers/sunsynk.mjs": {
     "mtime": 1794551698.0207686,
-    "seen": 1794586022.4168816,
+    "seen": 1794586591.5403862,
     "ast_hash": "66be986865abe69abe2b9c57dfdc3791",
-    "semantic_hash": ""
+    "semantic_hash": "66be986865abe69abe2b9c57dfdc3791"
   },
   "providers/victron.mjs": {
     "mtime": 1794551698.0207686,
-    "seen": 1794586022.4168847,
+    "seen": 1794586591.5403929,
     "ast_hash": "ae37bcdded8a4d4e103cdce721d5360e",
-    "semantic_hash": ""
+    "semantic_hash": "ae37bcdded8a4d4e103cdce721d5360e"
   },
   "test/providers.test.mjs": {
     "mtime": 1794551698.0247686,
-    "seen": 1794586022.4169126,
+    "seen": 1794586591.5404518,
     "ast_hash": "e563e9cf1a90a84d4e98ddb3316bbde3",
-    "semantic_hash": ""
+    "semantic_hash": "e563e9cf1a90a84d4e98ddb3316bbde3"
   },
   "test/auth.test.mjs": {
     "mtime": 1794585401.5797489,
-    "seen": 1794586022.4169047,
+    "seen": 1794586591.5404372,
     "ast_hash": "5aa65ac093f5c33e5dd5cd689d9c8fc4",
-    "semantic_hash": ""
+    "semantic_hash": "5aa65ac093f5c33e5dd5cd689d9c8fc4"
   },
   ".impeccable/surfaces/public-index-html.md": {
     "mtime": 1794585401.5677485,
-    "seen": 1794586022.4169219,
+    "seen": 1794586591.540472,
     "ast_hash": "6a3156244f541e4bdfd4d5331d6d7fcd",
-    "semantic_hash": ""
+    "semantic_hash": "6a3156244f541e4bdfd4d5331d6d7fcd"
   },
   "public/fonts/OFL-Figtree.txt": {
     "mtime": 1794585401.5717487,
-    "seen": 1794586022.4169347,
+    "seen": 1794586591.5405176,
     "ast_hash": "9d1b2335c80d1d9848f6918fad9c8872",
-    "semantic_hash": ""
+    "semantic_hash": "9d1b2335c80d1d9848f6918fad9c8872"
   },
   "public/fonts/OFL-Marcellus.txt": {
     "mtime": 1794585401.5717487,
-    "seen": 1794586022.4169376,
+    "seen": 1794586591.5405247,
     "ast_hash": "01a1cab828bd461d41adc5ca176b8217",
-    "semantic_hash": ""
+    "semantic_hash": "01a1cab828bd461d41adc5ca176b8217"
   },
   "public/images/desk.png": {
     "mtime": 1794585401.5717487,
-    "seen": 1794586022.4169466,
+    "seen": 1794586591.5405452,
     "ast_hash": "a56ac7e61c2ae776b41c7ac171518b2a",
-    "semantic_hash": ""
+    "semantic_hash": "a56ac7e61c2ae776b41c7ac171518b2a"
   },
   "public/images/poodle.jpg": {
     "mtime": 1794585401.5757487,
-    "seen": 1794586022.41695,
+    "seen": 1794586591.5405521,
     "ast_hash": "11e39a8a1a38bbddc6ba3eb94095696e",
-    "semantic_hash": ""
+    "semantic_hash": "11e39a8a1a38bbddc6ba3eb94095696e"
   },
   "public/images/settings.png": {
     "mtime": 1794585401.5757487,
-    "seen": 1794586022.4169528,
+    "seen": 1794586591.540559,
     "ast_hash": "b058c7f5c292e91888fbc6b1feb1ca3f",
-    "semantic_hash": ""
+    "semantic_hash": "b058c7f5c292e91888fbc6b1feb1ca3f"
   }
 }

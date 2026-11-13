@@ -1,16 +1,1 @@
-{
-  "0": "Solar Provider Adapters",
-  "2": "Dashboard Front-end",
-  "3": "Config Store and Profiles",
-  "4": "Installers and Env Settings",
-  "5": "HTTP Server Routes",
-  "6": "Sessions and Passwords",
-  "7": "README Concepts",
-  "8": "CI Test Workflow",
-  "9": "Docker Compose Service",
-  "10": "Package Manifest",
-  "11": "Login Page Script",
-  "12": "Container Entrypoint",
-  "13": "Nightly Self-Update",
-  "14": "Glanceable Design Principle"
-}
+{"0": "Design System & Brand", "1": "Solar Provider Adapters", "2": "Dashboard Front-end", "3": "HTTP Server Routes", "4": "Config Store and Profiles", "5": "Sessions and Passwords", "6": "Product Principles", "7": "Docker Compose Service", "8": "CI Test Workflow", "9": "Test Suite", "10": "Package Manifest", "11": "SSO Sign-in", "12": "Proxmox Installer", "13": "Installers and Update Timer", "14": "Desk Illustration", "15": "Poodle Photo", "16": "Settings Illustration", "17": "Nightly Self-Update", "18": "Container Entrypoint"}
