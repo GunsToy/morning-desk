@@ -11,7 +11,7 @@ export const REMEMBER_TTL = 90 * 24 * 60 * 60 * 1000; // "Remember me", so wall 
 // server.mjs mirrors this into config.json, so restarts and the nightly update keep people signed in.
 // Only hashes are kept, so a copy of config.json cannot be used to sign in.
 const sessions = new Map();
-const failures = new Map(); // ip -> { count, first }
+const failures = new Map(); // 'ip|username' -> { count, first }
 const FAIL_WINDOW = 10 * 60 * 1000;
 const MAX_FAILS = 8;
 
@@ -62,11 +62,23 @@ export function sessionFromReq(req) {
   return { token, who: session.who, remember: session.remember };
 }
 
-export function createSession(who, remember = false) {
+// Each sign-in keeps at most this many sessions, dropping its oldest, so signing in over and over cannot grow
+// config.json (rewritten on every sign-in) without limit. Plenty for a household's phones and wall displays.
+export const MAX_SESSIONS_PER_SIGN_IN = 20;
+function trimSessions() {
   const now = Date.now();
-  for (const [hash, session] of sessions) if (session.expires < now) sessions.delete(hash);
+  const kept = new Map();
+  for (const [hash, session] of [...sessions].reverse()) { // newest first: a Map keeps insertion order
+    const count = (kept.get(session.who) ?? 0) + 1;
+    kept.set(session.who, count);
+    if (session.expires < now || count > MAX_SESSIONS_PER_SIGN_IN) sessions.delete(hash);
+  }
+}
+
+export function createSession(who, remember = false) {
   const token = crypto.randomBytes(32).toString('hex');
-  sessions.set(hashToken(token), { who, expires: now + (remember ? REMEMBER_TTL : SESSION_TTL), remember: Boolean(remember) });
+  sessions.set(hashToken(token), { who, expires: Date.now() + (remember ? REMEMBER_TTL : SESSION_TTL), remember: Boolean(remember) });
+  trimSessions();
   return token;
 }
 
@@ -81,6 +93,7 @@ export const sessionList = () => [...sessions]
 
 export function restoreSessions(list = []) {
   for (const { hash, who, expires, remember } of list) sessions.set(hash, { who, expires, remember });
+  trimSessions();
 }
 
 // Seconds until this address may try again, or 0 if it is not locked out.

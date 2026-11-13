@@ -148,7 +148,10 @@ app.get('/auth/sso/callback', async (req, res) => {
     }
     // An admin by provider group gets a 12-hour session, never "Remember me": the group is only checked at sign-in,
     // so someone removed from it upstream must not stay the house admin here for 90 days.
-    await signIn(req, res, who, remember === '1' && who !== store.ADMIN_USERNAME);
+    // The link may be removed between the claim and the sign-in.
+    const stillLinked = config => who === store.ADMIN_USERNAME
+      || config.profiles.find(item => item.id === who)?.ssoSubjects[person.username] === person.subject;
+    await signIn(req, res, who, remember === '1' && who !== store.ADMIN_USERNAME, stillLinked);
     res.redirect('/');
   } catch (error) {
     console.error('Sign-in with the provider failed:', error);
@@ -236,9 +239,15 @@ const requireAdmin = (req, res, next) => {
 // Sessions live in memory and are mirrored into config.json, so restarts keep everyone signed in.
 const saveSessions = () => store.update(config => { config.sessions = auth.sessionList(); });
 
-async function signIn(req, res, who, remember) {
-  const token = auth.createSession(who, remember);
-  await saveSessions();
+// stillValid(config) is checked inside the write queue that revocations also go through, so a password reset,
+// removed sign-in or deleted profile that lands while a sign-in is being checked cannot leave a session behind.
+async function signIn(req, res, who, remember, stillValid = () => true) {
+  const token = await store.update(config => {
+    if (!stillValid(config)) throw httpError(401, 'Username or password is incorrect.');
+    const created = auth.createSession(who, remember);
+    config.sessions = auth.sessionList();
+    return created;
+  });
   res.cookie(auth.COOKIE_NAME, token, {
     httpOnly: true,
     sameSite: 'strict',
@@ -254,15 +263,18 @@ const passwordProblem = value =>
 
 // Checks the lockout and counts this attempt in one synchronous step, before any await. Counting only after the
 // slow password check let a burst of parallel requests all pass the check before any of them was counted.
-// A correct password clears the count again.
-function throwIfLockedOut(req, res) {
-  const retry = auth.loginRetryAfter(req.ip);
+// Counted per address and account, and a correct password clears only that account's count: otherwise signing in
+// to your own profile now and then would wipe the count of wrong guesses at the admin password.
+const lockoutKey = (req, username) => `${req.ip}|${String(username).slice(0, 64)}`;
+function throwIfLockedOut(res, key) {
+  const retry = auth.loginRetryAfter(key);
   if (retry) {
     res.set('Retry-After', String(retry));
     throw httpError(429, `Too many wrong passwords. Try again in ${Math.ceil(retry / 60)} minute(s).`);
   }
-  auth.recordFailure(req.ip);
+  auth.recordFailure(key);
 }
+const sameRecord = (a, b) => Boolean(a && b && a.salt === b.salt && a.hash === b.hash);
 
 // ---- Auth ------------------------------------------------------------------------------
 // Who is signed in. role: 'admin' (the house admin, every profile) or 'profile' (that profile only).
@@ -286,6 +298,8 @@ app.get('/api/session', handle(async (req, res) => {
 // First run only: whoever opens the dashboard first picks the admin password.
 // Set ADMIN_PASSWORD in the environment to skip this and avoid that window.
 app.post('/api/auth/setup', handle(async (req, res) => {
+  // Refused before the slow hash, so anonymous requests to a set-up server cost nothing.
+  if (auth.effectiveRecord(await store.read())) throw httpError(409, 'An admin password is already set.');
   const problem = passwordProblem(req.body?.password);
   if (problem) throw httpError(400, problem);
   const record = await auth.hashPassword(req.body.password);
@@ -293,22 +307,25 @@ app.post('/api/auth/setup', handle(async (req, res) => {
     if (auth.effectiveRecord(config)) throw httpError(409, 'An admin password is already set.');
     config.admin = record;
   });
+  auth.destroySessionsFor(store.ADMIN_USERNAME); // after a reset (README), sessions from the old password end here
   await signIn(req, res, store.ADMIN_USERNAME, req.body.remember === true);
   res.json({ ok: true });
 }));
 
 app.post('/api/auth/login', handle(async (req, res) => {
-  throwIfLockedOut(req, res);
-  const config = await store.read();
   const username = String(req.body?.username ?? '').trim().toLowerCase();
+  const key = lockoutKey(req, username);
+  throwIfLockedOut(res, key);
+  const config = await store.read();
   const password = typeof req.body?.password === 'string' ? req.body.password : '';
   const profile = username === store.ADMIN_USERNAME ? null : store.findByUsername(config, username);
   const record = username === store.ADMIN_USERNAME ? auth.effectiveRecord(config) : profile?.login;
   if (username === store.ADMIN_USERNAME && !record) throw httpError(409, 'No admin password is set yet.');
   const ok = await auth.verifyPassword(password, record ?? auth.DUMMY_RECORD) && Boolean(record);
   if (!ok) throw httpError(401, 'Username or password is incorrect.'); // already counted by throwIfLockedOut
-  auth.clearFailures(req.ip);
-  await signIn(req, res, profile ? profile.id : store.ADMIN_USERNAME, req.body.remember === true);
+  auth.clearFailures(key);
+  const current = latest => profile ? latest.profiles.find(item => item.id === profile.id)?.login : auth.effectiveRecord(latest);
+  await signIn(req, res, profile ? profile.id : store.ADMIN_USERNAME, req.body.remember === true, latest => sameRecord(current(latest), record));
   res.json({ ok: true });
 }));
 
@@ -326,12 +343,13 @@ app.post('/api/auth/logout', handle(async (req, res) => {
 app.post('/api/auth/password', handle(async (req, res) => {
   const admin = isAdmin(req);
   if (admin && auth.envManaged()) throw httpError(409, 'The admin password is set by the ADMIN_PASSWORD environment variable.');
-  throwIfLockedOut(req, res);
+  const key = lockoutKey(req, req.user.who);
+  throwIfLockedOut(res, key);
   const config = await store.read();
   const record = admin ? auth.effectiveRecord(config) : config.profiles.find(item => item.id === req.user.who)?.login;
   const knowsCurrent = typeof req.body?.current === 'string' && await auth.verifyPassword(req.body.current, record);
   if (!knowsCurrent) throw httpError(401, 'The current password is incorrect.'); // already counted by throwIfLockedOut
-  auth.clearFailures(req.ip);
+  auth.clearFailures(key);
   const problem = passwordProblem(req.body.next);
   if (problem) throw httpError(400, problem);
   const next = await auth.hashPassword(req.body.next);
@@ -510,19 +528,23 @@ app.get('/api/news', async (req, res) => {
 app.get('/api/solar', async (req, res) => {
   let profile;
   try { profile = profileFor(req, await store.read()); } catch (error) { return res.status(error.status ?? 500).json({ error: error.message }); }
-  const cache = solarCaches.get(profile.id) ?? { until: 0, value: null };
   const provider = providers.get(profile.solar.provider);
+  const settings = profile.solar.settings[provider.id] ?? provider.defaults();
+  if (!provider.isConfigured(settings)) return res.json({ configured: false });
+  // Keyed by the settings too: profile ids are reused after a delete, and a poll still in flight when a profile is
+  // deleted or its credentials change writes back readings that must not reach whoever holds the id next.
+  const key = JSON.stringify([provider.id, settings]);
+  const saved = solarCaches.get(profile.id);
+  const cache = saved?.key === key ? saved : { until: 0, value: null };
   try {
     if (cache.until > Date.now()) return res.status(cache.value?.error ? 429 : 200).json(cache.value);
-    const settings = profile.solar.settings[provider.id] ?? provider.defaults();
-    if (!provider.isConfigured(settings)) return res.json({ configured: false });
     const readings = await provider.fetchReadings(settings);
     const value = keepPreviousFlow(readings, cache.value ?? {});
-    solarCaches.set(profile.id, { until: Date.now() + Math.max(SOLAR_TTL, provider.minIntervalMs ?? 0), value });
+    solarCaches.set(profile.id, { key, until: Date.now() + Math.max(SOLAR_TTL, provider.minIntervalMs ?? 0), value });
     res.json(value);
   } catch (error) {
     const value = { configured: true, error: provider.explainError ? provider.explainError(error) : error.message };
-    solarCaches.set(profile.id, { until: Date.now() + SOLAR_TTL, value });
+    solarCaches.set(profile.id, { key, until: Date.now() + SOLAR_TTL, value });
     res.status(502).json(value);
   }
 });
@@ -536,7 +558,18 @@ app.get('/api/sky', async (_req, res) => {
   } catch (error) { res.status(502).json({ error: error.message }); }
 });
 
-auth.restoreSessions((await store.read()).sessions);
+// Admin sessions belong to the admin password they were signed in with. ADMIN_PASSWORD is changed by editing .env and
+// restarting, and the README's reset deletes the admin block: either way, end the old admin sessions here.
+const startup = await store.read();
+auth.restoreSessions(startup.sessions);
+const envPassword = process.env.ADMIN_PASSWORD || '';
+const envChanged = envPassword ? !(await auth.verifyPassword(envPassword, startup.envAdmin)) : Boolean(startup.envAdmin);
+if (envChanged || (!auth.effectiveRecord(startup) && startup.sessions.some(session => session.who === store.ADMIN_USERNAME))) {
+  auth.destroySessionsFor(store.ADMIN_USERNAME);
+  const envAdmin = envPassword ? await auth.hashPassword(envPassword) : null;
+  await store.update(config => { config.envAdmin = envAdmin; config.sessions = auth.sessionList(); })
+    .catch(error => console.error('Could not save the admin sign-out:', error.message)); // config.json unreadable: start anyway
+}
 
 const PORT = Number(process.env.PORT) || 4123;
 const HOST = process.env.HOST || '0.0.0.0'; // reachable on the local network, not only localhost
