@@ -3,44 +3,42 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#090d13" />
+  <meta name="theme-color" content="#146b4a" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <title>Sign in · Morning Desk</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" />
-  <link rel="icon" href="logo.svg" type="image/svg+xml" />
+  <link rel="preload" href="fonts/marcellus.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="fonts/figtree.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="icon" href="images/desk.png" type="image/png" />
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body class="login-body">
   <!-- Icons: shapes from Lucide (https://lucide.dev), ISC License, Copyright (c) Lucide Contributors. -->
+  <!-- images/: copied from the Poodle House theme (see DESIGN.md, Assets) -->
+  <aside class="login-photo">
+    <img src="images/poodle.jpg" alt="" />
+    <p class="plaque">Morning Desk</p>
+  </aside>
   <main class="login-page">
     <section class="login-card" aria-labelledby="login-title" data-loading>
-      <div class="login-bar">MORNING DESK</div>
-      <div class="login-mark-row">
-        <div class="login-mark" aria-hidden="true">
-          <svg class="icon" viewBox="10 12 44 42" fill="none" stroke-width="4" stroke-linecap="round"><path d="M32 16v6M13.6 23.6l4.3 4.3M50.4 23.6l-4.3 4.3" stroke="var(--lime)"/><path d="M20 42a12 12 0 0 1 24 0z" fill="var(--lime)"/><path d="M12 42h40" stroke="currentColor"/><path d="M22 50h20" stroke="var(--solar-muted)"/></svg>
-        </div>
-      </div>
-      <h1 id="login-title">Sign in</h1>
+      <img class="login-mark" src="images/desk.png" alt="" width="96" height="96" />
+      <h1 class="login-title" id="login-title">Sign in</h1>
       <p class="login-intro" id="login-intro" hidden></p>
       <form id="login-form" class="login-form">
         <div class="login-field">
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           <label for="login-username">Username</label>
           <input id="login-username" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required>
         </div>
         <div class="login-field">
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           <label for="login-password">Password</label>
-          <input id="login-password" name="password" type="password" autocomplete="current-password" required>
-          <button type="button" class="login-eye" id="login-eye" aria-label="Show password" aria-pressed="false">
-            <svg class="icon eye-show" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
-            <svg class="icon eye-hide" viewBox="0 0 24 24" aria-hidden="true" hidden><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/></svg>
-          </button>
+          <div class="login-secret">
+            <input id="login-password" name="password" type="password" autocomplete="current-password" required>
+            <button type="button" class="login-eye" id="login-eye" aria-label="Show password" aria-pressed="false">
+              <svg class="icon eye-show" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="icon eye-hide" viewBox="0 0 24 24" aria-hidden="true" hidden><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/></svg>
+            </button>
+          </div>
         </div>
         <div class="login-field" id="login-confirm-row" hidden>
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           <label for="login-confirm">Confirm password</label>
           <input id="login-confirm" name="confirm" type="password" autocomplete="new-password">
         </div>

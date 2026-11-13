@@ -54,7 +54,6 @@ const ICONS = {
   refresh: '<path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/>',
   close: '<path d="M18 6 6 18M6 6l12 12"/>',
   external: '<path d="M7 7h10v10M7 17 17 7"/>',
-  settings: '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>'
 };
 // label: an accessible name when the icon is the only thing saying what it means; otherwise hidden from screen readers.
 const icon = (name, label) => `<svg class="icon" viewBox="0 0 24 24" ${label ? `role="img" aria-label="${esc(label)}"` : 'aria-hidden="true"'}>${ICONS[name]}</svg>`;
@@ -108,7 +107,7 @@ async function loadNewsPanels() {
     const feed = feeds.find(item => item.id === id) || { id, name: id, site: '#' };
     return `<article class="panel news-panel" data-feed="${esc(id)}">
       <div class="panel-heading">
-        <div><p class="eyebrow section-label">${esc(feed.region || 'NEWS')}</p><h2 class="section-title">${esc(feed.name)}</h2></div>
+        <div><h2 class="section-title">${esc(feed.name)}</h2>${feed.region ? `<p class="section-region">${esc(feed.region)}</p>` : ''}</div>
         <div class="heading-actions">
           <button class="refresh" data-refresh="news" data-feed="${esc(id)}" aria-label="Refresh ${esc(feed.name)}">${icon('refresh')}</button>
           <a href="${esc(safeUrl(feed.site))}" target="_blank" rel="noreferrer" class="source-link">OPEN ${icon('external')}</a>
@@ -129,8 +128,8 @@ async function loadOneNews(id) {
     const res = await fetch(`/api/news?id=${encodeURIComponent(id)}`);
     const data = await res.json();
     if (!res.ok) throw Error(data.error);
-    box.innerHTML = data.items.map((item, index) =>
-      `<a class="news-item" href="${esc(safeUrl(item.link))}" target="_blank" rel="noreferrer"><span class="news-index">0${index + 1}</span><span>${esc(item.title)}</span></a>`
+    box.innerHTML = data.items.map(item =>
+      `<a class="news-item" href="${esc(safeUrl(item.link))}" target="_blank" rel="noreferrer"><span>${esc(item.title)}</span></a>`
     ).join('') || '<p class="loading">No stories right now.</p>';
   } catch {
     box.innerHTML = '<p class="loading">Could not load this feed.</p>';

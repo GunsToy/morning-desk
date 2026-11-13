@@ -3,21 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#090d13" />
+  <meta name="theme-color" content="#146b4a" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <title>Morning Desk</title>
-  <!-- Fonts: connect to Google Fonts early and fetch the font CSS alongside styles.css, not after it -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" />
-  <link rel="icon" href="logo.svg" type="image/svg+xml" />
+  <link rel="preload" href="fonts/marcellus.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="fonts/figtree.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="icon" href="images/desk.png" type="image/png" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <main class="dashboard">
     <header>
-      <div class="brand"><img src="logo.svg" alt="" width="32" height="32" /><h1 class="eyebrow">HOME DESK</h1></div>
-      <div class="header-actions"><select id="profile-select" aria-label="Switch profile" hidden></select><span class="live-dot">LIVE</span><button class="icon-button settings-open" id="settings-button" aria-label="Open settings" data-icon="settings"> Settings</button></div>
+      <div class="brand"><!-- images/: copied from the Poodle House theme (see DESIGN.md, Assets) --><img src="images/desk.png" alt="" width="64" height="64" /><h1>Morning Desk</h1></div>
+      <div class="header-actions"><select id="profile-select" aria-label="Switch profile" hidden></select><span class="live-dot">LIVE</span><button class="settings-open" id="settings-button"><img src="images/settings.png" alt="" width="30" height="30" /> Settings</button></div>
     </header>
     <section class="grid">
       <article class="panel weather-panel">
@@ -147,7 +145,7 @@
   <dialog id="settings-dialog" aria-labelledby="settings-title">
     <form id="settings-form">
       <div class="dialog-heading">
-        <div><p class="eyebrow">SETTINGS</p><h2 id="settings-title">Profiles</h2></div>
+        <h2 id="settings-title">Settings</h2>
         <button type="button" id="settings-close" aria-label="Close" data-icon="close"></button>
       </div>
       <p class="dialog-intro">Each profile has its own location, solar system and news channels. Saved only in the local <code>config.json</code>. Leave a saved token or password blank to keep it.</p>

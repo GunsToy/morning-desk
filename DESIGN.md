@@ -1,259 +1,336 @@
 ---
 name: Morning Desk
-description: A quiet daily briefing of the weather and the home's power, on a dark screen.
+description: A room of Poodle House that answers, at a glance, what the weather is doing and what state the home's power is in.
 colors:
-  lime: "#c7ff47"
-  coral: "#ff846c"
-  coral-glint: "#ffc8b8"
-  cyan: "#58e2ff"
-  ink: "#e9edf3"
-  muted: "#8c98aa"
-  panel: "#151c27"
-  panel-top: "rgba(29,39,53,.94)"
-  panel-bottom: "rgba(16,22,32,.94)"
-  page: "#090d13"
-  line: "rgba(236,242,255,.11)"
-  control-fill: "#131a25"
-  field-fill: "#0a1018"
-  field-line: "#626d80"
-  secondary-fill: "#263141"
-  solar-panel: "#1a1f4a"
-  solar-halo: "rgba(80,96,180,.22)"
-  solar-control-fill: "rgba(12,17,52,.4)"
-  solar-control-line: "rgba(213,221,255,.14)"
-  node-rim: "rgba(30,38,90,.75)"
-  node-inner-line: "rgba(200,210,255,.08)"
-  solar-bg-top: "#161b45"
-  solar-bg-mid: "#222868"
-  solar-bg-end: "#1a2050"
-  solar-ink: "#edf1ff"
-  solar-label: "#c5cef0"
-  solar-muted: "#9eabdb"
-  node-fill-light: "#3d4688"
-  node-fill-dark: "#2a3270"
-  flow-solar: "#a8f06a"
-  flow-solar-glint: "#e8ffb0"
-  flow-battery: "#5ce2ff"
-  flow-battery-glint: "#b8f4ff"
-  flow-track: "rgba(140,155,220,.25)"
+  green: "#146b4a"
+  card: "#18714d"
+  card-hover: "#1c7d56"
+  row: "#125f42"
+  deep: "#0f5a3e"
+  cream: "#f4efe3"
+  muted: "#d5e4d8"
+  gold: "#c4a35a"
+  gold-text: "#f5e6bb"
+  gold-soft: "#e6cc8a"
+  line: "rgba(244,239,227,.24)"
+  cream-outline: "rgba(244,239,227,.6)"
+  ink-on-light: "#0b3d2a"
+  live: "#b44a3c"
+  error: "#f0b3a6"
+  flow-sun-glint: "#fff3cf"
+  flow-battery: "#cfe2e3"
+  flow-battery-glint: "#f1f8f8"
+  flow-grid: "#ec9a86"
+  flow-grid-glint: "#ffd9cf"
+  flow-track: "rgba(244,239,227,.18)"
+  night: "#03140d"
 typography:
   display:
-    fontFamily: "Manrope, sans-serif"
-    fontSize: "clamp(2.7rem, 5vw, 4.5rem)"
-    fontWeight: 800
-    letterSpacing: "-.08em"
+    fontFamily: "Marcellus, Georgia, serif"
+    fontSize: "clamp(3rem, 5vw, 4.5rem)"
+    fontWeight: 400
+    lineHeight: 1
     fontFeature: "tnum"
   headline:
-    fontFamily: "Manrope, sans-serif"
-    fontSize: "clamp(2rem, 4vw, 3.3rem)"
-    fontWeight: 800
-    letterSpacing: "-.07em"
+    fontFamily: "Marcellus, Georgia, serif"
+    fontSize: "36px"
+    fontWeight: 400
+    lineHeight: 1.1
   title:
-    fontFamily: "Manrope, sans-serif"
-    fontSize: "1.15rem"
-    fontWeight: 700
-    letterSpacing: "-.03em"
+    fontFamily: "Marcellus, Georgia, serif"
+    fontSize: "22px"
+    fontWeight: 400
+    lineHeight: 1.25
   body:
-    fontFamily: "Manrope, sans-serif"
-    fontSize: ".875rem"
-    fontWeight: 600
-    lineHeight: 1.35
+    fontFamily: "Figtree, system-ui, sans-serif"
+    fontSize: "16px"
+    fontWeight: 400
+    lineHeight: 1.5
+  body-sm:
+    fontFamily: "Figtree, system-ui, sans-serif"
+    fontSize: ".9375rem"
+    fontWeight: 500
+    lineHeight: 1.4
   control:
-    fontFamily: "Manrope, sans-serif"
-    fontSize: ".8125rem"
-    fontWeight: 700
+    fontFamily: "Figtree, system-ui, sans-serif"
+    fontSize: ".9375rem"
+    fontWeight: 600
+    lineHeight: 1
   label:
-    fontFamily: "DM Mono, monospace"
-    fontSize: ".75rem"
-    letterSpacing: ".13em"
+    fontFamily: "Figtree, system-ui, sans-serif"
+    fontSize: ".8125rem"
+    fontWeight: 600
+    letterSpacing: ".06em"
   micro:
-    fontFamily: "DM Mono, monospace"
-    fontSize: ".6875rem"
+    fontFamily: "Figtree, system-ui, sans-serif"
+    fontSize: ".75rem"
+    fontWeight: 700
+    letterSpacing: ".08em"
 rounded:
   track: "3px"
-  badge: "4px"
-  option: "6px"
-  control: "7px"
-  frame: "10px"
-  group: "12px"
-  panel-compact: "16px"
-  panel: "18px"
-  pill: "999px"
+  control: "12px"
+  section: "16px"
+  card-compact: "20px"
+  card: "24px"
+  pill: "99px"
   round: "50%"
+spacing:
+  xs: "4px"
+  sm: "8px"
+  md: "12px"
+  lg: "16px"
+  xl: "20px"
+  2xl: "24px"
+  tap: "44px"
 components:
   button-primary:
-    backgroundColor: "{colors.lime}"
-    textColor: "{colors.page}"
+    backgroundColor: "{colors.cream}"
+    textColor: "{colors.deep}"
+    typography: "{typography.control}"
     rounded: "{rounded.control}"
-    padding: "10px 14px"
+    padding: "0 18px"
+    height: "{spacing.tap}"
+  button-primary-hover:
+    backgroundColor: "#ffffff"
+    textColor: "{colors.deep}"
   button-secondary:
-    backgroundColor: "{colors.secondary-fill}"
-    textColor: "{colors.ink}"
+    backgroundColor: "transparent"
+    textColor: "{colors.cream}"
+    typography: "{typography.control}"
+    rounded: "{rounded.control}"
+    padding: "0 18px"
+    height: "{spacing.tap}"
+  button-secondary-hover:
+    backgroundColor: "{colors.deep}"
+    textColor: "{colors.cream}"
+  button-refresh:
+    backgroundColor: "transparent"
+    textColor: "{colors.cream}"
+    rounded: "{rounded.round}"
+    size: "36px"
+  input:
+    backgroundColor: "{colors.deep}"
+    textColor: "{colors.cream}"
+    typography: "{typography.body}"
+    rounded: "{rounded.control}"
+    padding: "0 12px"
+    height: "{spacing.tap}"
+  card:
+    backgroundColor: "{colors.card}"
+    textColor: "{colors.cream}"
+    rounded: "{rounded.card}"
+    padding: "22px 22px 24px"
+  row:
+    backgroundColor: "{colors.row}"
+    textColor: "{colors.cream}"
+    typography: "{typography.body-sm}"
     rounded: "{rounded.control}"
     padding: "10px 14px"
-  button-round:
-    backgroundColor: "{colors.control-fill}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.round}"
-    size: "38px"
-  button-primary-pill:
-    backgroundColor: "{colors.lime}"
-    textColor: "{colors.page}"
-    typography: "{typography.control}"
+  row-hover:
+    backgroundColor: "{colors.card-hover}"
+  flow-badge-sun:
+    backgroundColor: "{colors.gold-soft}"
+    textColor: "{colors.ink-on-light}"
+    typography: "{typography.micro}"
     rounded: "{rounded.pill}"
-    height: "44px"
-  button-pill:
-    backgroundColor: "{colors.control-fill}"
-    textColor: "{colors.ink}"
-    typography: "{typography.control}"
+    padding: "2px 8px"
+  flow-badge-battery:
+    backgroundColor: "{colors.flow-battery}"
+    textColor: "{colors.ink-on-light}"
+  flow-badge-grid:
+    backgroundColor: "{colors.flow-grid}"
+    textColor: "{colors.ink-on-light}"
+  channel-badge:
+    backgroundColor: "{colors.live}"
+    textColor: "{colors.cream}"
+    typography: "{typography.micro}"
     rounded: "{rounded.pill}"
-    padding: "0 14px"
-  input:
-    backgroundColor: "{colors.field-fill}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.control}"
-    padding: "10px"
-  panel:
-    backgroundColor: "{colors.panel}"
-    rounded: "{rounded.panel}"
-    padding: "25px"
+    padding: "4px 10px"
+  plaque:
+    backgroundColor: "{colors.cream}"
+    textColor: "{colors.green}"
+    rounded: "{rounded.card}"
+    padding: "20px 22px"
 ---
 
 # Design System: Morning Desk
 
 ## Overview
 
-**Creative North Star: "The Morning Brief"**
+**Creative North Star: "A Room of Poodle House"**
 
-Morning Desk is a quiet daily briefing, read in a glance before the day starts. The weather and the home's power come first; everything else on the screen is secondary and stays out of their way. The page is dark and calm so it can sit on a screen all day and dim itself at night without glaring.
+Morning Desk is not a separate gadget; it is a sibling room of the Poodle House WordPress theme (`~/poodle-house/poodle-house/tokens.css`), the world the user pinned. The household walks from the Poodle House "Morning Desk" tile into the same green house, the same cream type and the same gold hardware. Its colours and fonts are the house's tokens, copied by value into `public/styles.css`; the desk adds only what its own jobs need: three flow colours for the solar diagram, a LIVE red, an error tint and the night layer.
 
-The look is soft and friendly rather than technical: rounded panels, pill and round controls, and generous spacing, so the whole household is comfortable with it. Precision lives in the readouts, not in hard edges: large tabular numbers, small mono labels, and a solar diagram that reads like a lit night-blue instrument set into the page.
+The screen is a glance surface, often an always-on wall display. Weather and power come first, with large Marcellus readouts and a solar diagram whose moving dashes say where the power is going. News and Sky News support. Density is calm: green cards on a green page, darker green rows inside them, no glowing tiles and no neon. It must stay light on cheap hardware: the only endless motion is a transform on the flow dashes.
+
+The world rejects the generic dark dashboard of glowing neon tiles that this product used to be (the retired lime, coral and cyan system).
 
 **Key Characteristics:**
-- Flat near-black page (no background glows) with softly lifted, rounded panels.
-- One action colour (lime), used for primary actions, focus and live accents.
-- The solar diagram is its own night-blue world, with flow colours that mean something (green for solar and household load, cyan for the battery).
-- Readouts in large tabular numerals; labels in small uppercase mono.
-- Honest state: LIVE or OFFLINE in the header, and stale data is labelled as stale.
+- Poodle House green page (#146b4a), lighter green cards with 24px corners, darker green rows with 12px corners.
+- Cream text, sage muted text, gold only for lines, accents and focus.
+- Marcellus for headings and readouts, engraved like a house-name plate; Figtree for everything else.
+- Cream primary buttons, cream-outline secondary buttons, as on Poodle House.
+- Honest state everywhere: LIVE or OFFLINE with the last good time, stale labels instead of old data passed off as current.
+- The desk-poodle illustration is the brand mark.
 
 ## Colors
 
-A near-black page, slate panels, and three accents that each carry one meaning.
+One green house in four tones, cream ink, and gold hardware; the only other hues belong to the solar diagram and to warnings.
 
 ### Primary
-- **Morning Lime** (`colors.lime`): the one action and focus colour. Primary buttons, the keyboard focus ring, text selection and the caret, the power readout and active news indices.
+- **House Green** (#146b4a): the page, the settings dialog surface, the sign-in page, and `theme-color`. Text on the plaque and the sign-in submit.
+- **Brass Gold** (#c4a35a): lines and accents only (the news-row left rule, solar node rims at 45% alpha). Too dark for text on green.
+- **Soft Gold** (#e6cc8a): focus rings, field focus border, `accent-color` and caret, the LIVE dot, weather icons, hover borders, and the sun flow (`--flow-sun` is this colour).
+- **Gold Text** (#f5e6bb): gold-toned text on green: the LIVE label, source links, flow summary, region headings in Settings, success status.
 
-### Secondary
-- **Ember Coral** (`colors.coral`): "live" and attention. The header LIVE badge, the Sky News LIVE tag, destructive actions. Its light form, `colors.coral-glint`, is the lit grid node icon.
-- **Signal Cyan** (`colors.cyan`): links and the battery. Source links, link hovers, battery badges.
+### Tertiary (the solar diagram)
+- **Sun Flow** (Soft Gold, #e6cc8a; glint #fff3cf): solar panels and household load. Lights the PV and home circles when they carry power.
+- **Cream-Blue Battery** (#cfe2e3; glint #f1f8f8): the battery path, charging or discharging, and the battery-power label.
+- **Lightened House Red** (#ec9a86; glint #ffd9cf): the grid path, and a grid-down voltage. It is the house danger red lightened to read on green.
+- **Flow Track** (rgba(244,239,227,.18)): the resting 3px line under every path.
 
 ### Neutral
-- **Daybreak Ink** (`colors.ink`): primary text on dark.
-- **Overcast Grey** (`colors.muted`): secondary text, labels, and the OFFLINE badge.
-- **Panel gradient** (`colors.panel-top` → `colors.panel-bottom`): the diagonal fill of dashboard panels and the sign-in card.
-- **Slate Panel** (`colors.panel`) and **Night Page** (`colors.page`): panel and page backgrounds; Night Page is also the text colour on lime buttons.
-- **Hairline** (`colors.line`): borders and dividers, always faint.
+- **Card Green** (#18714d): cards and settings sections. A shade darker than the house's original so cream and muted text pass 4.5:1.
+- **Hover Green** (#1c7d56): news-row hover.
+- **Row Green** (#125f42): forecast tiles, news rows, solar node fills, check-row hover.
+- **Deep Green** (#0f5a3e): fields, the video well, hovered secondary buttons, text on cream buttons and selection.
+- **Cream** (#f4efe3): primary text, primary button fill, the plaque.
+- **Sage** (#d5e4d8): secondary text, idle node icons, OFFLINE state, placeholders.
+- **Hairline** (rgba(244,239,227,.24)): dividers, field and refresh borders, dialog border.
+- **Cream Outline** (rgba(244,239,227,.6)): secondary button and header-control borders, active inverter rim.
+- **Ink on Light** (#0b3d2a): text on the flow badges.
+- **Night** (#03140d): the night-mode dim layer.
 
-### Solar diagram
-- **Night-blue ground** (`colors.solar-bg-top`, `colors.solar-bg-mid`, `colors.solar-bg-end`, `colors.solar-panel`): the diagram's own gradient background.
-- **Moonlit text** (`colors.solar-ink`, `colors.solar-label`, `colors.solar-muted`): heading, node labels, and secondary lines inside the diagram.
-- **Node fill** (`colors.node-fill-light` → `colors.node-fill-dark`): the round node buttons' gradient, with a `colors.node-rim` border (also on the sign-in mark) and a `colors.node-inner-line` inner edge. `colors.solar-halo` is the soft light behind the nodes; `colors.solar-control-fill` and `colors.solar-control-line` draw the refresh button inside the diagram.
-- **Flow colours** (`colors.flow-solar` + glint, `colors.flow-battery` + glint, `colors.flow-track`): the moving dashes on each active power path, and the unlit track under them.
-- **Text and icons inside the diagram** use only the moonlit tokens above; watt badges use the flow colour of their path (`colors.flow-solar`, `colors.coral`, `colors.flow-battery`) with Night Page text. The node glows are alpha tints of the same flow colours and are not separate tokens.
+### Signals
+- **LIVE Red** (#b44a3c): the Sky News LIVE pill only; the house danger red, deep enough for cream text.
+- **Error Blush** (#f0b3a6): error messages and the danger outline button on green.
 
 ### Named Rules
-**The One Action Rule.** Lime means "act here" or "you are here" (primary button, focus, live readout). Don't use it for decoration: section labels, news regions and settings legends are Overcast Grey.
+**The Gold Hardware Rule.** Brass gold (#c4a35a) is for lines and rims, never text; text that needs to read as gold uses Gold Text (#f5e6bb). Gold never fills a card.
 
-**The Meaningful Flow Rule.** In the solar diagram, colour encodes the source: green for solar and household load, cyan for the battery, coral for the grid. Never recolour a path for looks. Status "OK" (the connected dot and a saved-settings message) uses the solar green, `colors.flow-solar`.
+**The Three Paths Rule.** The solar diagram owns exactly three flow colours: sun gold for solar and load, cream-blue for battery, lightened red for grid. A path's colour also lights its circle when that source is live; idle circles stay plain row green with a sage icon.
 
 ## Typography
 
-**Display Font:** Manrope (with sans-serif)
-**Label/Mono Font:** DM Mono (with monospace)
+**Display Font:** Marcellus (with Georgia, serif), weight 400 only
+**Body Font:** Figtree (with system-ui, sans-serif), weights 400 to 700
 
-**Character:** Manrope is round and friendly for headings, readouts and body text. DM Mono adds the instrument feel, for small labels, timestamps and diagram readouts.
+**Character:** Marcellus is engraved and formal, like the house-name plate; it carries every heading and the big readouts. Figtree is plain and friendly for text, labels and controls. Both are self-hosted from `public/fonts`.
 
 ### Hierarchy
-- **Display** (800, clamp(2.7rem, 5vw, 4.5rem), tracking −.08em, tabular figures): the big power and temperature readouts.
-- **Headline** (800, clamp(2rem, 4vw, 3.3rem), tracking −.07em): the page title.
-- **Title** (700, 1rem–1.15rem, tracking −.03em): panel titles such as the date and news source names.
-- **Body** (600, 0.875rem / 14px, line-height 1.35): news headlines, messages, dialog intro text.
-- **Control** (700, 0.8125rem / 13px): form labels, buttons, selects.
-- **Label** (DM Mono, 0.75rem / 12px, tracking .13em, uppercase): section labels, badges, source links, forecast days.
-- **Micro** (DM Mono, 0.6875rem / 11px): solar diagram labels and flow badges only.
-
-The sizes are CSS variables on `:root`: `--text-micro`, `--text-meta`, `--text-control`, `--text-body-sm`.
+- **Display** (Marcellus 400, clamp(3rem, 5vw, 4.5rem), 1, tabular figures): the current temperature.
+- **Headline** (Marcellus 400, 36px/1.1; 28px at ≤760px): the brand name. Sign-in title 40px (32px at ≤820px), Settings title 30px, plaque 26px uppercase with .08em tracking.
+- **Title** (Marcellus 400, 22px/1.25; 20px at ≤760px): card titles (news source, solar source), the weather date (26px), settings legends (20px).
+- **Body** (Figtree 400, 16px/1.5): page default and field text.
+- **Body small** (Figtree 500, .9375rem/1.4): news rows, dialog intros, loading text.
+- **Control** (Figtree 600, .9375rem/1): buttons and header controls.
+- **Label** (Figtree 600, .8125rem, .04 to .06em, uppercase): LIVE state, source links, forecast day names, Settings region headings, node labels (not uppercase).
+- **Micro** (Figtree 700, .75rem, .08em): flow badges, the inverter mode, the LIVE pill, footer timestamps.
 
 ### Named Rules
-**The 11px Floor Rule.** No text renders below 11px at any width, including the solar diagram on phones.
+**The Tabular Readout Rule.** Every figure that refreshes in place (temperature, forecast, flow summary, node values, badges, footer totals) uses `font-variant-numeric: tabular-nums`, so digits do not shift on a wall screen.
 
-**The Steady Numbers Rule.** Numbers that refresh in place use tabular figures, so they never jitter.
+**The One Weight Plate Rule.** Marcellus is used at 400 only; hierarchy comes from size, never from bolding the display face.
 
 ## Layout
 
-- **Container:** the dashboard is centred, up to 1420px wide, with side padding of clamp(20px, 4vw, 64px).
-- **Grid:** a two-column grid (1fr : 1.25fr) placed by named areas. The weather panel spans the top. The left column holds Sky News and the solar diagram; the right column holds the news stack. Below 760px it becomes one column, in the order weather, left, right.
-- **Order:** the HTML order matches the visual order, so keyboard and screen-reader order follow the screen.
-- **Adaptive pieces:** the forecast is sized by its own space (a container query at 660px). Above that it's one inline row; below it, five stacked columns. The phone header lets its actions wrap to a second row rather than overflow.
+A centred dashboard (max 1420px; padding 24px top, clamp(20px, 4vw, 56px) sides, 56px bottom). Header row: desk poodle (64px) and "Morning Desk" left; profile switcher, live state and Settings right. Then a two-column grid (1.15fr / .85fr, 20px gap): the weather card spans both columns; the left column stacks Sky News then the solar card; the right column stacks news cards.
+
+The weather card splits into a date-and-place block (with a hairline right divider) and the readout with a five-day forecast of row tiles (8px gap; a container query at 520px stacks max and min).
+
+Breakpoints:
+- **≤980px:** one column (weather, left, right), 16px gaps, padding respects safe-area insets.
+- **≤820px (sign-in):** the photo moves to the top (34vh), the plaque sits on its lower edge, the form centres below (max 432px), the mark hides.
+- **≤760px:** cards 16px padding and 20px corners; weather stacks; solar nodes shrink to 56px; **flow badges are hidden**, because the labels beside each circle carry the same figures.
+- **≤520px:** header wraps. **≤420px:** nodes 46px.
+
+Spacing rhythm is 4px-based: 4, 8, 12, 16, 20, 24.
+
+The sign-in page copies the Poodle House login: a fixed photo column (31vw) on the left with a cream uppercase Marcellus plaque, and the form on green (max 400px) offset 8vw beyond it.
 
 ## Elevation & Depth
 
-Depth is soft and ambient. Panels sit on the page with a large, faint drop shadow (`0 20px 60px rgba(0,0,0,.18)`) over a subtle diagonal gradient fill. Inside the solar diagram, active nodes glow in their flow colour to show which sources are live. That glow is state, not decoration. Night mode lays a dark layer over the whole page between sunset and sunrise.
+Depth is tonal: the page, cards, rows and fields are four greens, and cards carry no shadow. Shadows appear only on floating things.
+
+### Shadow Vocabulary
+- **Node lift** (`box-shadow: 0 6px 14px rgba(9,46,32,.35)`): the solar diagram circles, so lines read as passing behind them.
+- **Dialog** (`box-shadow: 0 24px 60px rgba(4,30,20,.45)`, backdrop rgba(6,36,25,.72)): the Settings dialog.
 
 ### Named Rules
-**The Glow-Means-Live Rule.** A coloured glow appears only on something that is currently active (a live source node, the LIVE badge). Idle elements stay flat.
+**The Night Layer Rule.** Between sunset and sunrise a fixed `#03140d` layer at .45 opacity dims the whole dashboard over a 2s fade. Clicks pass through it. It is the only full-screen overlay.
 
 ## Shapes
 
-Soft, rounded forms throughout. Panels have generous 18px corners (16px on phones). Settings groups and fields use 12px, the video frame 10px, controls 7px, option rows 6px, and small badges 4px. Header and status controls are pills or circles. Flow tracks and badges are small, rounded capsules.
+Soft, generous corners in two steps: 24px for cards, dialog and plaque (20px at ≤760px), 12px for everything inside a card (rows, forecast tiles, fields, buttons). Settings sections and the video well use 16px. Badges are full pills (99px); refresh buttons, the LIVE dot and solar nodes are circles. Flow tracks are 3px lines with 3px corners. News rows add a 3px brass-gold left rule. Borders are 1px hairlines; no card has a border.
 
 ## Components
 
 ### Buttons
-- **Shape:** dialog actions have gently rounded corners (7px); the header Settings control is a pill; refresh and close are circles.
-- **Primary:** Morning Lime fill with Night Page text, 10px 14px padding, weight 800.
-- **Secondary:** a darker slate fill (`colors.secondary-fill`) with Daybreak Ink text. Destructive actions use Ember Coral text.
-- **Round and pill controls:** a dark fill (`colors.control-fill`) with a hairline border. On hover, the border brightens (only on pointers that can hover). On press, the button scales to 94%.
-- **Focus:** a 2px Morning Lime ring, 2px outside the control, on every focusable element.
-- **Touch:** on touch screens, refresh buttons and source links get an invisible tap area of at least 44px.
+- **Shape:** gently rounded (12px), at least 44px tall.
+- **Primary:** cream fill with deep-green text (Save profile, Sign in), padding 0 18px, Figtree 600 15px. Hover: white fill.
+- **Secondary:** transparent with a cream outline (rgba(244,239,227,.6)) and cream text. Hover (pointer devices only): soft-gold border on a deep-green fill.
+- **Danger:** secondary with error-blush text and outline.
+- **Refresh:** a 36px circle (40px at ≤760px) with a hairline border and a Lucide refresh icon; under `pointer: coarse` an invisible ring extends its hit area to 48px. Press: scale .94.
+- **Settings:** cream-outline header button with the house's settings.png illustration (30px) and the word Settings.
+- **Disabled:** .5 opacity, not-allowed cursor.
+
+### Chips
+- **LIVE pill:** live red with cream micro text over the Sky News video.
+- **Flow badges:** pills in the path's colour with ink-on-light micro text, on each line; hidden at ≤760px.
+- **Live state:** an 8px soft-gold dot and gold-text label LIVE; OFFLINE turns it into a sage ring with sage text and the last good time.
 
 ### Cards / Containers
-- **Corner Style:** 18px radius.
-- **Background:** a diagonal slate gradient over Slate Panel.
-- **Shadow Strategy:** ambient only (see Elevation & Depth).
-- **Border:** 1px Hairline.
-- **Internal Padding:** 25px (16px on phones).
+- **Corner Style:** 24px (20px at ≤760px).
+- **Background:** card green on the house-green page; no border, no shadow.
+- **Internal Padding:** 22px 22px 24px (16px at ≤760px); Sky News 12px around its 16px-cornered video; the solar card pads its diagram 20px 22px.
+
+### Rows
+- **News row:** row green, 12px corners, 3px brass-gold left rule, 10px 14px padding, body-small cream text; hover card-hover green.
+- **Forecast tile:** row green, 12px, centred: sage label, soft-gold Lucide weather icon, tabular max / sage min.
 
 ### Inputs / Fields
-- **Style:** a Field Fill background (`colors.field-fill`), 1px Field Line border (`colors.field-line`, at least 3:1 against both the field and the panel so the field's edge is visible), 7px radius, 10px padding.
-- **Autofill:** browser autofill keeps the Field Fill and Daybreak Ink text; it never paints the field pale.
-- **Focus:** the lime focus ring; the caret is lime.
-
-### Sign-in card
-- **What it is:** the `/login` page. One panel card, at most 440px wide, centred near the top of the page. Its layout follows the household's other self-hosted sign-in (Mealie), drawn in this system.
-- **Parts, top to bottom:** a night-blue header bar (the solar diagram's gradient) with "MORNING DESK" as a Label; a round 88px night-blue mark holding the logo's rising sun (52px), sitting on a hairline; the title ("Sign in", or "Set up Morning Desk" on first run); fields with a leading line icon and a small Overcast Grey label above the value; a show-password eye (44px round, a toggle with a fixed label); "Remember me" (a 44px-tall check row, ticked by default); the status line; the primary pill button; a muted note.
-- **The pill primary:** the sign-in button is the one primary button shaped as a pill (`components.button-primary-pill`, up to 300px wide, 44px tall), because it is the page's only action. Dialog actions stay 7px.
-- **Focus:** the lime ring wraps the whole field, not just the text input.
+- **Style:** deep-green fill, hairline border, 12px corners, 44px tall, Figtree 16px cream.
+- **Focus:** soft-gold border plus a 1px soft-gold ring; autofill keeps the deep-green field.
+- **Labels:** cream 14px 500 above the field. Checkboxes sit in a 44px check row that tints row green on hover.
 
 ### Navigation
-- The header has the logo (`public/logo.svg`, 32px: a lime sun rising over a desk line, also the favicon) and "HOME DESK" as the page's `h1` in Label style on the left. On the right are the profile switcher (shown only with two or more profiles), the LIVE/OFFLINE badge, and the Settings pill.
+The header is the only navigation: brand left, actions right (profile select, live state, Settings), all as cream-outline 44px controls; it wraps at ≤520px. Settings opens in a 520px dialog on house green with card-green fieldsets.
 
-### The Solar Flow Diagram (signature)
-- **What it is:** a night-blue instrument showing PV, grid, inverter, home and battery as round nodes, joined by thin tracks. Light travels along each active track in the direction the power flows, with a watt badge on each path.
-- **Lines:** each side line runs from circle centre to circle centre, behind the circles, so it always joins the nodes; nodes in a row align by their circles. The watt badge sits just above its line.
-- **Motion:** a row of 8px dashes (16px period) slides along each lit line with `transform` only (0.5s linear loop, exactly one period), so the browser never redoes the layout. With reduced motion they drift three times slower (1.5s) instead of stopping: Windows with "Animation effects" off reports reduced motion to every browser, and a diagram that never moves reads as broken.
+### Solar Flow Diagram (signature)
+Five circles (PV top, grid, inverter and home in a row, battery bottom), 76px, row-green fill with a 45% brass rim, joined by 3px tracks. A live path goes to full opacity and its dashes (8px on, 8px off) slide one 16px period in .5s, by `transform` only, so the endless loop never triggers layout. Idle paths rest at .35 opacity with no dashes. Under reduced motion the dashes drift three times slower (1.5s) rather than stopping, because direction is the information. Labels sit beside the PV, inverter and battery circles, clear of the vertical lines.
+
+### Sign-in
+Photo column (poodle.jpg) with the cream uppercase Marcellus plaque "Morning Desk"; the 96px desk poodle, Marcellus "Sign in", fields, a full-width cream submit and, when enabled, an outline "Sign in with Poodle House" button below an "or" divider. A Lucide eye toggle sits inside the password field.
+
+### Icons
+Lucide line icons (ISC License) at text size, stroke 1.75, round caps and joins, `currentColor`, inserted through the `icon()` helper in `app.js` (or `data-icon` attributes). An icon is hidden from screen readers unless it alone carries meaning, then it gets a label.
+
+## Assets
+
+Raster and font files are copied unchanged from the Poodle House theme repo (`~/poodle-house/poodle-house/`, GitHub GunsToy/poodle-house). Replace them there and re-copy; do not edit them here.
+
+- `public/images/desk.png`: the desk-poodle illustration, the brand mark (header 64px, sign-in 96px) and the favicon. From `images/desk.png`, last changed in commit c00daad.
+- `public/images/poodle.jpg`: the sign-in photo column. From `images/poodle.jpg`, last changed in commit f56d904.
+- `public/images/settings.png`: the Settings button illustration. From `images/settings.png`, last changed in commit c00daad.
+- `public/fonts/marcellus.woff2`, `public/fonts/figtree.woff2`: Marcellus and Figtree, Latin subset, from the theme's `fonts/`. SIL Open Font License (`public/fonts/OFL-Marcellus.txt`, `public/fonts/OFL-Figtree.txt`). Self-hosted; `server.mjs` sets CSP `font-src 'self'`.
+- The old `public/logo.svg` is removed.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** keep weather and power the first things a glance lands on.
-- **Do** use the type-size variables (`--text-micro` … `--text-body-sm`) and the colour variables; add a variable rather than a new one-off value when a colour gets reused.
-- **Do** label stale or unavailable data in place ("Weather unavailable · last update 02:52", "OFFLINE · 02:53").
-- **Do** keep continuous effects cheap: `transform` and `opacity` only, and always a reduced-motion alternative.
-- **Do** draw icons as inline SVG line drawings with `currentColor` and round caps and joins, at a constant 1.5px line (the `icon()` helper in `app.js`; shapes from Lucide, ISC licence). Never use emoji or text glyphs as icons.
+- **Do** take colours and fonts from the Poodle House tokens; add a desk-only token only for a job the house does not have.
+- **Do** keep state honest: LIVE or OFFLINE with the last good time, "last update" labels when data is stale, never old data shown as current.
+- **Do** use tabular figures for every readout that refreshes in place.
+- **Do** keep every tap target at least 44px (`--tap`).
+- **Do** animate endless motion with `transform` only, and slow it (1.5s) under reduced motion instead of stopping it.
+- **Do** draw icons as Lucide line icons through the `icon()` helper.
+- **Do** keep the night-mode dim layer above everything and click-through.
+- **Do** hide the flow badges at ≤760px; the labels beside each circle already carry the figures.
 
 ### Don't:
-- **Don't** set text below 11px, even inside the diagram on phones.
-- **Don't** use lime decoratively; it marks action, focus and live readouts.
-- **Don't** animate layout properties (`top`, `left`, `width`, `height`) in loops.
-- **Don't** add polling or effects that cost CPU or GPU continuously; this runs on cheap, always-on hardware.
+- **Don't** bring back the dark neon dashboard (lime, coral, cyan, slate, Manrope, DM Mono).
+- **Don't** use brass gold (#c4a35a) for text on green; use Gold Text (#f5e6bb).
+- **Don't** add a fourth flow colour or recolour a path; sun, battery and grid colours are user-confirmed.
+- **Don't** put shadows or borders on cards; depth is the four greens.
+- **Don't** edit the copied images or fonts in this repo; change them in the Poodle House theme and re-copy.
+- **Don't** add continuous effects (blur, glow, layout-driven animation, frequent polling) to the always-on screen.
