@@ -11,6 +11,7 @@ chmod +x update.sh install-update-timer.sh 2>/dev/null || true
 
 if [ ! -f config.json ]; then
   cp config.example.json config.json
+  chmod 600 config.json # it will hold password hashes and solar tokens
   echo "Created config.json from the example."
   echo "Edit it and paste your Growatt API token, then re-run this script."
   echo "  nano config.json"
