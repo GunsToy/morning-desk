@@ -1,100 +1,400 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-25T05:50:55Z",
+  "generatedAt": "2026-11-13T15:51:54Z",
   "title": "Design System: Morning Desk",
   "extensions": {
     "colorMeta": {
-      "lime": {
+      "green": {
         "role": "primary",
-        "displayName": "Morning Lime"
+        "displayName": "House Green",
+        "canonical": "oklch(47.0% 0.096 162.1)",
+        "tonalRamp": [
+          "#001303",
+          "#003016",
+          "#004f30",
+          "#196e4d",
+          "#408f6c",
+          "#63b18c",
+          "#8fd6b3",
+          "#c4fee0"
+        ]
       },
-      "coral": {
-        "role": "secondary",
-        "displayName": "Ember Coral"
+      "gold": {
+        "role": "primary",
+        "displayName": "Brass Gold",
+        "canonical": "oklch(73.0% 0.100 85.6)",
+        "tonalRamp": [
+          "#180600",
+          "#361f00",
+          "#573a00",
+          "#775800",
+          "#98782d",
+          "#ba9a51",
+          "#dec081",
+          "#ffecb8"
+        ]
       },
-      "cyan": {
-        "role": "secondary",
-        "displayName": "Signal Cyan"
+      "gold-soft": {
+        "role": "primary",
+        "displayName": "Soft Gold",
+        "canonical": "oklch(85.2% 0.089 88.9)",
+        "tonalRamp": [
+          "#170700",
+          "#342000",
+          "#533c00",
+          "#725a15",
+          "#937a39",
+          "#b59c5b",
+          "#dbc281",
+          "#ffedb8"
+        ]
       },
-      "ink": {
-        "role": "neutral",
-        "displayName": "Daybreak Ink"
+      "gold-text": {
+        "role": "primary",
+        "displayName": "Gold Text",
+        "canonical": "oklch(92.6% 0.058 91.1)",
+        "tonalRamp": [
+          "#140900",
+          "#2e2200",
+          "#4b3e18",
+          "#6a5d36",
+          "#8a7c55",
+          "#ac9e75",
+          "#d2c399",
+          "#fdeec3"
+        ]
       },
-      "muted": {
-        "role": "neutral",
-        "displayName": "Overcast Grey"
-      },
-      "panel": {
-        "role": "neutral",
-        "displayName": "Slate Panel"
-      },
-      "page": {
-        "role": "neutral",
-        "displayName": "Night Page"
-      },
-      "flow-solar": {
+      "flow-sun-glint": {
         "role": "tertiary",
-        "displayName": "Solar Flow"
+        "displayName": "Sun Flow Glint",
+        "canonical": "oklch(96.4% 0.049 91.8)",
+        "tonalRamp": [
+          "#130a00",
+          "#2d2304",
+          "#493f20",
+          "#675d3e",
+          "#887d5c",
+          "#a99e7c",
+          "#cfc4a1",
+          "#faeeca"
+        ]
       },
       "flow-battery": {
         "role": "tertiary",
-        "displayName": "Battery Flow"
+        "displayName": "Cream-Blue Battery",
+        "canonical": "oklch(89.9% 0.020 200.6)",
+        "tonalRamp": [
+          "#020e0f",
+          "#182728",
+          "#334344",
+          "#516162",
+          "#708182",
+          "#91a2a3",
+          "#b6c8c9",
+          "#e0f3f4"
+        ]
+      },
+      "flow-battery-glint": {
+        "role": "tertiary",
+        "displayName": "Battery Glint",
+        "canonical": "oklch(97.4% 0.007 197.0)",
+        "tonalRamp": [
+          "#080c0c",
+          "#202525",
+          "#3b4141",
+          "#595f5f",
+          "#787f7f",
+          "#99a0a0",
+          "#bfc6c6",
+          "#e9f0f0"
+        ]
+      },
+      "flow-grid": {
+        "role": "tertiary",
+        "displayName": "Lightened House Red",
+        "canonical": "oklch(76.4% 0.103 34.4)",
+        "tonalRamp": [
+          "#210000",
+          "#440e03",
+          "#6a2819",
+          "#8e4534",
+          "#b26553",
+          "#d68773",
+          "#f7b09e",
+          "#ffdecf"
+        ]
+      },
+      "flow-grid-glint": {
+        "role": "tertiary",
+        "displayName": "Grid Glint",
+        "canonical": "oklch(91.5% 0.045 35.1)",
+        "tonalRamp": [
+          "#1a0401",
+          "#371c15",
+          "#553730",
+          "#75554c",
+          "#96746b",
+          "#b8958c",
+          "#dfbbb1",
+          "#ffe5db"
+        ]
+      },
+      "flow-track": {
+        "role": "tertiary",
+        "displayName": "Flow Track"
+      },
+      "card": {
+        "role": "neutral",
+        "displayName": "Card Green",
+        "canonical": "oklch(48.9% 0.100 160.9)",
+        "tonalRamp": [
+          "#001302",
+          "#003015",
+          "#004f2e",
+          "#146f4b",
+          "#3d8f6a",
+          "#61b28a",
+          "#90d6b2",
+          "#c5fedf"
+        ]
+      },
+      "card-hover": {
+        "role": "neutral",
+        "displayName": "Hover Green",
+        "canonical": "oklch(52.5% 0.107 161.1)",
+        "tonalRamp": [
+          "#001302",
+          "#003016",
+          "#004f2e",
+          "#007049",
+          "#369168",
+          "#5fb28a",
+          "#90d6b2",
+          "#c4fedf"
+        ]
+      },
+      "row": {
+        "role": "neutral",
+        "displayName": "Row Green",
+        "canonical": "oklch(43.3% 0.087 162.5)",
+        "tonalRamp": [
+          "#001303",
+          "#003017",
+          "#004d32",
+          "#246d4f",
+          "#488d6e",
+          "#6ab08e",
+          "#8fd6b4",
+          "#c3fee0"
+        ]
+      },
+      "deep": {
+        "role": "neutral",
+        "displayName": "Deep Green",
+        "canonical": "oklch(41.6% 0.084 162.4)",
+        "tonalRamp": [
+          "#001303",
+          "#003017",
+          "#004d32",
+          "#276c4f",
+          "#4a8d6e",
+          "#6caf8f",
+          "#91d6b4",
+          "#c3fee0"
+        ]
+      },
+      "cream": {
+        "role": "neutral",
+        "displayName": "Cream",
+        "canonical": "oklch(95.3% 0.017 88.0)",
+        "tonalRamp": [
+          "#0e0b04",
+          "#27241b",
+          "#433f36",
+          "#615d53",
+          "#817d72",
+          "#a39e93",
+          "#c9c4b8",
+          "#f3eee2"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Sage",
+        "canonical": "oklch(90.4% 0.023 151.6)",
+        "tonalRamp": [
+          "#050e07",
+          "#1c271f",
+          "#37433a",
+          "#556157",
+          "#748177",
+          "#95a397",
+          "#bac9bd",
+          "#e4f3e7"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Hairline"
+      },
+      "cream-outline": {
+        "role": "neutral",
+        "displayName": "Cream Outline"
+      },
+      "ink-on-light": {
+        "role": "neutral",
+        "displayName": "Ink on Light",
+        "canonical": "oklch(32.2% 0.062 163.0)",
+        "tonalRamp": [
+          "#001204",
+          "#002d1b",
+          "#1b4a36",
+          "#3a6953",
+          "#5a8973",
+          "#7bab93",
+          "#a0d1b9",
+          "#cafce3"
+        ]
+      },
+      "night": {
+        "role": "neutral",
+        "displayName": "Night",
+        "canonical": "oklch(17.3% 0.029 166.0)",
+        "tonalRamp": [
+          "#010f08",
+          "#162921",
+          "#31453c",
+          "#4e635a",
+          "#6d8379",
+          "#8ea59a",
+          "#b3cac0",
+          "#ddf5ea"
+        ]
+      },
+      "live": {
+        "role": "secondary",
+        "displayName": "LIVE Red",
+        "canonical": "oklch(54.7% 0.141 29.9)",
+        "tonalRamp": [
+          "#220000",
+          "#450d08",
+          "#6a271e",
+          "#924136",
+          "#b86053",
+          "#d68679",
+          "#f8afa3",
+          "#ffddd2"
+        ]
+      },
+      "error": {
+        "role": "secondary",
+        "displayName": "Error Blush",
+        "canonical": "oklch(82.0% 0.074 32.3)",
+        "tonalRamp": [
+          "#220000",
+          "#41130a",
+          "#612f26",
+          "#824d43",
+          "#a56d61",
+          "#c88e81",
+          "#f0b3a6",
+          "#ffded0"
+        ]
       }
     },
     "typographyMeta": {
       "display": {
-        "displayName": "Readout",
-        "purpose": "Big power and temperature numbers; tabular figures."
+        "displayName": "Display",
+        "purpose": "The current temperature."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Brand name; sign-in and Settings titles; plaque."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Card titles, weather date, settings legends."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Page default and field text."
+      },
+      "body-sm": {
+        "displayName": "Body small",
+        "purpose": "News rows, dialog intros, loading text."
+      },
+      "control": {
+        "displayName": "Control",
+        "purpose": "Buttons and header controls."
       },
       "label": {
-        "displayName": "Mono Label",
-        "purpose": "Uppercase section labels, badges, source links."
+        "displayName": "Label",
+        "purpose": "LIVE state, source links, forecast day names, region headings, node labels."
       },
       "micro": {
-        "displayName": "Diagram Micro",
-        "purpose": "Solar diagram labels and flow badges only; the 11px floor."
+        "displayName": "Micro",
+        "purpose": "Flow badges, inverter mode, LIVE pill, footer timestamps."
       }
     },
     "shadows": [
       {
-        "name": "panel-ambient",
-        "value": "0 20px 60px rgba(0,0,0,.18)",
-        "purpose": "Soft lift of every panel off the page."
+        "name": "node-lift",
+        "value": "0 6px 14px rgba(9,46,32,.35)",
+        "purpose": "Solar diagram circles, so lines read as passing behind them."
+      },
+      {
+        "name": "dialog",
+        "value": "0 24px 60px rgba(4,30,20,.45)",
+        "purpose": "Settings dialog; backdrop rgba(6,36,25,.72)."
+      },
+      {
+        "name": "night-layer",
+        "value": "#03140d at opacity .45, 2s ease",
+        "purpose": "Night-mode dim layer over the whole dashboard, click-through."
       }
     ],
     "motion": [
       {
-        "name": "flow-loop",
-        "value": "1.1s linear infinite (transform)",
-        "purpose": "Power travelling along an active solar path; stops under reduced motion."
+        "name": "flow-dash",
+        "value": "translate 16px, .5s linear infinite",
+        "purpose": "Live solar path dashes; transform only."
       },
       {
-        "name": "state-fade",
-        "value": "opacity .3s ease",
-        "purpose": "Flow paths lighting up or going idle."
+        "name": "flow-dash-reduced",
+        "value": "1.5s",
+        "purpose": "Reduced motion: dashes drift three times slower instead of stopping."
       },
       {
-        "name": "press",
-        "value": "transform .1s ease, scale(.94)",
-        "purpose": "Round button press feedback."
+        "name": "state",
+        "value": ".15s to .35s",
+        "purpose": "Hover backgrounds and node rim changes."
+      },
+      {
+        "name": "night-fade",
+        "value": "opacity 2s ease",
+        "purpose": "Night layer in and out."
       }
     ],
     "breakpoints": [
       {
-        "name": "phone",
-        "value": "520px"
-      },
-      {
-        "name": "single-column",
-        "value": "760px"
-      },
-      {
-        "name": "compact",
+        "name": "stack",
         "value": "980px"
       },
       {
-        "name": "forecast-stack (container)",
-        "value": "660px"
+        "name": "login-stack",
+        "value": "820px"
+      },
+      {
+        "name": "phone",
+        "value": "760px"
+      },
+      {
+        "name": "header-wrap",
+        "value": "520px"
+      },
+      {
+        "name": "small-phone",
+        "value": "420px"
       }
     ]
   },
@@ -103,94 +403,122 @@
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "Lime dialog action.",
+      "description": "Cream action button (Save profile, Sign in).",
       "html": "<button class=\"ds-btn-primary\">Save profile</button>",
-      "css": ".ds-btn-primary{background:#c7ff47;color:#090d13;border:0;border-radius:7px;padding:10px 14px;font:800 .8125rem Manrope,sans-serif;cursor:pointer}.ds-btn-primary:hover{filter:brightness(1.12)}.ds-btn-primary:focus-visible{outline:2px solid #c7ff47;outline-offset:2px}"
+      "css": ".ds-btn-primary { min-height:44px; padding:0 18px; border:1px solid #f4efe3; border-radius:12px; background:#f4efe3; color:#0f5a3e; font:600 15px/1 Figtree, system-ui, sans-serif; cursor:pointer; } .ds-btn-primary:hover { background:#fff; border-color:#fff; } .ds-btn-primary:focus-visible { outline:2px solid #e6cc8a; outline-offset:3px; }"
     },
     {
       "name": "Secondary Button",
       "kind": "button",
       "refersTo": "button-secondary",
-      "description": "Cancel and secondary dialog actions.",
+      "description": "Cream-outline button for everything that is not the main action.",
       "html": "<button class=\"ds-btn-secondary\">Cancel</button>",
-      "css": ".ds-btn-secondary{background:#263141;color:#e9edf3;border:0;border-radius:7px;padding:10px 14px;font:800 .8125rem Manrope,sans-serif;cursor:pointer}.ds-btn-secondary:focus-visible{outline:2px solid #c7ff47;outline-offset:2px}"
+      "css": ".ds-btn-secondary { min-height:44px; padding:0 18px; border:1px solid rgba(244,239,227,.6); border-radius:12px; background:transparent; color:#f4efe3; font:600 15px/1 Figtree, system-ui, sans-serif; cursor:pointer; } .ds-btn-secondary:hover { border-color:#e6cc8a; background:#0f5a3e; } .ds-btn-secondary:focus-visible { outline:2px solid #e6cc8a; outline-offset:3px; }"
     },
     {
-      "name": "Round Refresh Button",
+      "name": "Refresh Button",
       "kind": "button",
-      "refersTo": "button-round",
-      "description": "Circular icon button with a line icon.",
-      "html": "<button class=\"ds-btn-round\" aria-label=\"Refresh\"><svg viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8\"/><path d=\"M21 3v5h-5\"/></svg></button>",
-      "css": ".ds-btn-round{display:inline-grid;place-items:center;width:38px;height:38px;border-radius:50%;border:1px solid rgba(236,242,255,.11);background:#131a25;color:#e9edf3;cursor:pointer;transition:border-color .15s ease,transform .1s ease}.ds-btn-round:hover{border-color:rgba(236,242,255,.32)}.ds-btn-round:active{transform:scale(.94)}.ds-btn-round:focus-visible{outline:2px solid #c7ff47;outline-offset:2px}"
+      "refersTo": "button-refresh",
+      "description": "Quiet round refresh with a Lucide icon.",
+      "html": "<button class=\"ds-refresh\" aria-label=\"Refresh\"><svg viewBox=\"0 0 24 24\" width=\"17\" height=\"17\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8\"/><path d=\"M21 3v5h-5\"/></svg></button>",
+      "css": ".ds-refresh { width:36px; height:36px; display:inline-grid; place-items:center; border:1px solid rgba(244,239,227,.24); border-radius:50%; background:transparent; color:#f4efe3; cursor:pointer; transition:background .15s, border-color .15s, transform .1s; } .ds-refresh:hover { background:#0f5a3e; border-color:#e6cc8a; } .ds-refresh:active { transform:scale(.94); } .ds-refresh:focus-visible { outline:2px solid #e6cc8a; outline-offset:3px; }"
     },
     {
       "name": "Text Field",
       "kind": "input",
       "refersTo": "input",
-      "description": "Settings form field.",
-      "html": "<input class=\"ds-input\" placeholder=\"Erasmuskloof\">",
-      "css": ".ds-input{background:#0a1018;color:#e9edf3;border:1px solid #626d80;border-radius:7px;padding:10px;font:600 .875rem Manrope,sans-serif;caret-color:#c7ff47}.ds-input:focus-visible{outline:2px solid #c7ff47;outline-offset:2px}"
+      "description": "Deep-green field with a soft-gold focus ring.",
+      "html": "<label class=\"ds-label\">Name <input class=\"ds-input\" placeholder=\"Erasmuskloof\"></label>",
+      "css": ".ds-label { display:grid; gap:6px; color:#f4efe3; font:500 14px Figtree, system-ui, sans-serif; } .ds-input { min-height:44px; padding:0 12px; border:1px solid rgba(244,239,227,.24); border-radius:12px; background:#0f5a3e; color:#f4efe3; font:400 16px/1.2 Figtree, system-ui, sans-serif; } .ds-input::placeholder { color:#d5e4d8; opacity:.85; } .ds-input:focus-visible { outline:none; border-color:#e6cc8a; box-shadow:0 0 0 1px #e6cc8a; }"
     },
     {
-      "name": "Panel",
+      "name": "Card with News Rows",
       "kind": "card",
-      "refersTo": "panel",
-      "description": "Every dashboard section.",
-      "html": "<article class=\"ds-panel\"><p class=\"ds-label\">WORLD</p><h2>BBC News</h2></article>",
-      "css": ".ds-panel{background:linear-gradient(135deg,rgba(29,39,53,.94),rgba(16,22,32,.94));border:1px solid rgba(236,242,255,.11);border-radius:18px;padding:25px;box-shadow:0 20px 60px rgba(0,0,0,.18);color:#e9edf3;font-family:Manrope,sans-serif}.ds-label{font:.75rem 'DM Mono',monospace;letter-spacing:.13em;color:#c7ff47;margin:0 0 6px}"
+      "refersTo": "card",
+      "description": "Card-green card, Marcellus title, row-green stories with a brass left rule.",
+      "html": "<article class=\"ds-card\"><h2 class=\"ds-card-title\">News24</h2><div class=\"ds-rows\"><a class=\"ds-row\" href=\"#\">Load-shedding suspended for the weekend</a><a class=\"ds-row\" href=\"#\">Cape storms ease by Sunday</a></div></article>",
+      "css": ".ds-card { background:#18714d; border-radius:24px; padding:22px 22px 24px; color:#f4efe3; font-family:Figtree, system-ui, sans-serif; } .ds-card-title { margin:0 0 14px; font:400 22px/1.25 Marcellus, Georgia, serif; } .ds-rows { display:grid; gap:6px; } .ds-row { display:block; padding:10px 14px; border-left:3px solid #c4a35a; border-radius:12px; background:#125f42; color:#f4efe3; font-size:.9375rem; font-weight:500; line-height:1.4; text-decoration:none; transition:background .15s; } .ds-row:hover { background:#1c7d56; } .ds-row:focus-visible { outline:2px solid #e6cc8a; outline-offset:3px; }"
     },
     {
-      "name": "Live Badge",
+      "name": "Live State",
       "kind": "chip",
-      "description": "Header connection state: LIVE (coral) or OFFLINE with the last good time (grey).",
-      "html": "<span class=\"ds-live\">LIVE</span>",
-      "css": ".ds-live{font:.75rem 'DM Mono',monospace;letter-spacing:.13em;color:#ff846c;white-space:nowrap}.ds-live:before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:#ff846c;margin-right:7px}"
+      "refersTo": "channel-badge",
+      "description": "Header LIVE/OFFLINE state and the Sky News LIVE pill.",
+      "html": "<span class=\"ds-live\">LIVE</span> <span class=\"ds-live ds-offline\">OFFLINE · 06:45</span> <span class=\"ds-pill\">LIVE</span>",
+      "css": ".ds-live { display:inline-flex; align-items:center; gap:8px; font:600 .8125rem Figtree, system-ui, sans-serif; letter-spacing:.06em; color:#f5e6bb; } .ds-live::before { content:''; width:8px; height:8px; border-radius:50%; background:#e6cc8a; } .ds-offline { color:#d5e4d8; } .ds-offline::before { background:transparent; border:1.5px solid #d5e4d8; } .ds-pill { display:inline-block; padding:4px 10px; border-radius:99px; background:#b44a3c; color:#f4efe3; font:700 .75rem Figtree, system-ui, sans-serif; letter-spacing:.08em; }"
     },
     {
-      "name": "Sign-in Card",
-      "kind": "card",
-      "refersTo": ".login-card",
-      "description": "The /login page: night-blue header bar, round sun mark on a hairline, icon fields with small labels, Remember me, lime pill Sign in button.",
-      "html": "<div class=\"ds-login\"><div class=\"ds-login-bar\">MORNING DESK</div><div class=\"ds-login-mark\"><svg viewBox=\"0 0 24 24\" width=\"40\" height=\"40\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"><circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2M12 20v2m-7.07-17.07 1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41\"/></svg></div><h1>Sign in</h1><label class=\"ds-login-field\"><span>Username</span><input></label><label class=\"ds-login-field\"><span>Password</span><input type=\"password\"></label><button class=\"ds-login-btn\">Sign in</button></div>",
-      "css": ".ds-login{max-width:440px;background:linear-gradient(135deg,rgba(29,39,53,.94),rgba(16,22,32,.94));border:1px solid rgba(236,242,255,.11);border-radius:18px;overflow:hidden;text-align:center;padding-bottom:24px;font-family:Manrope,sans-serif;color:#e9edf3}.ds-login-bar{padding:22px 16px;background:linear-gradient(160deg,#161b45,#222868);color:#edf1ff;font:.75rem 'DM Mono',monospace;letter-spacing:.13em}.ds-login-mark{width:88px;height:88px;margin:16px auto 0;border-radius:50%;border:3px solid rgba(30,38,90,.75);background:linear-gradient(145deg,#3d4688,#2a3270);color:#edf1ff;display:grid;place-items:center}.ds-login h1{margin:12px 0 18px;font-size:1.15rem;font-weight:700;letter-spacing:-.03em}.ds-login-field{display:grid;gap:2px;margin:0 24px 14px;padding:8px 12px;text-align:left;background:#0a1018;border:1px solid #626d80;border-radius:7px}.ds-login-field span{font-size:.75rem;color:#8c98aa}.ds-login-field input{border:0;background:transparent;color:#e9edf3;font:inherit;font-size:1rem;padding:2px 0}.ds-login-btn{width:min(100% - 48px,300px);min-height:44px;margin-top:12px;border:0;border-radius:999px;background:#c7ff47;color:#090d13;font:800 .8125rem Manrope,sans-serif}"
+      "name": "Flow Path",
+      "kind": "custom",
+      "refersTo": "flow-badge-sun",
+      "description": "A live solar path: badge on a 3px track, dashes sliding by transform only.",
+      "html": "<div class=\"ds-flow\"><span class=\"ds-badge\">2.4 kW</span><span class=\"ds-track\"><span class=\"ds-dash\"></span></span><span class=\"ds-badge ds-bat\">1.1 kW</span><span class=\"ds-track\"><span class=\"ds-dash ds-dash-bat\"></span></span><span class=\"ds-badge ds-grid\">0.3 kW</span><span class=\"ds-track\"><span class=\"ds-dash ds-dash-grid\"></span></span></div>",
+      "css": ".ds-flow { display:grid; gap:8px; justify-items:start; padding:16px; background:#18714d; border-radius:24px; } .ds-badge { padding:2px 8px; border-radius:99px; background:#e6cc8a; color:#0b3d2a; font:700 .75rem/1.3 Figtree, system-ui, sans-serif; font-variant-numeric:tabular-nums; } .ds-bat { background:#cfe2e3; } .ds-grid { background:#ec9a86; } .ds-track { position:relative; display:block; width:200px; height:3px; overflow:hidden; border-radius:3px; background:rgba(244,239,227,.18); } .ds-dash { position:absolute; top:0; bottom:0; left:-16px; right:0; background:repeating-linear-gradient(90deg,#e6cc8a 0 8px,transparent 8px 16px); animation:ds-flow .5s linear infinite; } .ds-dash-bat { background:repeating-linear-gradient(90deg,#cfe2e3 0 8px,transparent 8px 16px); } .ds-dash-grid { background:repeating-linear-gradient(90deg,#ec9a86 0 8px,transparent 8px 16px); } @keyframes ds-flow { to { transform:translateX(16px); } } @media (prefers-reduced-motion:reduce) { .ds-dash { animation-duration:1.5s; } }"
+    },
+    {
+      "name": "Sign-in Plaque",
+      "kind": "custom",
+      "refersTo": "plaque",
+      "description": "Cream uppercase Marcellus plaque over the sign-in photo, copied from the Poodle House login.",
+      "html": "<div class=\"ds-photo\"><p class=\"ds-plaque\">Morning Desk</p></div>",
+      "css": ".ds-photo { position:relative; width:280px; height:320px; background:#125f42; border-radius:4px; } .ds-plaque { position:absolute; left:24px; right:24px; bottom:24px; margin:0; padding:20px 22px; border-radius:24px; background:#f4efe3; color:#146b4a; font:400 26px/1.1 Marcellus, Georgia, serif; letter-spacing:.08em; text-transform:uppercase; }"
     }
   ],
   "narrative": {
-    "northStar": "The Morning Brief",
-    "overview": "Morning Desk is a quiet daily briefing, read in a glance before the day starts. The weather and the home's power come first; everything else on the screen is secondary and stays out of their way. The page is dark and calm so it can sit on a screen all day and dim itself at night without glaring. The look is soft and friendly rather than technical: rounded panels, pill and round controls, and generous spacing, so the whole household is comfortable with it. Precision lives in the readouts, not in hard edges: large tabular numbers, small mono labels, and a solar diagram that reads like a lit night-blue instrument set into the page.",
+    "northStar": "A Room of Poodle House",
+    "overview": "Morning Desk is not a separate gadget; it is a sibling room of the Poodle House WordPress theme (`~/poodle-house/poodle-house/tokens.css`), the world the user pinned. The household walks from the Poodle House \"Morning Desk\" tile into the same green house, the same cream type and the same gold hardware. Its colours and fonts are the house's tokens, copied by value into `public/styles.css`; the desk adds only what its own jobs need: three flow colours for the solar diagram, a LIVE red, an error tint and the night layer.\n\nThe screen is a glance surface, often an always-on wall display. Weather and power come first, with large Marcellus readouts and a solar diagram whose moving dashes say where the power is going. News and Sky News support. Density is calm: green cards on a green page, darker green rows inside them, no glowing tiles and no neon. It must stay light on cheap hardware: the only endless motion is a transform on the flow dashes.\n\nThe world rejects the generic dark dashboard of glowing neon tiles that this product used to be (the retired lime, coral and cyan system).",
     "keyCharacteristics": [
-      "Dark charcoal page with softly lifted, rounded panels.",
-      "One action colour (lime), used for primary actions, focus and live accents.",
-      "The solar diagram is its own night-blue world, with flow colours that mean something (green for solar and household load, cyan for the battery).",
-      "Readouts in large tabular numerals; labels in small uppercase mono.",
-      "Honest state: LIVE or OFFLINE in the header, and stale data is labelled as stale."
+      "Poodle House green page (#146b4a), lighter green cards with 24px corners, darker green rows with 12px corners.",
+      "Cream text, sage muted text, gold only for lines, accents and focus.",
+      "Marcellus for headings and readouts, engraved like a house-name plate; Figtree for everything else.",
+      "Cream primary buttons, cream-outline secondary buttons, as on Poodle House.",
+      "Honest state everywhere: LIVE or OFFLINE with the last good time, stale labels instead of old data passed off as current.",
+      "The desk-poodle illustration is the brand mark."
     ],
     "rules": [
       {
-        "name": "The One Action Rule",
-        "body": "Lime means \"act here\" or \"you are here\" (primary button, focus, live readout). Don't use it for decoration.",
+        "name": "The Gold Hardware Rule",
+        "body": "Brass gold (#c4a35a) is for lines and rims, never text; text that needs to read as gold uses Gold Text (#f5e6bb). Gold never fills a card.",
         "section": "colors"
       },
       {
-        "name": "The Meaningful Flow Rule",
-        "body": "In the solar diagram, colour encodes the source: green for solar and household load, cyan for the battery, coral for the grid. Never recolour a path for looks.",
+        "name": "The Three Paths Rule",
+        "body": "The solar diagram owns exactly three flow colours: sun gold for solar and load, cream-blue for battery, lightened red for grid. A path's colour also lights its circle when that source is live; idle circles stay plain row green with a sage icon.",
         "section": "colors"
       },
       {
-        "name": "The 11px Floor Rule",
-        "body": "No text renders below 11px at any width, including the solar diagram on phones.",
+        "name": "The Tabular Readout Rule",
+        "body": "Every figure that refreshes in place (temperature, forecast, flow summary, node values, badges, footer totals) uses `font-variant-numeric: tabular-nums`, so digits do not shift on a wall screen.",
         "section": "typography"
       },
       {
-        "name": "The Steady Numbers Rule",
-        "body": "Numbers that refresh in place use tabular figures, so they never jitter.",
+        "name": "The One Weight Plate Rule",
+        "body": "Marcellus is used at 400 only; hierarchy comes from size, never from bolding the display face.",
         "section": "typography"
       },
       {
-        "name": "The Glow-Means-Live Rule",
-        "body": "A coloured glow appears only on something that is currently active (a live source node, the LIVE badge). Idle elements stay flat.",
+        "name": "The Night Layer Rule",
+        "body": "Between sunset and sunrise a fixed `#03140d` layer at .45 opacity dims the whole dashboard over a 2s fade. Clicks pass through it. It is the only full-screen overlay.",
         "section": "elevation"
       }
+    ],
+    "dos": [
+      "Do take colours and fonts from the Poodle House tokens; add a desk-only token only for a job the house does not have.",
+      "Do keep state honest: LIVE or OFFLINE with the last good time, \"last update\" labels when data is stale, never old data shown as current.",
+      "Do use tabular figures for every readout that refreshes in place.",
+      "Do keep every tap target at least 44px (`--tap`).",
+      "Do animate endless motion with `transform` only, and slow it (1.5s) under reduced motion instead of stopping it.",
+      "Do draw icons as Lucide line icons through the `icon()` helper.",
+      "Do keep the night-mode dim layer above everything and click-through.",
+      "Do hide the flow badges at ≤760px; the labels beside each circle already carry the figures."
+    ],
+    "donts": [
+      "Don't bring back the dark neon dashboard (lime, coral, cyan, slate, Manrope, DM Mono).",
+      "Don't use brass gold (#c4a35a) for text on green; use Gold Text (#f5e6bb).",
+      "Don't add a fourth flow colour or recolour a path; sun, battery and grid colours are user-confirmed.",
+      "Don't put shadows or borders on cards; depth is the four greens.",
+      "Don't edit the copied images or fonts in this repo; change them in the Poodle House theme and re-copy.",
+      "Don't add continuous effects (blur, glow, layout-driven animation, frequent polling) to the always-on screen."
     ]
   }
 }
